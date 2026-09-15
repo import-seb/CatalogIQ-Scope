@@ -1,0 +1,1 @@
+1. Current set up doesn't ingest a table to look up sos. Will try `V_FLIS_MANAGEMENT` and `P_HELP`
