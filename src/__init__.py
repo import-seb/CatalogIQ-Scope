@@ -1,0 +1,1 @@
+from .paths.paths import ROOT_PATH, TRAIN_PATH, TARGET_PATH
