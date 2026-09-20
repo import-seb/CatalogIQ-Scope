@@ -1,4 +1,5 @@
 data/provided
+data/derived/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
