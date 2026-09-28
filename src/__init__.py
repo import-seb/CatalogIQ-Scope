@@ -1,1 +1,5 @@
-from .paths.paths import ROOT_PATH, TRAIN_PATH, TARGET_PATH
+from .paths.paths import (
+    ROOT_PATH, TRAIN_PATH, TARGET_PATH,
+    PROVIDED_DATA_PATH, DATA_PATH, DOCS_PATH,
+    NOTEBOOKS_PATH
+)

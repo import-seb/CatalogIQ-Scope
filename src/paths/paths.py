@@ -8,5 +8,12 @@ pd.set_option("display.max_colwidth", 80)
 ROOT_PATH = Path.cwd().parents[0]
 # print(ROOT)
 
-TRAIN_PATH = Path(ROOT_PATH/"data/provided/Selfcare_Training_data (1).csv")
-TARGET_PATH = Path(ROOT_PATH/"data/provided/Selfcare_Target_data (1).csv")
+DATA_PATH = ROOT_PATH/"data"
+PROVIDED_DATA_PATH = DATA_PATH/"provided"
+TRAIN_PATH = PROVIDED_DATA_PATH/"Selfcare_Training_data (1).csv"
+TARGET_PATH = PROVIDED_DATA_PATH/"Selfcare_Target_data (1).csv"
+
+DOCS_PATH = ROOT_PATH/"docs"
+
+NOTEBOOKS_PATH = ROOT_PATH/"notebooks"
+
