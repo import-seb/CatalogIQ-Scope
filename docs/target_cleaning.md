@@ -3,7 +3,7 @@
 Run from an installed project environment:
 
 ```bash
-python -m catalogiq.cleaning --output-dir data/processed/my_run
+python -m catalogiq --output-dir data/processed/my_run
 ```
 
 The default output directory is `data/processed/target_cleaning`. Existing run

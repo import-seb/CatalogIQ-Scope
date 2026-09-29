@@ -3,7 +3,7 @@
 ## Where work belongs
 
 - Put reusable, tested behavior in `src/catalogiq/`. New code imports `catalogiq`,
-  not `src`. The small `src` wrappers support older checkout commands only.
+  not `src`. Command-line argument handling belongs in `catalogiq/cli.py`.
 - Put exploration in numbered notebooks. Keep existing numbers stable so findings
   and decisions can continue to cite them. Add new notebooks to the index.
 - Put conclusions in `docs/findings/`, with the notebook, input scope, denominators,
@@ -31,10 +31,9 @@ training fold. Label-dependent preprocessing can otherwise leak evaluation data.
 ```bash
 python -m pip install -e ".[notebooks]"
 python -m unittest discover -s tests -v
-python scripts/check_repository.py
 ```
 
-CI runs synthetic tests, repository checks, and a package build without private
+CI runs synthetic tests and a package build without private
 CSVs. It does not execute the research notebooks or validate model quality.
 
 ## Notebook evidence
@@ -45,8 +44,8 @@ thresholds, and denominator. Preserve useful outputs only after reviewing them f
 private data. Clearing outputs is not a substitute for checking reproducibility.
 
 Old notebooks may contain private product examples and superseded assumptions.
-Repository checks validate structure and links, not data-sharing permission or
-scientific correctness. Consult the notebook index before reusing findings.
+Consult the notebook index before reusing findings, and review data-sharing
+permission and scientific validity before publishing results.
 
 ## Dependencies and reproducibility
 

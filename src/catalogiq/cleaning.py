@@ -1,12 +1,11 @@
 """Auditable implementation of notebooks/02_clean_target_cols.ipynb.
 
-Run from the repository root: python -m catalogiq.cleaning
+Run from the repository root: python -m catalogiq
 Reason 2 is review-only; structural and manufacturer checks still quarantine rows.
 """
 
 from __future__ import annotations
 
-import argparse
 from dataclasses import dataclass
 import hashlib
 import json
@@ -14,7 +13,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 TARGET_COLUMNS = ["Mnfr", "Brand", "Platform", "Segment", "Sub-Segment", "TargetAgeGroup"]
 PROVENANCE = ["dataset", "source_sha256", "source_row"]
@@ -249,22 +247,3 @@ def run(train_path: Path, target_path: Path, output_dir: Path) -> dict:
         write_csv(output, output_dir / filename)
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     return summary
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--train", type=Path, default=TRAIN_PATH, help="Training CSV")
-    parser.add_argument("--target", type=Path, default=TARGET_PATH, help="Target CSV (passed through)")
-    parser.add_argument("--output-dir", type=Path, default=DATA_PATH / "processed" / "target_cleaning",
-                        help="New directory for outputs; existing directories are never overwritten")
-    args = parser.parse_args()
-    try:
-        summary = run(args.train, args.target, args.output_dir)
-    except (ValueError, OSError) as error:
-        parser.exit(1, f"Error: {error}\n")
-    print(json.dumps({"output_dir": str(args.output_dir.resolve()), "rows": summary["rows"],
-                      "changes_by_rule": summary["changes_by_rule"]}, indent=2))
-
-
-if __name__ == "__main__":
-    main()

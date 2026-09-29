@@ -5,7 +5,6 @@
 - [Cleaning guide](target_cleaning.md): command, artifacts, and caveats.
 - [Decision log](decisions.md): accepted and withdrawn cleaning rules.
 - [Data contract](data_contract.md): current ingestion assumptions and unknowns.
-- [Repository assessment](project_assessment.md): technical review and next priorities.
 - [Contribution workflow](../CONTRIBUTING.md): analysis-to-code process.
 
 ## Evidence

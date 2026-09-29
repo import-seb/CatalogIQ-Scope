@@ -20,7 +20,7 @@ notebooks = [
 ]
 
 [project.scripts]
-catalogiq-clean = "catalogiq.cleaning:main"
+catalogiq-clean = "catalogiq.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
