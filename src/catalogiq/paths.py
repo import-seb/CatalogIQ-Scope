@@ -19,6 +19,7 @@ def find_project_root() -> Path:
 ROOT_PATH = find_project_root()
 DATA_PATH = ROOT_PATH / "data"
 PROVIDED_DATA_PATH = DATA_PATH / "provided"
+PROCESSED_DATA_PATH = DATA_PATH / "processed"
 TRAIN_PATH = PROVIDED_DATA_PATH / "Selfcare_Training_data (1).csv"
 TARGET_PATH = PROVIDED_DATA_PATH / "Selfcare_Target_data (1).csv"
 DOCS_PATH = ROOT_PATH / "docs"
