@@ -1,5 +1,8 @@
-data/provided
-data/derived/
+# Local source and generated datasets
+/data/provided/
+/data/derived/
+/data/interim/
+/data/processed/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
