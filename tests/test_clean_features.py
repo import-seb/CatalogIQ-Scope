@@ -30,13 +30,21 @@ class FeatureCleaningTests(unittest.TestCase):
 
     def test_file_roundtrip_and_no_overwrite(self):
         with tempfile.TemporaryDirectory() as tmp:
-            raw = Path(tmp) / 'raw.csv'
+            raw_dir = Path(tmp) / 'raw'
+            raw_dir.mkdir()
+            raw = raw_dir / 'raw.csv'
             fields = sorted(LABELS | IDS | NUMBERS | TRIM | {'ProductCategory', 'MDM_InsertDateTime'})
             row = dict.fromkeys(fields, 'null')
             row.update(ProductName='Quoted "name"\nsecond line', JoiningKey='0001')
             with raw.open('w', encoding='utf-8', newline='') as f:
                 w = csv.DictWriter(f, fieldnames=fields); w.writeheader(); w.writerow(row)
             before = raw.read_bytes()
+            for unsafe in (raw, raw_dir, raw_dir / 'generated', Path(tmp)):
+                with self.subTest(output=unsafe):
+                    with self.assertRaisesRegex(ValueError, 'outside the raw input directory'):
+                        run(raw, unsafe, 'training')
+                    self.assertEqual(raw.read_bytes(), before)
+            self.assertFalse((raw_dir / 'generated').exists())
             out = Path(tmp) / 'output'
             self.assertEqual(run(raw, out, 'training')['rows'], 1)
             with (out / 'features_candidate.csv').open(encoding='utf-8', newline='') as f:

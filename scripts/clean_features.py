@@ -104,7 +104,9 @@ def sha256(path):
 
 def run(source, output, dataset):
     source, output = Path(source).resolve(), Path(output).resolve()
-    if output == source or source.is_relative_to(output):
+    # source is a file: keep outputs outside its containing raw directory,
+    # and reject output ancestors that contain the input.
+    if output.is_relative_to(source.parent) or source.is_relative_to(output):
         raise ValueError('Output must be a separate directory outside the raw input directory.')
     digest = sha256(source)
     csv.field_size_limit(10_000_000)
