@@ -3,6 +3,12 @@
 This documents current code assumptions, **not a Product Owner-approved schema**.
 Do not confuse a successful CSV parse with a structurally valid product record.
 
+The tables below describe the legacy default `--mode targets`. The new
+`--mode integrated` uses the [integration contract](integration/cleaning_contract.md):
+`training|target` dataset tokens, one-based record identity, narrow blank/null
+missingness, original strings on export, and three complete partitions. Do not
+mix these identities with the legacy output without an explicit adapter.
+
 ## Inputs and grain
 
 | Item | Current behavior |

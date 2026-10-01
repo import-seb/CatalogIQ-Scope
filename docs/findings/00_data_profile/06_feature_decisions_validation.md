@@ -2,6 +2,12 @@
 
 Date: 2026-09-28. Owner: Maksim Pikalov.
 
+Historical feature-only run. The implementation now lives in `catalogiq` with
+compatibility wrappers under `scripts/`. The 2026-09-30
+[integration report](../01_cleaning/02_integration_validation.md) combines both
+cleaners and records the newer candidate partitions; the counts below retain
+their original feature-only scope.
+
 Status: implemented and validated locally; proposed for team review in PR #6.
 Feature-side recommendations still require agreement. No final
 quarantine mask or modeling-ready dataset is claimed.

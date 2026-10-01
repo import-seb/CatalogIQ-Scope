@@ -6,7 +6,7 @@ import unittest
 
 from scripts.clean_features import LABELS, IDS, NUMBERS, TRIM
 from scripts.feature_decisions import decide_row, flag_decision, run
-from scripts.validate_feature_decisions import verify
+from scripts.validate_feature_decisions import verify, valid_category_change
 
 
 def sample_row(**overrides):
@@ -21,6 +21,27 @@ def sample_row(**overrides):
 
 
 class FeatureDecisionTests(unittest.TestCase):
+    def test_blank_category_is_preserved_without_category_flags(self):
+        for value in ('', '   ', '\t'):
+            with self.subTest(value=value):
+                row = sample_row(ProductCategory=value)
+                cleaned, decision = decide_row(row)
+                self.assertEqual(cleaned, row)
+                self.assertFalse(any(f.startswith('ProductCategory:') for f in decision['flags']))
+                self.assertTrue(valid_category_change(value, value))
+                self.assertFalse(valid_category_change(value, 'Invented category'))
+
+    def test_null_category_is_preserved_without_category_flags(self):
+        for value in (None, 'null', ' NULL ', 'Null'):
+            with self.subTest(value=value):
+                row = sample_row(ProductCategory=value)
+                cleaned, decision = decide_row(row)
+                self.assertEqual(cleaned, row)
+                self.assertFalse(any(f.startswith('ProductCategory:') for f in decision['flags']))
+                self.assertTrue(valid_category_change(value, value))
+                self.assertFalse(valid_category_change(value, 'Invented category'))
+        self.assertFalse(valid_category_change(' null ', 'null'))
+
     def test_scientific_upc_retained_without_quarantine(self):
         raw = sample_row(Upc='3.00054E+11', Platform=' Rare label ', MDM_Id='000045')
         cleaned, decision = decide_row(raw)
