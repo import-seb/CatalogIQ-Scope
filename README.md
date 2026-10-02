@@ -42,6 +42,20 @@ python -m jupyterlab
 a new output directory. The command writes source fingerprints, changes, review
 flags, and a summary beside its CSV outputs. See the [cleaning guide](docs/target_cleaning.md).
 
+For combined feature/target processing, use `--mode integrated` and a new run directory:
+
+```bash
+python -m catalogiq --mode integrated --output-dir data/processed/integration_run
+```
+
+Pass `--train` and `--target` if your local filenames differ from the defaults.
+This writes one candidate row mask plus candidate, quarantine and review-hold
+partitions. It preserves source strings except audited corrections and runs the
+feature verifier on both inputs. The default source `Exclude` policy is `hold`;
+the result still requires team agreement before modeling. See the
+[integration contract](docs/integration/cleaning_contract.md) and
+[full-data validation](docs/findings/01_cleaning/02_integration_validation.md).
+
 **Current manufacturer policy:** preserve all supplied `Mnfr` values, including
 missing values. No Brand-to-J&J reassignment. Read [current decisions](docs/decisions.md)
 before promoting any notebook experiment into reusable code.
@@ -51,6 +65,10 @@ before promoting any notebook experiment into reusable code.
 ```text
 src/catalogiq/          Installable Python package
   cleaning.py           Reusable cleaning, validation, and audit output
+  features.py           Conservative feature formatting and flags
+  feature_decisions.py  Second-pass feature decisions and audit
+  feature_validation.py Separate full-file feature reconciliation
+  integration.py        Combined source-keyed candidate mask and partitions
   cli.py                Command-line arguments and invocation
   paths.py              Project path discovery
   __main__.py           Enables python -m catalogiq
