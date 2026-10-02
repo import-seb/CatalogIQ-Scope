@@ -5,6 +5,7 @@
 - [Cleaning guide](target_cleaning.md): command, artifacts, and caveats.
 - [Decision log](decisions.md): accepted and withdrawn cleaning rules.
 - [Data contract](data_contract.md): current ingestion assumptions and unknowns.
+- [Integration contract](integration/cleaning_contract.md): shared identity, candidate mask, and handoff artifacts.
 - [Contribution workflow](../CONTRIBUTING.md): analysis-to-code process.
 
 ## Evidence
@@ -12,6 +13,8 @@
 - [Initial profile](findings/00_data_profile/01_profile_results.md)
 - [Proposed cleaning direction](findings/00_data_profile/02_cleaning_direction.md)
 - [Pre-Aryx findings](findings/01_cleaning/01_CatalogIQ_Pre_Aryx_Findings.md)
+- [Combined cleaning validation](findings/01_cleaning/02_integration_validation.md)
+- [Timestamp audit](findings/01_cleaning/03_mdm_datetime_audit.md)
 - [Notebook index](../notebooks/README.md)
 
 Findings record their analysis context; they are not executable policy. Some older

@@ -1,5 +1,6 @@
 # Local source and generated datasets
 /data/provided/
+/data/derived/
 /data/interim/
 /data/processed/
 

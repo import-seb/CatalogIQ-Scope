@@ -15,6 +15,7 @@ fresh kernel from top to bottom. Numbering is reading order, not a pipeline DAG.
 | [07](07_mdm_id_identity_audit.ipynb) | Does MDM ID establish identity? | Provisional screening assumptions; no canonical product key established. |
 | [08](08_dataset_grain_and_uniqueness.ipynb) | What makes a row unique? | Includes a historical normalized-label comparison using withdrawn J&J assignments. |
 | [09](09_productbrand_brand_relationship.ipynb) | Is ProductBrand -> Brand stable? | Candidate evidence only; no automatic fills or relabeling approved. |
+| [10](10_mdm_datetime_audit.ipynb) | What does MDM_InsertDateTime encode? | Full-export and integrated-partition audit; Excel serials plausible, conversion deferred. Requires a local integrated run. |
 
 **Authority:** [current decisions](../docs/decisions.md) and
 [cleaning guide](../docs/target_cleaning.md). Historical notes are prominently marked
