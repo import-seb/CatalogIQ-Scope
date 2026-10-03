@@ -34,6 +34,7 @@ Place the two private source CSVs in `data/provided/` as described in
 
 ```bash
 python -m catalogiq --output-dir data/processed/my_run
+python -m catalogiq.check_structure --output-dir data/processed/structural_run
 python -m unittest discover -s tests -v
 python -m jupyterlab
 ```
@@ -56,6 +57,12 @@ the result still requires team agreement before modeling. See the
 [integration contract](docs/integration/cleaning_contract.md) and
 [full-data validation](docs/findings/01_cleaning/02_integration_validation.md).
 
+The separate [structural check](docs/structural_check.md) screens both original
+datasets and records row decisions and raw evidence without changing rows or
+applying either cleaner's quarantine mask.
+It uses the same role-named, one-based identities as integrated mode. You can
+also run it with `python -m catalogiq --mode structural --output-dir data/processed/structural_run`.
+
 **Current manufacturer policy:** preserve all supplied `Mnfr` values, including
 missing values. No Brand-to-J&J reassignment. Read [current decisions](docs/decisions.md)
 before promoting any notebook experiment into reusable code.
@@ -69,6 +76,8 @@ src/catalogiq/          Installable Python package
   feature_decisions.py  Second-pass feature decisions and audit
   feature_validation.py Separate full-file feature reconciliation
   integration.py        Combined source-keyed candidate mask and partitions
+  structural.py         Independent dataset-wide structural decisions and evidence
+  check_structure.py    Enables python -m catalogiq.check_structure
   cli.py                Command-line arguments and invocation
   paths.py              Project path discovery
   __main__.py           Enables python -m catalogiq

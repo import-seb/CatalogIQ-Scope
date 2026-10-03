@@ -1,5 +1,10 @@
 # Target-label cleaning
 
+Dataset-wide structural screening is available as a
+[separate command](structural_check.md) for both original datasets. It does not
+apply or replace this cleaner's quarantine rules. This command's target output
+remains an unscreened pass-through.
+
 Run from an installed project environment:
 
 ```bash

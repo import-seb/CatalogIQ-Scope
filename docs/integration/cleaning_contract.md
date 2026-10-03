@@ -35,6 +35,15 @@ guess their index base. Both returned partitions must together contain precisely
 the original key set. Duplicate, missing, or foreign keys stop the run.
 The legacy target-only command retains its old identity for compatibility.
 
+The independent [structural check](../structural_check.md), policy
+`structural-v2`, now writes canonical `training|target`/one-based keys directly.
+Use `python -m catalogiq --mode structural` or its standalone command on the same
+original source files. Its complete decision tables can be compared by key with
+feature/integrated audit tables; they are not automatically inputs to the candidate
+mask below. The optional structural validator checks feature-run compatibility
+without changing row selection. Historical `structural-v1` files use the legacy
+filename/zero-based convention and need an explicit conversion or source rerun.
+
 The new target cleaner exports `training_cleaned.csv`, `training_quarantine.csv`,
 `label_changes.csv`, `review_flags.csv`, and a summary. Its `target_unchanged.csv`
 is explicitly a parsed pass-through, not a structural screening of the prediction

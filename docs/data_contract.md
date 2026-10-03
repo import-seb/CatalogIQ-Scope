@@ -9,6 +9,13 @@ The tables below describe the legacy default `--mode targets`. The new
 missingness, original strings on export, and three complete partitions. Do not
 mix these identities with the legacy output without an explicit adapter.
 
+The separate
+[structural-check contract](structural_check.md) keeps literal source strings and
+uses explicit blank/null diagnostics with the canonical role-named, one-based
+identity used by integrated mode. Its full training and prediction decisions are
+independent of feature/target masks and partitions. Earlier `structural-v1` runs
+used the legacy identity; do not join those artifacts without explicit conversion.
+
 ## Inputs and grain
 
 | Item | Current behavior |

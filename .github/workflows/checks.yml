@@ -16,4 +16,5 @@ jobs:
       - run: python -m pip install .
       - run: python -m unittest discover -s tests -v
       - run: python -m catalogiq --help
+      - run: python -m catalogiq.check_structure --help
       - run: python -m pip wheel --no-deps --wheel-dir dist .

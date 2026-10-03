@@ -2,6 +2,17 @@
 
 These decisions govern `catalogiq.cleaning`. Historical notebooks may retain withdrawn assumptions; see the [analysis index](../notebooks/README.md).
 
+The independent `catalogiq.structural` policy is documented in the
+[structural-check guide](structural_check.md) and
+[validation summary](findings/00_data_profile/07_structural_validation.md).
+After the PR #8 main merge, `structural-v2` adopts the canonical role-named,
+one-based identity; see [compatibility validation](findings/00_data_profile/08_structural_main_compatibility.md).
+Its corroborated quarantine decisions preserve every source record and do not
+change the target-cleaning decisions below. Timestamp format warnings, missingness,
+absent measurements, label rarity and lowercase formatting alone do not justify
+structural quarantine. This implementation policy is subject to the documented
+schema/team review; it is not approval of a common modeling mask.
+
 1. We avoided enforcing a fixed Segment–Sub-Segment whitelist because some Sub-Segments legitimately appear under multiple Segments; instead, we apply incremental structural checks, such as validating count relationships only for Sub-Segments that have exactly one observed parent. (Sebastian, 9/27/2026)
 2. Decision Note — Normalize `Other Lifestyle` to `Other Lifestyle CHC`
 

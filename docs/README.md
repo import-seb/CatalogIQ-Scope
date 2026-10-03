@@ -3,6 +3,7 @@
 ## Current workflow and policy
 
 - [Cleaning guide](target_cleaning.md): command, artifacts, and caveats.
+- [Structural check](structural_check.md): independent full-dataset row screening and identity contract.
 - [Decision log](decisions.md): accepted and withdrawn cleaning rules.
 - [Data contract](data_contract.md): current ingestion assumptions and unknowns.
 - [Integration contract](integration/cleaning_contract.md): shared identity, candidate mask, and handoff artifacts.
@@ -12,6 +13,8 @@
 
 - [Initial profile](findings/00_data_profile/01_profile_results.md)
 - [Proposed cleaning direction](findings/00_data_profile/02_cleaning_direction.md)
+- [Structural validation](findings/00_data_profile/07_structural_validation.md): counts, reproducibility and remaining assumptions.
+- [Structural/main compatibility](findings/00_data_profile/08_structural_main_compatibility.md): canonical identities and checks against the merged feature pipeline.
 - [Pre-Aryx findings](findings/01_cleaning/01_CatalogIQ_Pre_Aryx_Findings.md)
 - [Combined cleaning validation](findings/01_cleaning/02_integration_validation.md)
 - [Timestamp audit](findings/01_cleaning/03_mdm_datetime_audit.md)

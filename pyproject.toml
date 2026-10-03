@@ -21,6 +21,7 @@ notebooks = [
 
 [project.scripts]
 catalogiq-clean = "catalogiq.cli:main"
+catalogiq-check-structure = "catalogiq.cli:structural_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

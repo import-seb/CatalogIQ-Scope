@@ -6,6 +6,11 @@ kernel against the same source hashes as the [integration run](02_integration_va
 
 ## What was checked
 
+Follow-up: the [2026-10-02 conversion and disputed-row audit](04_mdm_timestamp_followup.md)
+lists all timestamp patterns and tests four encodings. All 14 feature/structural
+disagreements contain image URLs in the timestamp field plus corroborating column
+displacement; none is an alternative date format. Source values and rules remain unchanged.
+
 Inspected every supplied CSV record, not a sample. Compared the full export with
 the subset outside integrated quarantine, which still includes review holds.
 Reviewed the working data contract, initial profiling, cleaning direction and
