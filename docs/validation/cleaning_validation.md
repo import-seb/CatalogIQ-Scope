@@ -295,6 +295,62 @@ in `target_review_flags.csv` (263 rows) rather than being discarded.
 
 ---
 
+## 3.12 Final answer: does the cleaned dataset follow the cleaning rules?
+
+**Yes.** Every policy in `docs/decisions.md` was checked against the data rather
+than against the pipeline's own report, and all ten hold.
+
+| # | Policy (decision log) | Verified |
+|---|---|---|
+| 1 | Keep otherwise usable `Exclude`-marked rows | 5,293 marked, **5,217 kept (98.6%)** |
+| 1 | Arbitrary text in `Exclude` is not the marker | 4 such rows; none removed by a marker rule |
+| 2 | `MDM_InsertDateTime` out of model inputs, retained in source | Absent from the export, present in the candidate partition |
+| 3 | A bad timestamp alone does not quarantine | 263 URL-in-timestamp rows, **263 with independent corroboration** |
+| 4 | All three text fields missing → structural quarantine | 151 such rows, **151 quarantined** |
+| 5 | A bad URL alone does not hold the row | 3 rows with no other signal, **3 kept** |
+| 6 | No automatic whole-row hold | `hold_reasons` empty on all 84,552 rows |
+| 6 | A field flag is not a row decision | 10,475 flagged, **94.1% kept** |
+| 7 | Shifted columns quarantined on documented combinations | Every reason matched by evidence in the row (§3.11) |
+| 9 | `Sun1`–`Sun5` and `Notes` out of exports, kept in source | Absent from the export, present in the candidate partition |
+| 10 | No derived category levels; full path preserved | No `retailer_category_level_*`; 84,522 paths intact |
+
+Label policies hold too: `Cold / Flu` → `Cold/Flu` (4 rows) and `Other Lifestyle`
+→ `Other Lifestyle CHC` (3 rows), both recorded in `label_changes.csv`; supplied
+`Mnfr` preserved with no J&J inferred from Brand; target reason 2 review-only
+with 242 rows flagged and none removed; and no fixed parent whitelist enforced,
+with `Probiotics` and `Internal Pain` retained under two parents each.
+
+### Three checks that looked like failures and were not
+
+Recorded because the next person to audit this will hit the same thing.
+
+- **Policy 1.** Four rows with arbitrary text in `Exclude` are quarantined, which
+  looks like the marker being enforced. Their reasons are `missing_product_text`
+  and `multiple_suspicious_targets` — independent rules. No marker rule fired.
+- **Policy 3.** All 263 URL-in-timestamp rows are removed, which looks like a bad
+  timestamp removing rows on its own. All 263 also carry text in a numeric
+  column, so every one has the independent evidence the policy requires.
+- **Policy 5.** 241 rows have a `ProductUrl` that fails a naive `startswith("http")`
+  test. Only 3 of them have no other displacement signal, and all 3 are kept —
+  and those 3 are valid Walgreens URLs whose inch marks (`10"" x 13""`) broke the
+  test, not the data.
+
+In all three the pipeline was right and the check was too crude. A policy audit
+that stops at the first surprising count will report failures that are not there.
+
+### The qualification
+
+The dataset follows the rules **as the decision log currently states them**. Two
+things it does are correct but not written down there, and both appear as WARNs
+in §3.6 and §3.10: the dtype change on four columns in the feature export, and
+the dropping of fourteen columns including `JoiningKey`, `Sku` and `Exclude`.
+
+Neither is a rule violation. Both are decisions the decision log does not record,
+and the second one has a downstream consequence — the split strategy must be
+settled before the export, because the identity columns do not survive it.
+
+---
+
 ## 4. Can the cleaned data be used?
 
 **Yes, with two caveats.**
