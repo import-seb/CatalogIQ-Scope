@@ -211,6 +211,90 @@ No labelled row was removed without a recorded reason.
 
 ---
 
+## 3.11 Removed rows, examined directly
+
+The ticket asks four specific questions about the 614 removed training rows.
+Each is answered against the rows themselves, not against the pipeline's own
+report of what it did.
+
+### Were good products removed?
+
+**No.** Every removed row carries concrete displacement evidence.
+
+| Group | Rows | Evidence found in those rows |
+|---|---|---|
+| No product text at all | 151 | Name, description and contents all blank |
+| Text in numeric columns | 199 | 727 non-numeric values in `ProductRating`, `XRatXRev`, `ProductReviewsCount`, `ReviewsCount` |
+| URL in the timestamp column | 263 | 263 URLs in `MDM_InsertDateTime`, one per row, plus 369 text-in-numeric values |
+| Exclude with populated unknown columns | 3 | 2 of 3 also have no product text |
+
+463 of the 614 have something that looks like a product name, which is why this
+needed checking rather than assuming. Reading them explains it: they begin with
+a stray quote and contain unescaped inch marks — `Entil Large Heating Pad 24"" x
+33""`, `NEWSTYLE Ice Bag, 3 Pack[6"`. The quote broke the CSV parse and shifted
+the row's fields. The product name survives because it is the field the
+displacement starts in; everything after it is wrong.
+
+### Were real rare classes removed?
+
+**No.** This is the strongest result in the audit, because the rarest classes are
+exactly where a removal would be invisible.
+
+Every one-row and two-row class survives intact:
+
+| Target | Class | Raw | v4 |
+|---|---|---|---|
+| Sub-Segment | `Creams & Gels (Rubs)` | 1 | 1 |
+| Sub-Segment | `Daily oral contracception` | 2 | 2 |
+| Sub-Segment | `Dermatologicals` | 4 | 4 |
+| Platform | `Precise`, `12 Hour Relief`, `Cold Max`, `SmartCheck`, `Effective in 15 Minutes` | 1 each | 1 each |
+
+The labels that do disappear are not classes. They are fragments of marketing
+copy that landed in a target column through the same displacement — `" coffee"`,
+`" Keto certified"`, `"aids in collagen formation* GRASS-FED COLLAGEN: Super
+Collagen + Vitamin C & Biotin is Keto certified"` as an `Mnfr` value. Each has
+one or two rows, and each of those rows is quarantined for displacement.
+
+The only two genuine labels that leave are `Cold / Flu` (4 rows) and
+`Other Lifestyle` (3), and neither is removed: both are relabelled, with the
+rule and the source rows recorded in `label_changes.csv`.
+
+### Were rows quarantined for the correct reason?
+
+**Yes.** Each reason is matched by evidence in the rows it fired on, with no
+cross-contamination:
+
+- `url_in_timestamp_with_displacement` — 263 rows, 263 URLs in the timestamp
+  column. One per row, exactly.
+- `structural:missing_product_text` — 149 rows, 149 with no product text.
+- `text_in_multiple_numeric_anchors` — 199 rows, 727 text values across four
+  numeric columns, and zero of them have the URL or missing-text signature.
+
+No row is quarantined under a rule whose evidence is absent from it.
+
+### Were review-only rows treated correctly?
+
+**Yes**, and the distinction is enforced rather than merely documented.
+
+| Flag | Rows flagged | Of those, quarantined |
+|---|---|---|
+| `target_reason_codes` = 2 (formatting) | 242 | **0** |
+| `target_reason_codes` = 2;6 | 3 | 3 |
+| `feature_flags` | 10,475 | 614 (5.9%) |
+| `hold_reasons` | **0** | — |
+
+Target reason 2 is review-only in the decision log, and on its own it removes
+nothing: all 242 such rows are retained. The three that are quarantined also
+carry reason 6, which the decision log defines as a quarantine rule. 10,475 rows
+carry a feature flag and 94.1% of them are kept, so a flag is a note rather than
+a verdict.
+
+`hold_reasons` is empty for all 84,552 rows, which is decision 6 working as
+written: no automatic whole-row hold. The review evidence is preserved separately
+in `target_review_flags.csv` (263 rows) rather than being discarded.
+
+---
+
 ## 4. Can the cleaned data be used?
 
 **Yes, with two caveats.**
