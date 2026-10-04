@@ -52,7 +52,7 @@ class FeatureDecisionTests(unittest.TestCase):
 
     def test_source_marker_is_separate_policy_not_corruption(self):
         _, decision = decide_row(sample_row(Exclude='Exclude'))
-        self.assertEqual(decision['disposition'], 'policy_hold')
+        self.assertEqual(decision['disposition'], 'retain')
         self.assertTrue(decision['source_exclude_marker'])
         self.assertFalse(decision['recommend_quarantine'])
         _, unexpected = decide_row(sample_row(Exclude='other text'))
@@ -108,6 +108,7 @@ class FeatureDecisionTests(unittest.TestCase):
         self.assertEqual(decision['disposition'], 'retain')
         _, empty = decide_row(sample_row(ProductName='null'))
         self.assertEqual(empty['disposition'], 'review')
+        self.assertFalse(empty['recommend_hold'])
         self.assertFalse(empty['recommend_quarantine'])
 
     def test_unmapped_flag_cannot_silently_pass(self):
@@ -139,7 +140,7 @@ class FeatureDecisionTests(unittest.TestCase):
                 audit = list(csv.DictReader(f))
             self.assertEqual([r['source_row'] for r in audit], ['1', '2', '3'])
             self.assertEqual([r['dataset'] for r in audit], ['target'] * 3)
-            self.assertEqual([r['disposition'] for r in audit], ['repaired', 'quarantine_candidate', 'policy_hold'])
+            self.assertEqual([r['disposition'] for r in audit], ['repaired', 'quarantine_candidate', 'retain'])
             with (root / 'out1' / 'features_candidate.csv').open(newline='') as f:
                 cleaned = list(csv.DictReader(f))
             self.assertEqual(len(cleaned), len(rows))

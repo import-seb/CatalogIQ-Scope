@@ -1,0 +1,91 @@
+HISTORICAL: superseded by structural-v6 and docs/decisions.md on 2026-10-03.
+The current policy quarantines all-three-missing descriptive text and combines
+structural decisions in integrated mode. This file records the earlier migration.
+
+Structural screening v4: migration of target row-content rules
+
+The target cleaner now owns label checks and approved label corrections only.
+Target reason 6 (manufacturer vocabulary) remains label policy. Reasons 4 and 5
+are retired there; historical outputs retain their original meanings. The
+structural checker owns their revised row-content checks for BOTH datasets.
+The v3 fixed 11-of-12 missing-fields rule and configuration option are retired.
+
+Interface and identity
+Run python -m catalogiq --mode structural --output-dir <new-directory> on the
+original sources. Optional --config supplies JSON overrides. assess_row accepts
+original strings, a source identity, explicit field scopes, an upper missingness
+count and text-length bounds. None for length bounds means no observed product
+text was available to fit that profile; the empty-content rule still runs.
+Findings and decisions use (dataset, source_sha256, source_row), where dataset is
+training or target and source_row is the ONE-BASED parsed CSV data record.
+The header and empty physical lines are excluded; quoted multiline fields count
+once. Duplicate business identifiers do not merge records. Raw values are saved
+with affected-row evidence. Neither source values nor cleaner masks are changed.
+
+Adaptive missingness and length (replacement for target reason 4)
+Missingness uses the configured product feature scope: retailer, product
+category/brand/name, four rating/review measurements, two product URLs,
+description and contents by default. Missing means trimmed blank or
+case-insensitive null. Labels, identifiers and timestamps cannot enter this
+scope. The ratio is missing fields / configured feature fields.
+Text length uses a separate, explicit scope: product category, brand, name,
+description and contents. It is the average trimmed character length of present
+values, not a sum with missing values filled by zeros. A malformed numeric cell
+cannot change the text scope, unlike the old inferred-column implementation.
+Each source independently supplies Q1 and Q3 from full-width rows. The existing
+1.5 IQR multiplier is retained and configurable separately for missingness and
+text length. Linear quantiles are used. Quarantine requires BOTH:
+  missing fraction > Q3 + multiplier * IQR, AND
+  mean text length strictly outside its lower/upper IQR bounds.
+Equality is not an outlier. Either signal alone remains a warning. The old
+low-missingness branch is intentionally not migrated: a complete row with a
+long description does not provide enough evidence to quarantine it.
+Reason: missingness_with_unusual_text_length.
+
+Numeric content (replacement for target reason 5)
+Only rating, review counts and rating-times-reviews are numeric anchors.
+Valid anchors must be finite and nonnegative; count fields must be integers.
+Zeros are valid. IDs, UPCs, timestamps and labels cannot rescue a damaged row.
+No valid anchors is a warning on its own: an unrated product with descriptive
+text can still be useful. When ALL configured product-text fields are missing
+AND there is no valid anchor, quarantine for no_usable_product_content. This is
+insufficient usable content, not proof of column misalignment. It also handles
+fully empty rows, whose mean text length is undefined, and homogeneous sparse
+files where IQR cannot distinguish any outlier. Numeric-looking IDs do not help.
+An otherwise populated product with one bad numeric value remains review-only
+unless a separate, established corroboration rule triggers.
+
+Other structural rules are unchanged: wrong CSV field count, multiple text
+numeric failures, corroborated numeric displacement, shifted unknown metadata,
+and corroborated suspicious labels. Max's independent feature rules are not
+modified or consumed. Disabling a quarantine rule keeps its evidence as a flag.
+
+Pipeline boundary and compatibility
+Target-only and integrated summaries explicitly state that independent
+structural screening has not been applied. Integrated mode still combines its
+existing feature and target-label decisions only; this migration does not add a
+structural mask to it. Its policy version is now integrated-review-v2, and the
+target policy is target-labels-v2. Run the structural audit separately before
+treating candidate partitions as a cleaned handoff. Prior delivered datasets
+and historical audit files are not overwritten. Historical target-only outputs
+use legacy filename/zero-based identity and need explicit conversion before
+comparison with the canonical structural identity.
+
+Limitations
+IQR is an outlier heuristic, not verified corruption. Small or homogeneous
+sources can have zero IQR; strict boundaries still apply without an invented
+minimum spread or sample-size cutoff. If the lower length fence is negative,
+short positive strings cannot be lower-tail outliers. Broadly corrupted files
+can distort their own baseline. All-empty text rows are omitted from the length
+profile and handled by the no-content rule. A single populated text field can
+contain meaningless text; this rule does not establish its semantic validity.
+Profile thresholds and field scopes are recorded in summary.json, together
+with reason/decision counts and limitations. Team review of vocabulary and
+population suitability remains necessary before any modeling use.
+
+Validation run
+data/processed/structural_v4_adaptive_20261003 contains the full audit; the
+validation_summary.json records source verification, reproducibility, counts,
+comparison with v3, and the delivered handoff comparison. Source row 48936
+remains quarantined under no_usable_product_content. No markdown files were
+changed for this migration.

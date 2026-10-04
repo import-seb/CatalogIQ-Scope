@@ -18,32 +18,48 @@ import re
 from urllib.parse import urlsplit
 
 
-POLICY_VERSION = "structural-v2"
+POLICY_VERSION = "structural-v6"
 KEY = ("dataset", "source_sha256", "source_row")
 TARGETS = ("Mnfr", "Brand", "Platform", "Segment", "Sub-Segment", "TargetAgeGroup")
 NUMERIC = ("ProductRating", "ProductReviewsCount", "ReviewsCount", "XRatXRev")
+PRODUCT_TEXT = ("ProductCategory", "ProductBrand", "ProductName", "ProductDescription", "ProductContents")
+DESCRIPTIVE_FIELDS = ("ProductName", "ProductDescription", "ProductContents")
 UNKNOWN = ("Sun1", "Sun2", "Sun3", "Sun4", "Sun5", "Notes")
 QUARANTINE_RULES = (
     "csv_field_count", "text_in_multiple_numeric_anchors",
     "text_numeric_failure_with_corroboration",
     "unexpected_exclude_with_populated_unknown_columns",
     "multiple_suspicious_targets", "suspicious_target_with_displacement",
+    "missingness_with_unusual_text_length",
+    "url_in_timestamp_with_displacement", "missing_product_text",
 )
 LIMITATIONS = [
     "Heuristic review quarantine, not confirmed corruption or an approved modeling mask.",
-    "Missingness and absent numeric anchors alone never quarantine; sparse rows can be valid.",
+    "Replaces target reasons 4/5 and the v3 fixed 11/12 cutoff; target manufacturer validation remains label policy.",
+    "High feature missingness plus unusual mean product-text length quarantines; either signal alone is review-only.",
+    "Missing name, description and contents always quarantines under the user-approved completeness policy, regardless of other values.",
+    "Missing measurements alone do not quarantine; numeric IDs, timestamps and labels cannot satisfy numeric anchors.",
+    "IQR profiles use each full source independently; small, homogeneous or broadly corrupt sources can give weak baselines.",
+    "Strict IQR bounds use the existing 1.5 multiplier; complete long-text rows are not quarantined by the joint missingness rule.",
+    "Rows with no product text have undefined mean length and are omitted from the length profile; the no-content rule covers empty rows.",
     "Missing tokens are trimmed blank/null only; raw strings are preserved, including NA and NaN.",
     "Target vocabularies and numeric meanings are working assumptions, not sponsor-approved schema.",
-    "Unknown timestamp encoding, Exclude semantics, and unknown metadata need team confirmation.",
+    "Timestamp excluded from model inputs; unfamiliar format alone produces no flag. Exclude markers retain otherwise usable rows.",
     "No inference of shifts between fields of the same type; no attempt to reconstruct records.",
     "Unparseable CSV syntax aborts without a completion summary; no reliable record identity can be assigned.",
-    "Cleaner masks are neither consumed nor combined; legacy zero-based artifacts require explicit conversion.",
+    "This checker does not consume cleaner masks; integrated mode combines its keyed decisions with the independent feature/target decisions. Legacy identities require conversion.",
 ]
 
 
 @dataclass(frozen=True)
 class StructuralConfig:
-    """Serializable policy; statistical cutoffs are diagnostics, never exclusion gates."""
+    """Serializable scopes and IQR multipliers; single outliers are diagnostics.
+
+    The joint rule migrates target reason 4 using only high missingness (low
+    missingness is not evidence of damage) and either tail of text length.
+    Reason 5 becomes an anchor and no-product-content diagnostic:
+    products without reviews remain usable when descriptive text is present.
+    """
 
     numeric_fields: tuple[str, ...] = NUMERIC
     count_fields: tuple[str, ...] = ("ProductReviewsCount", "ReviewsCount")
@@ -53,26 +69,32 @@ class StructuralConfig:
     )
     missing_tokens: tuple[str, ...] = ("", "null")
     missingness_iqr_multiplier: float = 1.5
+    text_fields: tuple[str, ...] = PRODUCT_TEXT
+    text_length_iqr_multiplier: float = 1.5
     manufacturer_values: tuple[str, ...] = ("All others", "J&J")
     age_group_values: tuple[str, ...] = ("Adult", "Children", "Infant")
     quarantine_rules: tuple[str, ...] = QUARANTINE_RULES
 
     def __post_init__(self):
         for name, value in asdict(self).items():
-            if name == "missingness_iqr_multiplier":
+            if name in {"missingness_iqr_multiplier", "text_length_iqr_multiplier"}:
                 if (isinstance(value, bool) or not isinstance(value, (int, float))
                         or not math.isfinite(value) or value < 0):
-                    raise ValueError("missingness_iqr_multiplier must be finite and nonnegative")
+                    raise ValueError(f"{name} must be finite and nonnegative")
             else:
                 if (not isinstance(value, tuple) or any(not isinstance(v, str) for v in value)
                         or len(value) != len(set(value))):
                     raise ValueError(f"{name} must contain unique strings")
-        if not self.numeric_fields or not self.missingness_fields:
+        if not self.numeric_fields or not self.missingness_fields or not self.text_fields:
             raise ValueError("Numeric and missingness field scopes cannot be empty")
         if not set(self.numeric_fields) <= set(NUMERIC):
             raise ValueError("Only documented measurement fields may be numeric anchors")
         if not set(self.count_fields) <= set(self.numeric_fields):
             raise ValueError("Count fields must be numeric anchors")
+        if not set(self.text_fields) <= set(PRODUCT_TEXT):
+            raise ValueError("Text scope must contain documented product-text fields only")
+        if not set(self.missingness_fields) <= set((*PRODUCT_TEXT, *NUMERIC, "Retailer", "ProductUrl", "ProductImageUrl")):
+            raise ValueError("Missingness scope must contain documented product features only")
         if set(self.missingness_fields) & set((*TARGETS, "Category", *KEY)):
             raise ValueError("Missingness must exclude targets and provenance")
         if not set(self.quarantine_rules) <= set(QUARANTINE_RULES):
@@ -129,7 +151,7 @@ def valid_url(value: str) -> bool:
 
 
 def required_fields(config: StructuralConfig) -> set[str]:
-    return set((*config.numeric_fields, *config.missingness_fields, *TARGETS, *UNKNOWN,
+    return set((*config.numeric_fields, *config.missingness_fields, *config.text_fields, *DESCRIPTIVE_FIELDS, *TARGETS, *UNKNOWN,
                 "Exclude", "MDM_Id", "MDM_InsertDateTime", "ProductUrl", "ProductImageUrl"))
 
 
@@ -169,8 +191,14 @@ def missing_count(row: dict[str, str], config: StructuralConfig) -> int:
     return sum(missing(row[c], config) for c in config.missingness_fields)
 
 
+def mean_text_length(row: dict[str, str], config: StructuralConfig) -> float | None:
+    """Mean trimmed character length of present product-text fields; never fill missing cells."""
+    lengths = [len(row[c].strip()) for c in config.text_fields if not missing(row[c], config)]
+    return sum(lengths) / len(lengths) if lengths else None
+
+
 def quantile(counts: Counter, fraction: float) -> float:
-    """Linear quantile of integer missing counts, without retaining source rows."""
+    """Linear quantile of numeric observations, without retaining source rows."""
     total = sum(counts.values())
     if not total:
         return 0.0
@@ -187,7 +215,7 @@ def quantile(counts: Counter, fraction: float) -> float:
 
 
 def assess_row(row: dict[str, str], identity: dict, *, config: StructuralConfig,
-               missingness_upper_count: float) -> dict:
+               missingness_upper_count: float, text_length_bounds: tuple[float, float] | None) -> dict:
     """Pure row decision with explicit dataset-profile context; no cleaner imports.
 
     Consumers use this result's keyed findings, never infer a decision from flags.
@@ -203,6 +231,10 @@ def assess_row(row: dict[str, str], identity: dict, *, config: StructuralConfig,
         raise ValueError("Expected complete raw string fields")
     if not math.isfinite(missingness_upper_count) or missingness_upper_count < 0:
         raise ValueError("Invalid missingness profile")
+    if text_length_bounds is not None and (len(text_length_bounds) != 2
+            or not all(math.isfinite(v) for v in text_length_bounds)
+            or text_length_bounds[0] > text_length_bounds[1]):
+        raise ValueError("Invalid text-length profile")
     findings, reasons = [], []
 
     def emit(code: str, columns=(), *, quarantine=False, **evidence):
@@ -219,7 +251,8 @@ def assess_row(row: dict[str, str], identity: dict, *, config: StructuralConfig,
             errors[column] = error
             emit("numeric_" + error, [column], column=column)
     text_numeric = {c for c, error in errors.items() if error == "non_numeric"}
-    if all(missing(row[c], config) or c in errors for c in config.numeric_fields):
+    no_anchors = all(missing(row[c], config) or c in errors for c in config.numeric_fields)
+    if no_anchors:
         emit("no_valid_numeric_anchor", config.numeric_fields)
 
     displaced = set()
@@ -231,13 +264,9 @@ def assess_row(row: dict[str, str], identity: dict, *, config: StructuralConfig,
             displaced.add(column)
             emit("invalid_url_field", [column], column=column)
     stamp = row["MDM_InsertDateTime"]
-    if not missing(stamp, config):
-        try:
-            finite = Decimal(stamp.strip()).is_finite()
-        except InvalidOperation:
-            finite = False
-        if not finite:
-            emit("unconfirmed_timestamp_format", ["MDM_InsertDateTime"])
+    if is_url(stamp) and (text_numeric or displaced):
+        displaced.add("MDM_InsertDateTime")
+        emit("url_in_timestamp_with_displacement", displaced | text_numeric, quarantine=True)
 
     populated_unknown = {c for c in UNKNOWN if not missing(row[c], config)}
     if populated_unknown:
@@ -261,11 +290,35 @@ def assess_row(row: dict[str, str], identity: dict, *, config: StructuralConfig,
                  basis="url_in_label" if is_url(value) else "outside_working_vocabulary",
                  allowed_values=list(vocabularies.get(column, ())))
 
+    if all(missing(row[c], config) for c in DESCRIPTIVE_FIELDS):
+        emit("missing_product_text", DESCRIPTIVE_FIELDS, quarantine=True,
+             basis="name_description_and_contents_all_missing",
+             required_any_of=list(DESCRIPTIVE_FIELDS))
+
     count = missing_count(row, config)
+    length = mean_text_length(row, config)
+    unusual_length = (length is not None and text_length_bounds is not None
+                      and (length < text_length_bounds[0] or length > text_length_bounds[1]))
+    if unusual_length:
+        emit("unusual_product_text_length", config.text_fields, mean_length=length,
+             lower_length=text_length_bounds[0], upper_length=text_length_bounds[1],
+             comparison="strictly_outside")
+    if no_anchors and length is None:
+        emit("no_usable_product_content", (*config.numeric_fields, *config.text_fields),
+             numeric_fields=list(config.numeric_fields),
+             text_fields=list(config.text_fields), basis="no_valid_measurement_and_no_product_text")
     if count > missingness_upper_count:
         emit("high_feature_missingness", [c for c in config.missingness_fields if missing(row[c], config)],
              missing_count=count, field_count=len(config.missingness_fields),
              upper_count=missingness_upper_count, comparison="strictly_greater")
+        if unusual_length:
+            emit("missingness_with_unusual_text_length",
+                 set(config.missingness_fields) | set(config.text_fields), quarantine=True,
+                 missing_count=count, field_count=len(config.missingness_fields),
+                 missing_fraction=count / len(config.missingness_fields),
+                 upper_missing_fraction=missingness_upper_count / len(config.missingness_fields),
+                 mean_length=length, lower_length=text_length_bounds[0],
+                 upper_length=text_length_bounds[1], comparison="strictly_greater_and_strictly_outside")
 
     if len(text_numeric) >= 2:
         emit("text_in_multiple_numeric_anchors", text_numeric, quarantine=True)
@@ -301,14 +354,27 @@ def run(train_path: Path, target_path: Path, output_dir: Path,
     profiles = {}
     for role, path in paths.items():
         counts = Counter()
+        text_lengths = Counter()
         total = 0
         for _, fields, values in records(path, config):
             total += 1
             if len(values) == len(fields):
-                counts[missing_count(dict(zip(fields, values)), config)] += 1
+                row = dict(zip(fields, values))
+                counts[missing_count(row, config)] += 1
+                length = mean_text_length(row, config)
+                if length is not None:
+                    text_lengths[length] += 1
         q1, q3 = quantile(counts, .25), quantile(counts, .75)
+        text_q1, text_q3 = quantile(text_lengths, .25), quantile(text_lengths, .75)
+        text_spread = config.text_length_iqr_multiplier * (text_q3 - text_q1)
+        length_bounds = (text_q1 - text_spread, text_q3 + text_spread) if text_lengths else None
         profiles[role] = {"rows": total, "profile_rows": sum(counts.values()),
                           "q1_missing_count": q1, "q3_missing_count": q3,
+                          "text_profile_rows": sum(text_lengths.values()),
+                          "text_length_q1": text_q1 if text_lengths else None,
+                          "text_length_q3": text_q3 if text_lengths else None,
+                          "text_length_bounds": length_bounds,
+                          "upper_missing_fraction": (q3 + config.missingness_iqr_multiplier * (q3 - q1)) / len(config.missingness_fields),
                           "upper_missing_count": q3 + config.missingness_iqr_multiplier * (q3 - q1)}
         if sha256(path) != fingerprints[role]:
             raise RuntimeError("Source changed during profiling")
@@ -337,7 +403,8 @@ def run(train_path: Path, target_path: Path, output_dir: Path,
                                             "evidence": {"expected_fields": len(fields), "actual_fields": len(values)}}]}
                 else:
                     result = assess_row(dict(zip(fields, values)), identity, config=config,
-                                        missingness_upper_count=profiles[role]["upper_missing_count"])
+                                        missingness_upper_count=profiles[role]["upper_missing_count"],
+                                        text_length_bounds=profiles[role]["text_length_bounds"])
                 decision = "quarantine" if result["quarantine"] else "keep"
                 decisions[decision] += 1
                 finding_counts.update(result["finding_codes"])

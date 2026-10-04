@@ -13,8 +13,8 @@ def main() -> None:
     parser.add_argument("--target", type=Path, default=TARGET_PATH, help="Prediction target CSV")
     parser.add_argument("--mode", choices=("targets", "integrated", "structural"), default="targets",
                         help="Legacy target cleaner, combined decisions, or independent structural audit")
-    parser.add_argument("--exclude-policy", choices=("hold", "keep", "quarantine"), default="hold",
-                        help="Integrated mode: handling of the literal source Exclude marker")
+    parser.add_argument("--exclude-policy", choices=("hold", "keep", "quarantine"), default=None,
+                        help="Integrated mode: Exclude policy (agreed default: keep; other values are explicit overrides)")
     parser.add_argument("--output-dir", type=Path,
                         help="New directory for outputs; existing directories are never overwritten")
     parser.add_argument("--config", type=Path, help="Structural mode only: JSON policy overrides")
@@ -24,11 +24,11 @@ def main() -> None:
     try:
         if args.config and args.mode != "structural":
             raise ValueError("--config applies only to --mode structural")
-        if args.mode != "integrated" and args.exclude_policy != "hold":
+        if args.mode != "integrated" and args.exclude_policy is not None:
             raise ValueError("--exclude-policy applies only to --mode integrated")
         if args.mode == "integrated":
             from .integration import run as integrate
-            summary = integrate(args.train, args.target, args.output_dir, args.exclude_policy)
+            summary = integrate(args.train, args.target, args.output_dir, args.exclude_policy or "keep")
         elif args.mode == "structural":
             from .structural import StructuralConfig, run as structural_run
             config = (StructuralConfig.from_dict(json.loads(args.config.read_text(encoding="utf-8")))

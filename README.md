@@ -43,23 +43,28 @@ python -m jupyterlab
 a new output directory. The command writes source fingerprints, changes, review
 flags, and a summary beside its CSV outputs. See the [cleaning guide](docs/target_cleaning.md).
 
-For combined feature/target processing, use `--mode integrated` and a new run directory:
+For combined feature/target/structural processing, use `--mode integrated` and a new run directory:
 
 ```bash
 python -m catalogiq --mode integrated --output-dir data/processed/integration_run
+python -m catalogiq.integration_validation --output-dir data/processed/integration_run
 ```
 
 Pass `--train` and `--target` if your local filenames differ from the defaults.
 This writes one candidate row mask plus candidate, quarantine and review-hold
 partitions. It preserves source strings except audited corrections and runs the
-feature verifier on both inputs. The default source `Exclude` policy is `hold`;
-the result still requires team agreement before modeling. See the
+feature and structural verifiers on both inputs. The agreed default source
+`Exclude` policy is `keep`. Field flags alone do not hold a row; missing name,
+description and contents triggers structural quarantine. Candidate feature
+exports omit timestamps and Sun1-Sun5/Notes while complete audit partitions
+preserve them. Category-level features remain deferred to feature engineering. See the
 [integration contract](docs/integration/cleaning_contract.md) and
 [full-data validation](docs/findings/01_cleaning/02_integration_validation.md).
 
 The separate [structural check](docs/structural_check.md) screens both original
 datasets and records row decisions and raw evidence without changing rows or
-applying either cleaner's quarantine mask.
+applying either cleaner's quarantine mask. Integrated mode consumes this audit
+and combines the three explicit quarantine recommendations by source key.
 It uses the same role-named, one-based identities as integrated mode. You can
 also run it with `python -m catalogiq --mode structural --output-dir data/processed/structural_run`.
 

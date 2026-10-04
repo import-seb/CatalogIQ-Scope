@@ -33,9 +33,9 @@ def sample(**overrides):
     return row
 
 
-def decide(row, role="training", config=CONFIG, upper=4):
+def decide(row, role="training", config=CONFIG, upper=4, length_bounds=(0, 1000)):
     return assess_row(row, {"dataset": role, "source_sha256": "a" * 64, "source_row": 1},
-                      config=config, missingness_upper_count=upper)
+                      config=config, missingness_upper_count=upper, text_length_bounds=length_bounds)
 
 
 def write_source(path, rows):
@@ -124,7 +124,7 @@ class StructuralTests(unittest.TestCase):
     def test_missingness_boundary_excludes_labels_and_metadata(self):
         row = sample(ProductName="", ProductDescription=" null ")
         self.assertNotIn("high_feature_missingness", decide(row, upper=2)["finding_codes"])
-        row["ProductContents"] = ""
+        row["ProductBrand"] = ""
         result = decide(row, upper=2)
         self.assertIn("high_feature_missingness", result["finding_codes"])
         self.assertFalse(result["quarantine"])
@@ -135,7 +135,7 @@ class StructuralTests(unittest.TestCase):
         row.update(dict.fromkeys(CONFIG.missingness_fields, ""))
         result = decide(row, upper=2)
         self.assertIn("no_valid_numeric_anchor", result["finding_codes"])
-        self.assertFalse(result["quarantine"])
+        self.assertEqual(result["reason_codes"], ["missing_product_text"])
         self.assertEqual(quantile(Counter({0: 3, 4: 1}), .75), 1)
         self.assertEqual(quantile(Counter(), .75), 0)
 
@@ -152,13 +152,155 @@ class StructuralTests(unittest.TestCase):
             with self.subTest(values=values), self.assertRaises(ValueError):
                 StructuralConfig.from_dict(values)
 
+    def test_joint_outliers_require_both_signals_and_strict_boundaries(self):
+        for role in ("training", "target"):
+            for count, length, expected in ((0, 9, False), (2, 9, False),
+                                             (3, 10, False), (3, 20, False),
+                                             (3, 15, False), (3, 9, True), (3, 21, True)):
+                with self.subTest(role=role, missing=count, length=length):
+                    row = sample(**dict.fromkeys(CONFIG.text_fields, "x" * length))
+                    row.update(dict.fromkeys(NUMERIC[:count], " null "))
+                    if role == "target":
+                        row.update(dict.fromkeys(TARGETS, ""))
+                    before = copy.deepcopy(row)
+                    result = decide(row, role, upper=2, length_bounds=(10, 20))
+                    self.assertEqual(result["quarantine"], expected)
+                    self.assertEqual(result, decide(row, role, upper=2, length_bounds=(10, 20)))
+                    self.assertEqual(row, before)
+                    if expected:
+                        self.assertEqual(result["reason_codes"], ["missingness_with_unusual_text_length"])
+                        evidence = next(f["evidence"] for f in result["findings"]
+                                        if f["reason_code"] == "missingness_with_unusual_text_length")
+                        self.assertEqual(evidence["missing_fraction"], 3 / 12)
+                        self.assertEqual(evidence["upper_missing_fraction"], 2 / 12)
+                        self.assertEqual(evidence["mean_length"], length)
+                        self.assertFalse(decide(row, role, upper=2, length_bounds=(10, 20),
+                                               config=replace(CONFIG, quarantine_rules=()))["quarantine"])
+
+    def test_no_content_uses_product_evidence_not_ids_or_fixed_missing_count(self):
+        for role in ("training", "target"):
+            row = sample(**dict.fromkeys((*CONFIG.text_fields, *NUMERIC), " null "))
+            # Only 9/12 missing; numeric IDs and timestamps do not rescue content.
+            row.update(Sku="123", Upc="123", MDM_Id="123", MDM_InsertDateTime="45117")
+            result = decide(row, role, upper=12, length_bounds=None)
+            self.assertIn("no_usable_product_content", result["finding_codes"])
+            self.assertEqual(result["reason_codes"], ["missing_product_text"])
+            self.assertEqual(result, decide(row, role, upper=12, length_bounds=None))
+            self.assertFalse(decide(row, role, config=replace(CONFIG, quarantine_rules=()))["quarantine"])
+            # A descriptive product without ratings can still be used.
+            self.assertFalse(decide(row | {"ProductName": "A product"}, role)["quarantine"])
+            # Valid measurements cannot rescue all three missing descriptive fields.
+            self.assertTrue(decide(row | {"ReviewsCount": "0"}, role)["quarantine"])
+            self.assertIn("no_usable_product_content", decide(row | {"ReviewsCount": "NaN"}, role)["finding_codes"])
+            # The reported source row's shape: only retailer populated.
+            sparse = sample(**dict.fromkeys(CONFIG.missingness_fields, ""))
+            sparse["Retailer"] = "Shop"
+            self.assertIn("no_usable_product_content", decide(sparse, role)["finding_codes"])
+
+    def test_missing_descriptive_text_is_unconditional_but_any_text_is_sufficient(self):
+        fields = ("ProductName", "ProductDescription", "ProductContents")
+        for role in ("training", "target"):
+            for token in ("", "  ", "null", " NULL "):
+                row = sample(**dict.fromkeys(fields, token))
+                # Category, brand and all numeric anchors are present and valid.
+                result = decide(row, role, upper=12, length_bounds=None)
+                self.assertEqual(result["reason_codes"], ["missing_product_text"])
+                self.assertEqual(result, decide(row, role, upper=12, length_bounds=None))
+                evidence = next(f["evidence"] for f in result["findings"]
+                                if f["reason_code"] == "missing_product_text")
+                self.assertEqual(evidence["raw_values"], dict.fromkeys(fields, token))
+                for column in fields:
+                    self.assertFalse(decide(row | {column: "some usable text"}, role)["quarantine"])
+                # This is independent of configurable statistical text scope.
+                self.assertTrue(decide(row, role, config=replace(CONFIG, text_fields=("ProductBrand",)))["quarantine"])
+
+    def test_profile_scopes_and_degenerate_sources(self):
+        from catalogiq.structural import mean_text_length
+        row = sample(**dict.fromkeys(CONFIG.text_fields, " x "))
+        self.assertEqual(mean_text_length(row, CONFIG), 1)
+        self.assertEqual(mean_text_length(row | {"ProductName": " null "}, CONFIG), 1)
+        for fields in (("MDM_Id",), ("Brand",), ("ProductRating",), ()):
+            with self.assertRaises(ValueError):
+                replace(CONFIG, text_fields=fields)
+        for fields in (("Sku",), ("MDM_InsertDateTime",), ("Brand",)):
+            with self.assertRaises(ValueError):
+                replace(CONFIG, missingness_fields=fields)
+        for value in (-1, True, float("inf"), float("nan")):
+            with self.assertRaises(ValueError):
+                replace(CONFIG, text_length_iqr_multiplier=value)
+        for bounds in ((2, 1), (0, float("nan")), (1,)):
+            with self.assertRaises(ValueError):
+                decide(row, length_bounds=bounds)
+        # Retired fixed-count configuration must not silently apply to v4.
+        with self.assertRaises(ValueError):
+            StructuralConfig.from_dict({"severe_missingness_min_count": 11})
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw = root / "raw"
+            raw.mkdir()
+            train, target = raw / "train.csv", raw / "target.csv"
+            empty = sample(**dict.fromkeys((*CONFIG.text_fields, *NUMERIC), ""))
+            write_source(train, [empty, empty])
+            write_source(target, [row, row | dict.fromkeys(TARGETS, "")])
+            result = run(train, target, root / "out")
+            self.assertIsNone(result["datasets"]["training"]["text_length_bounds"])
+            self.assertEqual(result["datasets"]["training"]["decisions"]["quarantine"], 2)
+            self.assertEqual(result["datasets"]["target"]["text_length_bounds"], (1, 1))
+            self.assertEqual(result["datasets"]["target"]["decisions"]["quarantine"], 0)
+
+    def test_full_profiles_are_independent_of_labels_ids_and_numeric_text_errors(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw = root / "raw"
+            raw.mkdir()
+            train, target = raw / "train.csv", raw / "target.csv"
+            rows = [sample(**dict.fromkeys(CONFIG.text_fields, "x" * n)) for n in range(10, 30)]
+            changed = [r | dict.fromkeys(TARGETS, "") | {"MDM_Id": "x" * 10000,
+                       "MDM_InsertDateTime": "anything", "ProductRating": "ingredient text"} for r in rows]
+            write_source(train, rows)
+            write_source(target, changed)
+            result = run(train, target, root / "out")
+            for key in ("text_profile_rows", "text_length_q1", "text_length_q3",
+                        "text_length_bounds", "upper_missing_fraction"):
+                self.assertEqual(result["datasets"]["training"][key], result["datasets"]["target"][key])
+
+    def test_adaptive_joint_rule_profiles_both_sources_and_repeats_identically(self):
+        from scripts.validate_structural import verify
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw = root / "raw"
+            raw.mkdir()
+            train, target = raw / "train.csv", raw / "target.csv"
+            base = sample(**dict.fromkeys(CONFIG.text_fields, "x" * 10))
+            rows = [dict(base) for _ in range(20)]
+            # With a homogeneous reference population the strict length fence is 10.
+            rows.append(base | {"ProductName": "x" * 100, "ReviewsCount": ""})
+            rows.append(base | {"ProductName": "x" * 100})  # Length alone.
+            rows.append(base | {"ReviewsCount": ""})  # Missingness alone.
+            write_source(train, rows)
+            write_source(target, [r | dict.fromkeys(TARGETS, "") for r in rows])
+            first = run(train, target, root / "out1")
+            self.assertEqual(first, run(train, target, root / "out2"))
+            verify(root / "out1")
+            for role in ("training", "target"):
+                report = first["datasets"][role]
+                self.assertEqual(report["upper_missing_fraction"], 0)
+                self.assertEqual(report["text_length_bounds"], (10, 10))
+                self.assertEqual(report["rows_by_quarantine_reason"],
+                                 {"missingness_with_unusual_text_length": 1})
+                with (root / "out1" / f"{role}_decisions.csv").open(newline="") as f:
+                    quarantined = [r["source_row"] for r in csv.DictReader(f) if r["quarantine"] == "1"]
+                self.assertEqual(quarantined, ["21"])
+            for name in (*first["output_sha256"], "summary.json"):
+                self.assertEqual((root / "out1" / name).read_bytes(), (root / "out2" / name).read_bytes())
+
     def test_invalid_identity_rejected(self):
         valid = {"dataset": "training", "source_sha256": "a" * 64, "source_row": 1}
         for override in ({"dataset": ""}, {"source_sha256": "bad"}, {"source_row": -1},
                          {"dataset": "training.csv"}, {"source_row": 0},
                          {"source_row": True}, {"source_row": "0"}):
             with self.subTest(override=override), self.assertRaises(ValueError):
-                assess_row(sample(), valid | override, config=CONFIG, missingness_upper_count=1)
+                assess_row(sample(), valid | override, config=CONFIG, missingness_upper_count=1, text_length_bounds=(0, 1000))
 
     def test_full_run_identity_audit_preservation_and_repeatability(self):
         from catalogiq.cleaning import load_source
@@ -197,7 +339,7 @@ class StructuralTests(unittest.TestCase):
                 self.assertEqual((loaded["source_row"] + 1).tolist(), [int(r["source_row"]) for r in decisions])
                 self.assertEqual(decisions[1]["quarantine"], "1")
                 self.assertEqual(decisions[2]["quarantine"], "0")
-                self.assertEqual(first["datasets"][role]["decisions"]["quarantine"], 2 if role == "training" else 1)
+                self.assertEqual(first["datasets"][role]["decisions"]["quarantine"], 3 if role == "training" else 2)
                 for detail in details:
                     self.assertEqual(dict(zip(detail["raw_columns"], detail["raw_values"])),
                                      expected_rows[detail["source_row"] - 1])
@@ -314,9 +456,9 @@ class StructuralTests(unittest.TestCase):
             compared = verify_feature_compatibility(root / "structural", feature_dirs)
             self.assertEqual(compared, verify_feature_compatibility(root / "structural", feature_dirs))
             self.assertEqual(compared["training"]["decisions_compared"],
-                             {"both_quarantine": 1, "structural_only": 1, "feature_only": 1, "neither": 1})
+                             {"both_quarantine": 1, "structural_only": 1, "feature_only": 0, "neither": 2})
             self.assertEqual(compared["target"]["decisions_compared"],
-                             {"both_quarantine": 1, "structural_only": 0, "feature_only": 1, "neither": 2})
+                             {"both_quarantine": 1, "structural_only": 0, "feature_only": 0, "neither": 3})
             self.assertFalse(compared["training"]["masks_combined"])
             self.assertTrue(all(p.read_bytes() == content for p, content in feature_bytes.items()))
             # Exercise Max's existing integration on synthetic data only. Structural

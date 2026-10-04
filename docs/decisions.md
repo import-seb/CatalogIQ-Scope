@@ -1,57 +1,68 @@
 # Current cleaning decisions
 
-These decisions govern `catalogiq.cleaning`. Historical notebooks may retain withdrawn assumptions; see the [analysis index](../notebooks/README.md).
+Updated 2026-10-03. These decisions govern feature, target-label, structural,
+and integrated cleaning. The authority column distinguishes group agreement
+reported by Sebastian from Sebastian's implementation decisions. They supersede
+the earlier conservative handoff's blanket feature-review and Exclude holds.
 
-The independent `catalogiq.structural` policy is documented in the
-[structural-check guide](structural_check.md) and
-[validation summary](findings/00_data_profile/07_structural_validation.md).
-After the PR #8 main merge, `structural-v2` adopts the canonical role-named,
-one-based identity; see [compatibility validation](findings/00_data_profile/08_structural_main_compatibility.md).
-Its corroborated quarantine decisions preserve every source record and do not
-change the target-cleaning decisions below. Timestamp format warnings, missingness,
-absent measurements, label rarity and lowercase formatting alone do not justify
-structural quarantine. This implementation policy is subject to the documented
-schema/team review; it is not approval of a common modeling mask.
+## Cleaning philosophy
 
-1. We avoided enforcing a fixed Segment–Sub-Segment whitelist because some Sub-Segments legitimately appear under multiple Segments; instead, we apply incremental structural checks, such as validating count relationships only for Sub-Segments that have exactly one observed parent. (Sebastian, 9/27/2026)
-2. Decision Note — Normalize `Other Lifestyle` to `Other Lifestyle CHC`
+Preserve usable products. Distinguish a questionable field from an unusable or
+misaligned row. Record field warnings without automatically excluding the row;
+quarantine only when an explicit row rule applies. Preserve original source
+values and identity for audit. Never invent labels, repair a suspected column
+shift by guessing, or replace suspicious numeric values with sentinel values.
 
-The three `Other Lifestyle` records were normalized to `Other Lifestyle CHC`. Both labels occur under the same parent Segment, `Lifestyle CHC`, and the smaller class contains only three products, including blister lip balm and an `ORGANIC VITALITY Premium Berberine HCL Supplement - 1200mg of Berberine Per...`. These products do not demonstrate a clear, distinct taxonomy from the 195-record `Other Lifestyle CHC` class. Given the shared parent, near-identical label meaning, and very small support for `Other Lifestyle`, the smaller label was treated as an inconsistent naming variant rather than a separate Sub-Segment.
+| Policy | Authority/status | Current implementation |
+| --- | --- | --- |
+| 1. Literal `Exclude` marker | Group agreed | Keep otherwise usable rows. Marker remains auditable; arbitrary text in Exclude is not treated as the marker. |
+| 2. `MDM_InsertDateTime` as model input | Group agreed | Omit from feature exports/model inputs; retain the original value in source and audit partitions. No guessed date conversion. |
+| 3. Bad timestamp alone | Sebastian decision | No timestamp flag, hold or quarantine on its own. A URL in the timestamp contributes to quarantine only with independent displacement evidence. |
+| 4. Name, description and contents all missing | Sebastian decision | Structural `missing_product_text` quarantine, even if category, brand or numeric measurements are present. Any one of the three being present avoids this particular rule. |
+| 5. Bad URL alone | Sebastian decision | Keep the URL flag and original value; do not hold the row. Corroborated displacement can still quarantine it. |
+| 6. One feature issue generally | Sebastian decision | No automatic whole-row hold. Apply the explicit rule for that issue; a field-review flag is not a row decision. |
+| 7. Evidence of shifted columns | Sebastian decision | Quarantine using documented combinations of distinct-field evidence; retain every contributing reason. |
+| 8. Structural checker integration | Sebastian decision | Run independently on raw sources, verify its complete decision tables, and combine keyed quarantine decisions with feature and target-label decisions in integrated mode. |
+| 9. `Sun1`-`Sun5` and `Notes` | Sebastian decision | Omit from feature exports/model inputs; retain in raw sources, complete partitions and structural evidence. Do not infer their intended meaning. |
+| 10. Category-level features | Deferred to feature engineering | Later derive `retailer_category_level_N` from ProductCategory. Preserve the full path and Retailer now. No derived levels, root removal or new ampersand normalization in cleaning. |
 
-3. Decision Note - Preserve supplied manufacturer labels
+Missing means blank/whitespace or case-insensitive `null` in the integrated and
+structural passes. No fixed 11/12 missing-field cutoff remains. Statistical
+missingness and text-length checks use explicit product-feature scopes and
+per-source IQR profiles; both unusual missingness and unusual text length are
+required for that quarantine rule. Labels, IDs and timestamps cannot distort
+those profiles. Missing measurements alone are not grounds for quarantine.
 
-Do not infer or overwrite `Mnfr` from `Brand`. The earlier J&J reassignment decision is withdrawn: a dominant association does not establish that minority labels or missing values should become `J&J`. Preserve supplied values, including missing values.
+## Label policies retained
 
-Keep vocabulary validation only: populated values outside `J&J` and `All others` are flagged for review, not replaced.
+- Normalize `Cold / Flu` to `Cold/Flu` in Sub-Segment.
+- Normalize `Other Lifestyle` to `Other Lifestyle CHC`. The three reviewed
+  records share Lifestyle CHC as their parent and do not support a separate class.
+- Preserve supplied Mnfr, including missing and invalid values. Do not infer
+  J&J from Brand. Populated values outside J&J / All others are quarantined under
+  target reason 6 without changing the source label.
+- Target reasons 2 (leading-space/lowercase formatting) and 3 (rarity) remain
+  review-only. Missing labels are eligibility concerns for the corresponding
+  future model, not automatic whole-row failures.
+- Do not enforce a fixed Segment/Sub-Segment parent whitelist: shared parents
+  can be legitimate. Single-parent count diagnostics do not change labels.
 
-4. Decision Note - Reason 2 is review-only
+## Ownership and superseded behavior
 
-Reason 2 (label starts with a space or lowercase character) adds a flag but does
-not quarantine a row. Reason 3 remains review-only as before. Reasons 4, 5, and 6
-still quarantine records; having reason 2 as well does not override them.
-Manufacturer values remain unchanged. The earlier all-reasons-flag-only change
-was a misunderstanding and is withdrawn.
+Target reasons 4/5 (row-content checks) have moved out of target cleaning. Their
+reinforced equivalents live in the structural module and run on both datasets.
+The structural module does not import either cleaner or consume their masks.
+Integration alone combines the three decision streams, preserving reason prefixes
+`feature:`, `target:`, and `structural:`. See the
+[integration contract](integration/cleaning_contract.md).
 
-5. Integration implementation and pending policy (Maksim, 2026-09-30)
+Historical runs retain their original policy versions. In particular, v3's
+11/12 cutoff, the earlier standalone no-content rule, automatic feature holds,
+and default Exclude holds are superseded. The prior decision to preserve raw
+timestamps remains; only corroborated displacement is now actionable. Explicit
+`--exclude-policy hold|quarantine` overrides remain available for comparison,
+are recorded in the run summary, and are not the agreed default.
 
-`--mode integrated` assigns canonical source identity before either cleaner.
-It preserves raw string values except logged feature formatting and the two
-accepted Sub-Segment replacements. Blank/whitespace, case-insensitive `null`,
-and direct Python `None` category inputs remain missing; no category is inferred.
-The legacy target-only command retains its existing parsing and identity.
-
-The executable integration proposal combines structural recommendations by union,
-keeps target reasons 2/3 review-only, and defaults unknown `Exclude` semantics and
-unresolved feature fields to a separate review hold. `keep_candidate` is a
-candidate mask, not an approved final training mask. These hold/exclusion choices
-still require team agreement and Maria's independent quality review.
-See the [contract](integration/cleaning_contract.md) and
-[validated run](findings/01_cleaning/02_integration_validation.md).
-
-6. Preserve MDM_InsertDateTime pending source confirmation (Maksim, 2026-09-30)
-
-[Notebook 10](../notebooks/10_mdm_datetime_audit.ipynb) supports an Excel-style
-serial-date hypothesis for common numeric values but finds no confirmed epoch
-or timezone. Preserve the raw field; do not apply a guessed conversion or use it
-for a time split. A later derived ISO 8601 field needs confirmed source semantics,
-the original token and a conversion audit. Details: [date evidence](findings/01_cleaning/03_mdm_datetime_audit.md).
+No model, feature-engineered category levels, evaluation split or inferred target
+labels are introduced by these decisions. Working manufacturer/age vocabularies,
+ambiguous fields and individual flagged values remain visible for team review.

@@ -13,7 +13,7 @@ The separate
 [structural-check contract](structural_check.md) keeps literal source strings and
 uses explicit blank/null diagnostics with the canonical role-named, one-based
 identity used by integrated mode. Its full training and prediction decisions are
-independent of feature/target masks and partitions. Earlier `structural-v1` runs
+computed independently of feature/target masks and partitions, then consumed by integrated mode. Earlier `structural-v1` runs
 used the legacy identity; do not join those artifacts without explicit conversion.
 
 ## Inputs and grain
@@ -45,15 +45,16 @@ An existing run directory is rejected to prevent accidental overwrite.
 ## Outputs and invariants
 
 Cleaned and quarantined outputs together retain every input row exactly once.
-Reasons 2 and 3 are review-only. Reasons 4, 5, and 6 quarantine rows, including
-rows that also have reason 2. Every label change needs old/new values, a rule, and source identity.
+Reasons 2 and 3 are review-only. Target reason 6 quarantines rows, including
+rows that also have reason 2. Former target row-content reasons 4/5 are now
+owned by the structural pass, which also quarantines missing name/description/contents. Every label change needs old/new values, a rule, and source identity.
 The target export is a parsed pass-through with provenance, not a claim that its
 records passed structural screening. See [artifact definitions](target_cleaning.md).
 
 ## Unresolved contract questions
 
 Confirm with the Product Owner: row grain; canonical entity identity; Exclude field
-semantics; timestamp encoding; permitted label vocabularies and applicability;
+semantics (selection is resolved: retain otherwise usable marked rows); timestamp encoding; permitted label vocabularies and applicability;
 meaning of missing versus not-applicable values; handling of malformed CSV records;
 retailer-specific taxonomy rules; redistribution and retention terms.
 

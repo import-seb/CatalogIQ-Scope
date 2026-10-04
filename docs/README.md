@@ -11,6 +11,8 @@
 
 ## Evidence
 
+- [Current combined cleaning validation](findings/01_cleaning/05_current_policy_validation.md): agreed Exclude handling, integrated structural decisions, exports and reproducibility.
+
 - [Initial profile](findings/00_data_profile/01_profile_results.md)
 - [Proposed cleaning direction](findings/00_data_profile/02_cleaning_direction.md)
 - [Structural validation](findings/00_data_profile/07_structural_validation.md): counts, reproducibility and remaining assumptions.

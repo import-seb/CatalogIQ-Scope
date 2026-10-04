@@ -1,7 +1,8 @@
 """Auditable implementation of notebooks/02_clean_target_cols.ipynb.
 
 Run from the repository root: python -m catalogiq
-Reason 2 is review-only; structural and manufacturer checks still quarantine rows.
+Reasons 2/3 are review-only; manufacturer validation can quarantine rows.
+Row-content checks live in catalogiq.structural and must be run separately.
 """
 
 from __future__ import annotations
@@ -19,13 +20,12 @@ PROVENANCE = ["dataset", "source_sha256", "source_row"]
 REASONS = {
     2: "Target label starts with a space or lowercase character (review heuristic)",
     3: "Target label frequency below lower IQR bound (review only; not invalidity)",
-    4: "Both source-text missingness and average length outside IQR bounds",
-    5: "No numeric content in any source column",
     6: "Populated Mnfr outside J&J / All others",
 }
 CHANGE_COLUMNS = PROVENANCE + ["column", "old_value", "new_value", "rule"]
 FLAG_COLUMNS = PROVENANCE + ["reason_code", "column", "value"]
-QUARANTINE_REASONS = {4, 5, 6}
+QUARANTINE_REASONS = {6}
+POLICY_VERSION = "target-labels-v2"
 
 
 @dataclass
@@ -80,7 +80,8 @@ def clean_training(frame: pd.DataFrame) -> CleaningResult:
     """Return cleaned and quarantined rows without mutating the input.
 
     Requires provenance from load_source. Reasons 2 and 3 are review-only;
-    reasons 4, 5, and 6 quarantine a row even when reason 2 is also present.
+    reason 6 quarantines a row even when reason 2 is also present.
+    Former reasons 4/5 have moved to the independent structural checker.
     """
     required = set(TARGET_COLUMNS + PROVENANCE)
     if not required.issubset(frame.columns):
@@ -90,7 +91,6 @@ def clean_training(frame: pd.DataFrame) -> CleaningResult:
     if "Q_REASON" in frame:
         raise ValueError("Pass source records, not an already cleaned output")
     working = frame.copy(deep=True)
-    source_columns = [c for c in frame if c not in PROVENANCE]
     reasons = {index: set() for index in frame.index}
     flag_parts = []
     change_parts = []
@@ -116,24 +116,6 @@ def clean_training(frame: pd.DataFrame) -> CleaningResult:
         counts = labels.value_counts()
         lower, _ = iqr_bounds(counts)
         flag(labels.map(counts).lt(lower), 3, column)
-
-    # Compute diagnostics from source data only. Provenance cannot satisfy the
-    # numeric-content check or change the missingness/length distribution.
-    numeric = working[source_columns].apply(pd.to_numeric, errors="coerce")
-    # String loading protects identifiers. Pure numeric columns are omitted
-    # from text diagnostics, as inferred numeric columns were in the notebook.
-    text_columns = [c for c in source_columns
-                    if (working[c].notna() & numeric[c].isna()).any()]
-    if text_columns:
-        lengths = working[text_columns].apply(lambda column: column.astype("string").str.len())
-        missingness = lengths.isna().mean(axis=1)
-        row_length = lengths.mean(axis=1)
-        low_missing, high_missing = iqr_bounds(missingness)
-        low_length, high_length = iqr_bounds(row_length)
-        unusual_missing = missingness.lt(low_missing) | missingness.gt(high_missing)
-        unusual_length = row_length.lt(low_length) | row_length.gt(high_length)
-        flag(unusual_missing & unusual_length, 4)
-    flag(numeric.isna().all(axis=1), 5)
 
     invalid_mnfr = working["Mnfr"].notna() & ~working["Mnfr"].isin({"J&J", "All others"})
     flag(invalid_mnfr, 6, "Mnfr")
@@ -210,6 +192,8 @@ def run(train_path: Path, target_path: Path, output_dir: Path) -> dict:
     }
     counts = result.flags["reason_code"].value_counts().sort_index()
     summary = {
+        "policy_version": POLICY_VERSION,
+        "structural_screening_applied": False,
         "source_notebook": "notebooks/02_clean_target_cols.ipynb",
         "sources": {"training": {"path": str(train_path), "sha256": sha256(train_path)},
                     "target": {"path": str(target_path), "sha256": sha256(target_path)}},
@@ -233,10 +217,10 @@ def run(train_path: Path, target_path: Path, output_dir: Path) -> dict:
         "hierarchy_violations": len(result.hierarchy_violations),
         "notes": [
             "source_row is the zero-based parsed CSV record, not a physical line number.",
-            "Reason 2 is review-only. Reasons 4, 5, and 6 quarantine rows, including mixed-reason rows.",
+            "Reasons 2/3 are review-only. Reason 6 quarantines rows, including mixed-reason rows.",
             "Frequency alone is review-only; lowercase labels can be legitimate.",
             "Source columns are read as strings with pandas default NA parsing.",
-            "Text diagnostics exclude numeric-only columns and all added metadata.",
+            "Former row-content reasons 4/5 moved to catalogiq.structural; run structural mode separately on both raw sources.",
             "Invalid Mnfr values are preserved in quarantine for review.",
             "Target data is passed through with provenance; it is not screened or filled.",
             "Brand, Platform, Segment and TargetAgeGroup are never inferred or replaced.",

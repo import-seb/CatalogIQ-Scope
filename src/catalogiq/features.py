@@ -84,14 +84,14 @@ def clean_row(row):
     mdm = row.get('MDM_Id', '')
     if mdm.strip().lower().startswith(('http://', 'https://')):
         flags.append('MDM_Id:url_in_identifier')
+    # Timestamp format alone is not a quality finding. A URL in this field
+    # contributes only when another field already supplies displacement evidence.
     stamp = row.get('MDM_InsertDateTime', '')
-    if not missing(stamp):
-        try:
-            number = Decimal(stamp.strip())
-            if not number.is_finite():
-                raise InvalidOperation
-        except InvalidOperation:
-            flags.append('MDM_InsertDateTime:non_numeric_review')
+    corroborated = any(f in {'MDM_Id:url_in_identifier', 'ProductUrl:invalid_http_url',
+                            'ProductImageUrl:invalid_http_url'}
+                       or (f.split(':')[0] in NUMBERS and f.endswith(':non_numeric')) for f in flags)
+    if stamp.strip().lower().startswith(('http://', 'https://')) and corroborated:
+        flags.append('MDM_InsertDateTime:url_with_displacement')
     for column in row:
         if result[column] != row[column]:
             changes.append(column)
