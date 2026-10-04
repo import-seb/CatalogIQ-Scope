@@ -1,11 +1,12 @@
 import csv
+import json
 from pathlib import Path
 import tempfile
 import unittest
 
 from catalogiq.cleaning import clean_training
 from catalogiq.features import sha256, IDS
-from catalogiq.integration import identity, row_decision, run, target_audit
+from catalogiq.integration import identity, row_decision, run, target_audit, load_structural_decisions
 from test_feature_decisions import sample_row
 import pandas as pd
 
@@ -23,21 +24,100 @@ def read_rows(path):
 
 
 class IntegrationTests(unittest.TestCase):
+    def test_current_policy_end_to_end_and_feature_projection(self):
+        from catalogiq.integration_validation import verify
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "raw").mkdir()
+            train, target = root / "raw/train.csv", root / "raw/target.csv"
+            base = sample_row(Mnfr="J&J", Retailer="Shop", ProductName="x" * 10,
+                              ProductDescription="x" * 10, ProductContents="x" * 10,
+                              ProductBrand="x" * 10, ProductCategory="ABCD > EFG",
+                              ProductRating="4", ReviewsCount="10", ProductReviewsCount="10", XRatXRev="40")
+            empty_text = dict.fromkeys(("ProductName", "ProductDescription", "ProductContents"), " null ")
+            cases = [({"Exclude": "Exclude"}, "candidate"),
+                     ({"MDM_InsertDateTime": "not a date"}, "candidate"),
+                     ({"MDM_InsertDateTime": "https://example.test/image"}, "candidate"),
+                     ({"ProductUrl": "bad URL"}, "candidate"),
+                     ({"ProductRating": "bad"}, "candidate"),
+                     (empty_text, "quarantine"),
+                     (empty_text | {"ProductUrl": "bad"}, "quarantine"),
+                     ({"ProductRating": "text", "ReviewsCount": "text"}, "quarantine"),
+                     (empty_text | {"ProductRating": "text", "ReviewsCount": "text"}, "quarantine"),
+                     ({"ProductRating": "text", "MDM_InsertDateTime": "https://example.test/image"}, "quarantine"),
+                     ({"MDM_InsertDateTime": "https://example.test/image", "ProductUrl": "bad"}, "quarantine"),
+                     ({"Sun1": "ingredient", "Notes": "fragment", "Exclude": "shifted text"}, "quarantine")]
+            rows = [dict(base) for _ in range(30)] + [base | changes for changes, _ in cases]
+            write_rows(train, rows)
+            write_rows(target, [r | dict.fromkeys(("Mnfr", "Brand", "Platform", "Segment", "Sub-Segment", "TargetAgeGroup"), "null") for r in rows])
+            out = root / "out"
+            result = run(train, target, out)
+            checked = verify(train, target, out)
+            for role in ("training", "target"):
+                audit = [r for r in read_rows(out / "row_decisions.csv") if r["dataset"] == role]
+                self.assertEqual([r["status"] for r in audit[30:]], [status for _, status in cases])
+                for r in audit[31:33]:
+                    self.assertNotIn("MDM_InsertDateTime", r["feature_flags"])
+                    self.assertNotIn("timestamp", r["structural_finding_codes"])
+                self.assertIn("ProductUrl:invalid_http_url", audit[33]["feature_flags"])
+                self.assertEqual(audit[38]["hold_reasons"], "")
+                self.assertIn("structural:missing_product_text", audit[35]["quarantine_reasons"])
+                self.assertIn("structural:missing_product_text", audit[38]["quarantine_reasons"])
+                exported = read_rows(out / f"{role}_features.csv")
+                self.assertEqual(len(exported), result["rows"][role]["candidate"])
+                self.assertTrue(all(c not in exported[0] for c in ("Sun1", "Sun2", "Sun3", "Sun4", "Sun5", "Notes", "MDM_InsertDateTime")))
+                self.assertFalse(any(c.startswith("retailer_category_level_") for c in exported[0]))
+                self.assertIn("ProductCategory", exported[0])
+                self.assertIn("Retailer", exported[0])
+                self.assertTrue(checked[role]["partitions_and_feature_exports_verified"])
+            self.assertTrue(result["independent_structural_screening_applied"])
+            self.assertEqual(result["exclude_policy"], "keep")
+            # Rehash a tampered projection: the verifier must check actual values too.
+            exported = read_rows(out / "training_features.csv")
+            exported[0]["ProductName"] = "invented product"
+            write_rows(out / "training_features.csv", exported)
+            result["output_sha256"]["training_features.csv"] = sha256(out / "training_features.csv")
+            (out / "summary.json").write_text(json.dumps(result))
+            with self.assertRaisesRegex(ValueError, "Feature export value"):
+                verify(train, target, out)
+
+    def test_structural_identity_join_rejects_foreign_duplicates_and_ignores_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decisions.csv"
+            rows = [dict(dataset="training", source_sha256="digest", source_row=str(n),
+                         quarantine="0", reason_codes="[]", finding_codes="[]") for n in (2, 1)]
+            write_rows(path, rows)
+            result = load_structural_decisions(path, "training", "digest")
+            self.assertEqual(set(result), {("training", "digest", "1"), ("training", "digest", "2")})
+            for bad in (rows + [rows[0]], [rows[0] | {"source_sha256": "foreign"}],
+                        [rows[0] | {"dataset": "target"}], [rows[0] | {"source_row": "0"}],
+                        [rows[0] | {"quarantine": "1"}]):
+                write_rows(path, bad)
+                with self.assertRaises(ValueError):
+                    load_structural_decisions(path, "training", "digest")
+
     def test_union_precedence_and_marker_policies(self):
-        feature = dict(reasons="", source_exclude_marker="0", requires_review="0", recommend_quarantine="0")
-        self.assertEqual(row_decision(feature, [2, 3], "hold"), ("candidate", [], []))
+        feature = dict(reasons="", source_exclude_marker="0", requires_review="0",
+                       recommend_quarantine="0", hold_reasons="")
+        clean_structural = dict(reason_codes="[]", quarantine="0")
+        def decision(f, codes=(), policy="keep", structural=clean_structural):
+            return row_decision(f, codes, policy, structural=structural)
+        self.assertEqual(decision(feature, [2, 3]), ("candidate", [], []))
         marked = {**feature, "source_exclude_marker": "1"}
-        self.assertEqual(row_decision(marked, [], "hold")[0], "review_hold")
-        self.assertEqual(row_decision(marked, [], "keep")[0], "candidate")
-        self.assertEqual(row_decision(marked, [], "quarantine")[1], ["source:Exclude"])
-        structural = {**marked, "reasons": "displaced", "recommend_quarantine": "1", "requires_review": "1"}
-        status, reasons, holds = row_decision(structural, [2, 6], "hold")
+        self.assertEqual(decision(marked)[0], "candidate")
+        self.assertEqual(decision(marked, policy="hold")[0], "review_hold")
+        self.assertEqual(decision(marked, policy="quarantine")[1], ["source:Exclude"])
+        shifted = {**marked, "reasons": "displaced", "recommend_quarantine": "1",
+                   "requires_review": "1", "hold_reasons": "missing_product_text"}
+        status, reasons, holds = decision(shifted, [2, 6], structural={"reason_codes": '["shifted"]'})
         self.assertEqual(status, "quarantine")
-        self.assertEqual(reasons, ["feature:displaced", "target:6"])
-        self.assertEqual(holds, ["source_exclude_policy_unconfirmed"])
-        self.assertEqual(row_decision({**feature, "requires_review": "1"}, [], "keep")[0], "review_hold")
+        self.assertEqual(reasons, ["feature:displaced", "target:6", "structural:shifted"])
+        self.assertEqual(holds, ["feature:missing_product_text"])
+        self.assertEqual(decision({**feature, "requires_review": "1"})[0], "candidate")
+        self.assertEqual(decision({**feature, "hold_reasons": "missing_product_text"})[0], "review_hold")
+        self.assertEqual(decision(feature, structural={"reason_codes": '["shifted"]'})[0], "quarantine")
         with self.assertRaisesRegex(ValueError, "Unknown Exclude"):
-            row_decision(feature, [], "guess")
+            decision(feature, policy="guess")
 
     def test_target_join_checks_coverage_and_duplicates_not_position(self):
         rows = [sample_row(Mnfr="J&J") for _ in range(3)]
@@ -98,13 +178,12 @@ class IntegrationTests(unittest.TestCase):
                     if original["ProductCategory"] in {"", "null", " NULL "}:
                         self.assertEqual(record["ProductCategory"], original["ProductCategory"])
             statuses = {int(r["source_row"]): r["status"] for r in audit if r["dataset"] == "training"}
-            # On a tiny synthetic distribution IQR reason 4 can supersede a
-            # feature hold. The hold reason must still be preserved in the audit.
+            # Structural content rules no longer run inside target cleaning.
             by_number = {int(r["source_row"]): r for r in audit if r["dataset"] == "training"}
-            self.assertIn("source_exclude_policy_unconfirmed", by_number[6]["hold_reasons"])
-            self.assertIn("feature_field_review", by_number[7]["hold_reasons"])
+            self.assertEqual(by_number[6]["hold_reasons"], "")
+            self.assertEqual(by_number[7]["hold_reasons"], "")
             for number in (6, 7):
-                self.assertEqual(statuses[number], "quarantine" if by_number[number]["quarantine_reasons"] else "review_hold")
+                self.assertEqual(statuses[number], "candidate")
             self.assertEqual([statuses[i] for i in (8, 9, 10)], ["quarantine"] * 3)
             self.assertEqual(summary["changes_by_rule"], {"slash_spacing": 1, "reviewed_other_lifestyle": 1})
             self.assertFalse(summary["modeling_ready"])

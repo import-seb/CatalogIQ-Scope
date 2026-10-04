@@ -53,14 +53,14 @@ class CleanTargetsTests(unittest.TestCase):
             pd.testing.assert_series_equal(result.cleaned[column], original.loc[result.cleaned.index, column])
         self.assertEqual(result.cleaned.loc[6, "Mnfr"], "All others")
 
-    def test_multiple_reasons_and_provenance_not_numeric_evidence(self):
+    def test_label_quarantine_preserves_multiple_label_reasons(self):
         frame = sample_frame()
         for column in [c for c in frame if c not in ["dataset", "source_sha256", "source_row"]]:
             frame.loc[0, column] = "Text"
         frame.loc[0, "Brand"] = "lowercase"
         frame.loc[1, "Mnfr"] = "Unexpected"
         result = clean_training(frame)
-        self.assertTrue({2, 5, 6}.issubset(result.quarantine.loc[0, "Q_REASON"]))
+        self.assertTrue({2, 6}.issubset(result.quarantine.loc[0, "Q_REASON"]))
         self.assertIn(6, result.quarantine.loc[1, "Q_REASON"])
         self.assertEqual(result.quarantine.loc[1, "Mnfr"], "Unexpected")
         self.assertNotIn(0, result.cleaned.index)
@@ -76,6 +76,18 @@ class CleanTargetsTests(unittest.TestCase):
         self.assertIn(2, result.cleaned.loc[0, "Q_REASON"])
         self.assertEqual(result.cleaned.loc[0, "Sub-Segment"], "Cold/Flu")
         self.assertEqual(len(result.cleaned), len(frame))
+
+    def test_row_content_rules_have_moved_out_of_target_cleaning(self):
+        frame = sample_frame()
+        product_fields = [c for c in frame if c not in TARGET_COLUMNS + ["dataset", "source_sha256", "source_row"]]
+        frame.loc[0, product_fields] = pd.NA
+        frame.loc[1, product_fields] = "non-numeric text"
+        frame.loc[2, product_fields] = pd.NA
+        frame.loc[2, "ProductName"] = "x" * 10000
+        result = clean_training(frame)
+        self.assertEqual(len(result.cleaned), len(frame))
+        self.assertTrue(result.quarantine.empty)
+        self.assertFalse(set(result.flags["reason_code"]) & {4, 5})
 
     def test_rarity_alone_is_review_only(self):
         frame = sample_frame().iloc[:31].copy()

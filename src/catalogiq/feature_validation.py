@@ -33,6 +33,9 @@ def valid_category_change(before, after):
 def verify(source, output, dataset):
     source, output = Path(source), Path(output)
     summary = json.loads((output / 'summary.json').read_text(encoding='utf-8'))
+    require(summary['policy_version'] in {'feature-decisions-v1', 'feature-decisions-v2', 'feature-decisions-v3'},
+            'Unsupported feature policy.')
+    current_policy = summary['policy_version'] != 'feature-decisions-v1'
     digest = sha256(source)
     require(summary['dataset'] == dataset, 'Dataset mismatch.')
     require(summary['source_sha256'] == digest, 'Raw input hash mismatch.')
@@ -81,7 +84,14 @@ def verify(source, output, dataset):
             excluded = raw['Exclude'].strip() == 'Exclude'
             require((audit['source_exclude_marker'] == '1') == excluded, 'Exclude interpretation changed.')
             require(quarantine == bool(reasons), 'Quarantine reason mismatch.')
-            expected_disposition = ('quarantine_candidate' if quarantine else 'policy_hold' if excluded
+            held = (summary['policy_version'] == 'feature-decisions-v2' and
+                    all(missing(raw[c]) for c in ('ProductName', 'ProductDescription', 'ProductContents')))
+            if current_policy:
+                require(audit['recommend_hold'] == str(int(held)), 'Row hold mismatch.')
+                require(audit['hold_reasons'] == ('missing_product_text' if held else ''), 'Hold reasons mismatch.')
+            expected_disposition = ('quarantine_candidate' if quarantine
+                                    else 'review_hold' if current_policy and held
+                                    else 'policy_hold' if not current_policy and excluded
                                     else 'review' if audit['requires_review'] == '1'
                                     else 'repaired' if actual_changes else 'retain')
             require(audit['disposition'] == expected_disposition, 'Disposition mismatch.')
@@ -94,6 +104,9 @@ def verify(source, output, dataset):
                         and detail['disposition'] == audit['disposition'], 'Detail decision mismatch.')
                 for name in ('recommend_quarantine', 'source_exclude_marker', 'requires_review'):
                     require(detail[name] == (audit[name] == '1'), 'Detail boolean mismatch.')
+                if current_policy:
+                    require(detail['recommend_hold'] == held and detail['hold_reasons'] ==
+                            (['missing_product_text'] if held else []), 'Detail hold mismatch.')
                 require(set(flags) <= {e['flag'] for e in detail['decisions']}, 'Unresolved flag in detail.')
             dispositions.update([audit['disposition']])
             changes_count.update(actual_changes.keys())

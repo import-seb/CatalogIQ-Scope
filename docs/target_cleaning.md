@@ -1,5 +1,10 @@
 # Target-label cleaning
 
+Dataset-wide structural screening is available as a
+[separate command](structural_check.md) for both original datasets. It does not
+apply this cleaner's label rules. Former row-content reasons 4/5 now live there. Integrated mode runs all three passes; this standalone command's target output
+remains an unscreened pass-through.
+
 Run from an installed project environment:
 
 ```bash
@@ -14,8 +19,8 @@ The source notebook is [02_clean_target_cols.ipynb](../notebooks/02_clean_target
 
 **Reason 2 is review-only.** Rows with reason 2 (leading space or lowercase label)
 remain in the cleaned data unless they also trigger a quarantine reason. Reason 3
-(label rarity) remains review-only, as before. Reasons **4, 5, and 6** quarantine
-rows. For example, `[2]` is retained and `[2, 5]` is quarantined. Reasons accumulate;
+(label rarity) remains review-only, as before. Only reason **6** quarantines
+rows here. For example, `[2]` is retained and `[2, 6]` is quarantined. Reasons accumulate;
 quarantine is for review, not proof of invalidity.
 
 The cleaner applies only `Cold / Flu` -> `Cold/Flu` and `Other Lifestyle` ->
@@ -24,9 +29,8 @@ including missing and out-of-vocabulary values. Invalid populated Mnfr values ar
 flagged and quarantined, never reassigned. There is no Brand, Platform, Segment, or TargetAgeGroup
 inference, and no deduplication.
 
-Checks record label formatting, rare-label frequency, unusual source-text
-missingness/length, absent numeric content, and invalid manufacturer vocabulary.
-Source metadata is excluded from those checks. Multiple reasons accumulate.
+Checks record label formatting, rare-label frequency and invalid manufacturer
+vocabulary. Row-content checks are owned by the structural pass. Multiple reasons accumulate.
 Lowercase brands may be legitimate; these are prompts for review.
 
 ## Outputs
@@ -34,7 +38,7 @@ Lowercase brands may be legitimate; these are prompts for review.
 | File | Contents |
 | --- | --- |
 | `training_cleaned.csv` | Retained records, including reason-2-only flags, corrections and provenance. |
-| `training_quarantine.csv` | Records triggering reasons 4, 5, or 6, with all accumulated reasons. |
+| `training_quarantine.csv` | Records triggering reason 6, with all accumulated reasons. |
 | `target_unchanged.csv` | Parsed prediction data with provenance; not screened or filled. |
 | `label_changes.csv` | Source identity, old/new values, and rule for each correction. |
 | `review_flags.csv` | Detailed flag events for both retained and quarantined records. |
@@ -61,7 +65,7 @@ conflating it with nulls. `target_distributions_scope` records the definitions.
 
 The notebook uses the shared package checks for Q_REASON, while retaining its
 exploratory sequence of label corrections. Previously saved notebook outputs from
-the exclusion-based policy must be rerun before reuse. Older generated output runs are historical; the current policy is reason-2-only
-review behavior with the existing reason-3 exception.
+the exclusion-based policy must be rerun before reuse. Older generated output runs are historical. The current target-labels-v2 policy
+keeps reasons 2/3 review-only and quarantines reason 6; see [decisions](decisions.md).
 
 Run checks with `python -m unittest discover -s tests -v`.
