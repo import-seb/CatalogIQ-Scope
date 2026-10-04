@@ -81,7 +81,9 @@ because the same trap will catch anyone auditing without the provenance key.
 | 3.9 | Structural corruption | PASS |
 | 3.10 | Unexpected information loss | **WARN** |
 
-Machine-readable copy: `data/interim/cleaning_audit_summary.csv`.
+Machine-readable copy: written to `data/interim/cleaning_audit_summary.csv` by
+the notebook. `data/` is git-ignored, so regenerate it rather than expecting it
+in the repo.
 
 ### 3.1 Row counts — PASS
 

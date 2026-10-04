@@ -3,7 +3,7 @@
 **Status:** verified against data. Row-level results from the v4 integrated run.
 **Scope:** relationships among the CatalogIQ classification targets, and whether
 they can serve as validation rules or supporting evidence
-**Location:** `docs/research/`
+**Location:** `docs/classification-relationships-and-hierarchy.md`
 **Notebook:** `notebooks/01-classification-relationships.ipynb`
 **Data basis:** `training_candidate.csv` from a local `--mode integrated
 --exclude-policy keep` run reproducing `integrated_policy_v4_final_20261003`
@@ -132,7 +132,8 @@ Internal Analgesics**, its only parent.
 by counts alone that Ear Care could not sit under Other Self Care. It sits under
 **Lifestyle CHC** (3,094 of that Segment's 4,549), its only parent.
 
-Full map: `data/interim/segment_subsegment_map.csv`.
+Full map: written to `data/interim/segment_subsegment_map.csv` by the notebook.
+`data/` is git-ignored, so regenerate it rather than expecting it in the repo.
 
 ### 4.2 Near-duplicate labels — all three resolved
 
