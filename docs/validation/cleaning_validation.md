@@ -351,6 +351,77 @@ settled before the export, because the identity columns do not survive it.
 
 ---
 
+## 3.13 What failed, exactly
+
+**Nothing failed.** Zero FAIL across the ten criteria. What follows is the same
+breakdown applied to the two WARNs, so they can be dispositioned rather than
+carried as unexplained.
+
+### WARN 1 — dtype change in the feature export
+
+| | |
+|---|---|
+| **Rule** | None. The decision log does not cover export dtypes. |
+| **Which rows** | All 83,938. The change is per-column, not per-row. |
+| **Which columns** | `ProductRating`, `XRatXRev`, `ProductReviewsCount` → float; `ReviewsCount` → int |
+| **Data lost** | **None.** Every populated value parses as a number: 83,938 / 83,938 / 83,821 / 83,938, zero unparseable. |
+| **Fix or review?** | **Review, and it is a confirmation rather than a question.** |
+
+The conversion is representational. No value becomes unreadable and no row is
+affected in content. It is listed only because a downstream consumer reading the
+export gets a different schema than the one in the candidate partition, and that
+should be a known fact rather than a discovery.
+
+### WARN 2 — fourteen columns dropped by the feature export
+
+| | |
+|---|---|
+| **Rule** | Policies 2 and 9 cover five of the fourteen. The other nine are undocumented. |
+| **Which rows** | All 83,938. |
+| **Fix or review?** | **Review for eleven. One needs a decision before modelling.** |
+
+Breaking the fourteen down by what is actually lost:
+
+| Column | Rows with data | Distinct values | What dropping it costs |
+|---|---|---|---|
+| `Notes`, `Sun1`–`Sun5` | **0** | 0 | Nothing. Empty in every row. Policy 9. |
+| `Category` | 83,938 | **1** | Nothing. Constant `Self Care`. |
+| `MDM_InsertDateTime` | 83,938 | 12 | Nothing for modelling. Policy 2, retained in source. |
+| `Exclude` | 5,217 | 1 | The marker is invisible downstream. Auditable in `row_decisions.csv`. |
+| `Upc` | 16,613 (19.8%) | 12,280 | A possible feature, 80% missing. |
+| `ProductModelNumber` | 11,678 (13.9%) | 10,464 | A possible feature, 86% missing. |
+| `MDM_Id` | 83,938 | 83,938 | A row identifier. |
+| **`JoiningKey`** | **83,938** | **83,938** | **A row identifier.** |
+| **`Sku`** | **83,938** | **83,460** | **A near-unique identifier.** |
+
+**Eleven of the fourteen cost nothing or are already documented.** Seven are
+empty or constant, and three are deliberate policy.
+
+**The one that needs a decision is the identity columns.** `JoiningKey`, `Sku`
+and `MDM_Id` do not survive into `training_cleaned.csv`. Only `source_row`
+remains, and it is a row index, not a grouping key.
+
+The consequence is concrete and it is not an audit finding so much as a
+sequencing constraint:
+
+> A grouped train/test split cannot be built from the modelling export. It has to
+> be constructed from the candidate partition, before or alongside the export.
+
+This matters because a random row split on a product catalogue puts size and
+flavour variants of the same product in both train and test, which inflates every
+score invisibly. §2.7 of the evaluation strategy covers the key construction.
+
+### Disposition
+
+| Item | Needs |
+|---|---|
+| Dtype change | Confirmation that the export schema is intended |
+| Eleven of the dropped columns | Nothing |
+| `Upc`, `ProductModelNumber` dropped | Confirmation they are not wanted as features |
+| Identity columns dropped | **A decision on where the split is built** |
+
+---
+
 ## 4. Can the cleaned data be used?
 
 **Yes, with two caveats.**
