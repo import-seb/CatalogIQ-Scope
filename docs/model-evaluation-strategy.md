@@ -151,9 +151,15 @@ in a way no metric reveals.
    punctuation and size/count tokens) plus `Brand`. Validate by inspecting the
    largest resulting groups by hand — if they are variants of one product, it
    works.
-2. **Decide the split before the feature export.** `training_cleaned.csv` drops
-   `JoiningKey`, `Sku` and `Upc`, so the identity columns are not available
-   downstream. Only `source_row` survives, and it does not group.
+2. **Build it from the candidate partition, not the export.**
+   `training_cleaned.csv` drops the business keys `JoiningKey`, `Sku`, `Upc` and
+   `MDM_Id`. Row identity itself does survive, through `source_row`, which is
+   unique across all 83,938 rows — so the business keys are recoverable with one
+   join back to `training_candidate.csv`. The constraint is a join, not a wall.
+
+   That does not solve the problem, because none of those keys groups product
+   variants in the first place. The grouping key has to be constructed (item 1)
+   and it is easiest to do that where the full schema is still present.
 
 This blocks the validity of every reported number.
 
