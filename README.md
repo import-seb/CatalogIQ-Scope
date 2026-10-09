@@ -62,12 +62,13 @@ preserve them. Category-level features remain deferred to feature engineering. S
 [integration contract](docs/integration/cleaning_contract.md) and
 [full-data validation](docs/findings/01_cleaning/02_integration_validation.md).
 
-### Create model-ready splits
+### Create Segment model splits
 
-Create train, validation, and test datasets directly from a cleaned export:
+Create train, validation, and test datasets from the integrated cleaner's
+`training_candidate.csv` export:
 
 ```bash
-python -m scripts.split_data --input data/processed/training_cleaned.csv --output-dir data/processed/my_splits
+python -m scripts.split_data --input data/processed/integration_run/training_candidate.csv --output-dir data/processed/my_splits
 ```
 
 Use a new output directory for each run. This command uses rule-v3 product groups,
