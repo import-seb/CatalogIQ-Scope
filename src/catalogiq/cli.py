@@ -65,3 +65,37 @@ def structural_main() -> None:
         parser.exit(1, f"Error: {error}\n")
     print(json.dumps({role: data["decisions"] for role, data in summary["datasets"].items()}, indent=2))
 
+
+def splitting_main() -> None:
+    """Compare label-blind product groupings and Segment-stratified splits."""
+    from .paths import PROCESSED_DATA_PATH
+    from .splitting import SplitConfig
+    from .splitting_experiment import display_results, run_experiment, verify_saved
+
+    parser = argparse.ArgumentParser(description=splitting_main.__doc__)
+    parser.add_argument("--input", type=Path, default=PROCESSED_DATA_PATH / "training_cleaned.csv")
+    parser.add_argument("--identifiers", type=Path,
+                        help="Audited identifier CSV; default: cleaned export's integrated candidate artifact")
+    parser.add_argument("--output-dir", type=Path, default=PROCESSED_DATA_PATH / "split_comparison")
+    parser.add_argument("--config", type=Path, help="JSON SplitConfig overrides; resolved settings saved with run")
+    parser.add_argument("--seed", type=int, help="Override the configured random seed (default 42)")
+    parser.add_argument("--skip-reproduction", action="store_true",
+                        help="Explicitly omit the full grouping+allocation repeat check")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--show", type=Path, help="Display a completed run without recomputing")
+    mode.add_argument("--verify", type=Path, help="Check artifact hashes, isolation, and saved allocation reproducibility")
+    args = parser.parse_args()
+    try:
+        if args.show:
+            display_results(args.show)
+        elif args.verify:
+            print(json.dumps(verify_saved(args.verify), indent=2))
+        else:
+            values = json.loads(args.config.read_text(encoding="utf-8")) if args.config else {}
+            if args.seed is not None:
+                values["seed"] = args.seed
+            run_experiment(args.input, args.output_dir, SplitConfig.from_dict(values), args.identifiers,
+                           verify_reproducibility=not args.skip_reproduction)
+    except (ValueError, OSError, RuntimeError) as error:
+        parser.exit(1, f"Error: {error}\n")
+
