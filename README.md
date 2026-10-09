@@ -62,6 +62,49 @@ preserve them. Category-level features remain deferred to feature engineering. S
 [integration contract](docs/integration/cleaning_contract.md) and
 [full-data validation](docs/findings/01_cleaning/02_integration_validation.md).
 
+### Create Segment model splits
+
+Create train, validation, and test datasets from the integrated cleaner's
+`training_candidate.csv` export:
+
+```bash
+python -m scripts.split_data --input data/processed/integration_run/training_candidate.csv --output-dir data/processed/my_splits
+```
+
+Use a new output directory for each run. This command uses rule-v3 product groups,
+seed **42**, and a **70/15/15** target ratio, balancing `Segment` where practical.
+Groups stay within one split, so actual proportions may differ from the targets.
+This is an experimental grouping option; no splitting policy has been adopted.
+
+The output contains `train.csv`, `validation.csv`, and `test.csv`, with all input
+columns plus `record_id`, `group_id`, and `split`; no assignment join is needed.
+`rule_assignments.csv` remains available for tracing records. Matching edges,
+group sizes, and Segment distributions accompany `summary.json`, which records
+diagnostics, isolation checks, runtime, package versions, and output hashes.
+`input_manifest.json`, `split_config.json`, and `rule_refinement_config.json`
+capture input fingerprints and resolved settings for reproduction.
+
+Use `--seed`, `--config path/to/split_config.json`, or
+`--grouping-config path/to/rule_config.json` to change settings.
+`--identifiers path/to/identifiers.csv` supplies source-keyed identifiers;
+otherwise they are recovered from the cleaned-export manifest when available.
+
+Read the saved datasets as strings to preserve original values. Missing Segment
+values are preserved; exclude blank/`null` labels when fitting a supervised model:
+
+```python
+import pandas as pd
+
+train = pd.read_csv("data/processed/my_splits/train.csv",
+                    dtype=str, keep_default_na=False, encoding="utf-8")
+train = train.loc[~train["Segment"].str.strip().str.casefold().isin(["", "null"])]
+X_train = train[["ProductName", "ProductBrand", "ProductDescription", "ProductContents"]]
+y_train = train["Segment"]
+```
+
+Load validation and test the same way. IDs, group/split columns, provenance,
+identifiers, and other target columns are audit data, not model inputs.
+
 Compare rule-based and TF-IDF product groups on the retained cleaned training export:
 
 ```bash
