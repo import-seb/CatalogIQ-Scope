@@ -4,8 +4,9 @@ Product classification research and auditable preparation of six CatalogIQ label
 `Mnfr`, `Brand`, `Platform`, `Segment`, `Sub-Segment`, and `TargetAgeGroup`.
 
 **Current stage: data understanding and preparation.** The repo contains exploratory
-audits and a tested cleaning command. A trained production classifier, frozen
-model-evaluation split, and deployment are not implemented here yet.
+audits, a tested cleaning command, and experimental grouped evaluation splits.
+A splitting policy has not yet been adopted; a trained production classifier,
+frozen model-evaluation split, and deployment are not implemented here yet.
 
 ## Start here
 
@@ -60,6 +61,47 @@ exports omit timestamps and Sun1-Sun5/Notes while complete audit partitions
 preserve them. Category-level features remain deferred to feature engineering. See the
 [integration contract](docs/integration/cleaning_contract.md) and
 [full-data validation](docs/findings/01_cleaning/02_integration_validation.md).
+
+Compare rule-based and TF-IDF product groups on the retained cleaned training export:
+
+```bash
+python -m scripts.compare_splits --output-dir data/processed/split_comparison
+python -m scripts.compare_splits --show data/processed/split_comparison
+python -m scripts.compare_splits --verify data/processed/split_comparison
+```
+
+The experiment saves separate 70/15/15 assignments, matching links, Segment
+distributions, disagreements, and a shared independent character-shingle leakage
+audit. It repeats both grouping/splitting computations by default. `--config`
+accepts JSON parameter overrides; resolved settings, input hashes and package
+versions are saved with each new run. `--input` and `--identifiers` select another
+cleaned export and its source-keyed identifier artifact. No cleaning rules or
+source records change. The missing Segment stratum stays visible as `<MISSING>`.
+
+Set `"grouping_version": 2` in the configuration for the refined matchers. V2
+uses title/core/formulation guards and packaging-family normalization. Its rules
+use `rule_family_threshold` and `rule_family_edit_threshold`; TF-IDF uses
+`tfidf_name_threshold`, `tfidf_family_threshold`, and the two supporting-text
+thresholds. Title features are uncapped by default. V2 uses only the description
+and contents entries of `tfidf_weights`; title/brand weights, `tfidf_threshold`,
+and `tfidf_max_df` retain their v1 meaning and do not control v2 title matching.
+The independent leakage evaluator and split allocator are shared across versions.
+
+For diagnostic refinement, reserve identifier-only pairs with
+`catalogiq.split_review_validation.reserve_holdout` before changing matchers.
+It excludes whole baseline components touched by the diagnostic annotations.
+Call `seal_refinement` after the completed run and before inspecting held-out
+product details. Then compare saved runs and weak pair judgments:
+
+```bash
+python -m scripts.compare_refinement --baseline data/processed/split_comparison_20261008 --refined data/processed/split_refinement_20261008_final --diagnostic data/processed/split_pair_review_20261008/annotated_pair_review.csv --holdout-dir data/processed/split_refinement_holdout_20261008 --output data/processed/split_refinement_comparison_20261008
+```
+
+Add `--heldout-annotations path/to/annotated_pairs.csv` after the blind review.
+The comparison verifies identical input records, evaluator pairs/scores, and
+the frozen run; it reports diagnostic and held-out errors separately. These
+selected weak judgments are not population accuracy estimates. Keep held-out
+judgments out of subsequent tuning of the same experiment.
 
 The separate [structural check](docs/structural_check.md) screens both original
 datasets and records row decisions and raw evidence without changing rows or

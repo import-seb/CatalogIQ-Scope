@@ -1,0 +1,6 @@
+# Segment baseline extras; existing frozen project metadata remains unchanged.
+# Install CUDA PyTorch using the official index appropriate to the GPU driver.
+-e .
+torch>=2.6,<3
+transformers>=4.45,<6
+safetensors>=0.4,<1
