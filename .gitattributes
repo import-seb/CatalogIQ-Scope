@@ -1,0 +1,4 @@
+# These reviewed fixtures were byte-fingerprinted with CRLF line endings.
+# Preserve their original bytes on Linux and Windows for integrity checks.
+/tests/fixtures/grouping_review_75.json text eol=crlf
+/tests/fixtures/grouping_review_75_baseline.json text eol=crlf

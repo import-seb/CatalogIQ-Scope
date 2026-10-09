@@ -7,9 +7,11 @@ import pandas as pd
 
 from catalogiq.cleaning import PROVENANCE, TARGET_COLUMNS
 from catalogiq.splitting import (
+    GROUP_FIELDS,
     SPLITS,
     SplitConfig,
     check_assignments,
+    grouping_view,
     record_ids,
     rule_groups,
     stratified_group_split,
@@ -35,6 +37,21 @@ def mapping(ids, values):
 class SplittingTests(unittest.TestCase):
     def setUp(self):
         self.config = SplitConfig(tfidf_max_df=1.0)
+
+    def test_grouping_view_preserves_records_when_optional_fields_are_absent(self):
+        frame = pd.DataFrame({"ProductName": ["Alpha", None],
+                              "ProductBrand": ["ACME", "ACME"],
+                              "Segment": ["Excluded label", "Another label"]},
+                             index=pd.Index([9, 2], name="source"))
+        original = frame.copy(deep=True)
+        view = grouping_view(frame)
+        self.assertEqual(list(view), list(GROUP_FIELDS))
+        pd.testing.assert_index_equal(view.index, frame.index)
+        self.assertEqual(view.ProductName.tolist(), ["Alpha", ""])
+        self.assertEqual(view.ProductBrand.tolist(), ["ACME", "ACME"])
+        for field in set(GROUP_FIELDS) - {"ProductName", "ProductBrand"}:
+            self.assertEqual(view[field].tolist(), ["", ""])
+        pd.testing.assert_frame_equal(frame, original)
 
     def assert_isolated(self, ids, groups, splits):
         assignments = pd.DataFrame({

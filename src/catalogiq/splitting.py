@@ -134,7 +134,10 @@ def text(value) -> str:
 
 def grouping_view(frame: pd.DataFrame) -> pd.DataFrame:
     """Allowlisted attributes only: labels and provenance cannot reach matching."""
-    return frame.reindex(columns=GROUP_FIELDS, fill_value="").fillna("").astype(str)
+    # Construct missing columns explicitly: pandas 3's inferred string blocks
+    # can fail when reindex creates several columns with a scalar fill value.
+    return pd.DataFrame({field: frame[field] if field in frame else ""
+                         for field in GROUP_FIELDS}, index=frame.index).fillna("").astype(str)
 
 
 def record_ids(frame: pd.DataFrame) -> np.ndarray:

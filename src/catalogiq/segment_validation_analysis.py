@@ -80,7 +80,10 @@ def evaluate_predictions(predictions, label_names, probability_columns=None, bin
     labels, true, predicted = _predictions(predictions, label_names)
     if not isinstance(bins, int) or isinstance(bins, bool) or bins < 1:
         raise ValueError("calibration bins must be a positive integer")
-    matrix = confusion_matrix(true, predicted, labels=np.arange(len(labels)))
+    # Empty fixed cohorts are valid and remain unscored. Newer scikit-learn
+    # rejects empty inputs, so construct their declared-label matrix directly.
+    matrix = (confusion_matrix(true, predicted, labels=np.arange(len(labels)))
+              if len(true) else np.zeros((len(labels), len(labels)), dtype=np.int64))
     metrics, precision, recall, f1, support, predicted_support = _confusion_metrics(matrix)
     metrics["unsupported_true_labels"] = [label for label, n in zip(labels, support) if n == 0]
     metrics.update({"negative_log_likelihood": None, "multiclass_brier": None,

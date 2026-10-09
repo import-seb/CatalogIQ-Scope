@@ -23,6 +23,7 @@ from .balanced_pair_sample import (
     candidate_pool,
 )
 from .features import sha256
+from .paths import ROOT_PATH
 from .split_review_validation import verify_refinement_seal
 from .splitting import Components
 from .splitting_experiment import load_input
@@ -134,7 +135,10 @@ def reserve_from_frames(frame, prior_pairs, groupings, independent_pairs, *, see
     if not required <= set(frame):
         raise ValueError("input requires record IDs, names and brands")
     # Project before any retrieval, including when a caller supplies targets.
-    source = frame.reindex(columns=["record_id", *EVIDENCE_FIELDS], fill_value="").fillna("").astype(str)
+    # Build absent optional fields explicitly for pandas 3 string-block support.
+    source = pd.DataFrame({field: frame[field] if field in frame else ""
+                           for field in ["record_id", *EVIDENCE_FIELDS]},
+                          index=frame.index).fillna("").astype(str)
     ids = _validate_ids(source.record_id, "input")
     component_map = union_component_map(groupings, independent_pairs)
     if ids != set(component_map):
@@ -244,7 +248,7 @@ def reserve_independent_review(run_dir, prior_paths, output_dir, *, seed=SEED,
     report["proof"].update({"repeated_retrieval_identical": True, "frozen_methods_unchanged": True,
                              "all_input_fingerprints_unchanged": True})
     code_paths = [Path(__file__), Path(__file__).with_name("balanced_pair_sample.py"),
-                  Path(__file__).resolve().parents[2] / "scripts" / "reserve_independent_review.py"]
+                  ROOT_PATH / "scripts" / "reserve_independent_review.py"]
     report["source_sha256"] = fingerprints
     report["code_sha256"] = {str(path.resolve()): sha256(path) for path in code_paths}
     report["frozen_run"] = str(run_dir.resolve())

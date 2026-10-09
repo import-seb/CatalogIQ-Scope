@@ -21,6 +21,7 @@ from .features import sha256
 from .group_graph_audit import _verify_edge_snapshot
 from .grouping_regression import compare_review_regression
 from .independent_review_reservation import verify_reservation
+from .paths import ROOT_PATH
 from .split_evaluation import PAYLOAD_FIELDS, evaluation_name, leakage_metrics, segment_distribution
 from .split_refinement_comparison import AUDIT_PARAMETERS, _canonical_audit
 from .split_review_validation import verify_refinement_seal
@@ -29,7 +30,7 @@ from .splitting_experiment import _assign, _edges_frame, _environment, compariso
 
 
 VERSION = "rule-refinement-v3"
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = ROOT_PATH
 DEFAULT_BASELINE = ROOT / "data/processed/split_refinement_20261008_final"
 DEFAULT_RESERVATION = ROOT / "data/processed/split_future_review_reservation_20261008"
 DEFAULT_EDGE_SNAPSHOT = ROOT / "data/processed/split_balanced_graph_edge_snapshot_20261008.json"
