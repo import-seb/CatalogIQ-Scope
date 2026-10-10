@@ -11,6 +11,8 @@
 
 ## Evidence
 
+- [Classical Segment baseline](findings/03_modeling/01_classical_segment_baseline.md): implementation, shared-split handoff, synthetic checks and local cleaning validation; real-data training pending private artifacts.
+
 - [Finalized Segment splits](findings/02_splitting/02_finalization_20261009.md): confirmed fixes, the protected test, integrity checks, and remaining risks.
 - [Split leakage audit](findings/02_splitting/01_leakage_audit_20261009.md): independent duplicate checks, reviewed misses and groups, and frozen-test integrity.
 - [Current combined cleaning validation](findings/01_cleaning/05_current_policy_validation.md): agreed Exclude handling, integrated structural decisions, exports and reproducibility.

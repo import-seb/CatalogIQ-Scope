@@ -7,6 +7,26 @@ from pathlib import Path
 from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 
+def segment_baseline_main(argv=None) -> int:
+    """Train TF-IDF + logistic regression using frozen Segment development only."""
+    parser = argparse.ArgumentParser(description=segment_baseline_main.__doc__)
+    parser.add_argument("--split-dir", type=Path, default=DATA_PATH / "processed/split_finalization_20261009/frozen")
+    parser.add_argument("--tokenizer-dir", type=Path, required=True, help="The saved tokenizer used by the frozen split")
+    parser.add_argument("--model-config", type=Path, required=True, help="The frozen transformer's model_config.json")
+    parser.add_argument("--config", type=Path, help="Optional BaselineConfig JSON; never changes splits or model inputs")
+    parser.add_argument("--output-dir", type=Path, required=True, help="New run directory")
+    args = parser.parse_args(argv)
+    try:
+        from .segment_baseline import BaselineConfig, run_baseline
+        values = json.loads(args.config.read_text(encoding="utf-8")) if args.config else {}
+        if not isinstance(values, dict):
+            raise ValueError("Baseline configuration must be a JSON object")
+        run_baseline(args.split_dir, args.tokenizer_dir, args.model_config, args.output_dir, BaselineConfig(**values))
+    except (ValueError, OSError, RuntimeError, TypeError, Warning) as error:
+        parser.exit(1, f"Error: {error}\n")
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--train", type=Path, default=TRAIN_PATH, help="Training CSV")
