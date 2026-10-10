@@ -75,8 +75,17 @@ correct, which is the part that matters.
 | Information loss | PASS | 212 / 212 |
 | Target distributions | BLOCKED | — |
 
-Machine-readable: `data/interim/cleaning_audit_summary.csv` and
-`data/interim/cleaning_audit_diagnostics.csv`.
+Machine-readable: the notebook writes `cleaning_audit_summary.csv` and
+`cleaning_audit_diagnostics.csv` to `data/interim/`. **Neither is in the repo** —
+`/data/interim/` is gitignored, like the rest of the generated data — so running
+the notebook is what produces them. The tables above and in §3 are the committed
+record.
+
+**Reproduced independently.** This run was produced twice, on two machines, from
+the same raw CSVs and the same pipeline commands: 16 PASS, 4 WARN, 1 BLOCKED,
+0 FAIL, 4 diagnostics, with identical coverage figures, the same 12 and 2 rows
+carrying an unsupported reason code, and the same 11 Platform `source_row`
+values.
 
 ### What the statuses mean now
 
