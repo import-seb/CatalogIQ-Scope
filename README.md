@@ -5,7 +5,7 @@ Product classification research and auditable preparation of six CatalogIQ label
 
 **Current stage: Segment model development.** The repo contains audited cleaning,
 grouping experiments, a first transformer baseline, and a frozen evaluation
-protocol. Use the protected snapshot described below for further model work.
+protocol. Generate the authoritative splits with the commands below for model work.
 A production classifier and deployment remain future work.
 
 ## Start here
@@ -21,12 +21,13 @@ Activate with `.venv\Scripts\Activate.ps1` in PowerShell, or
 `source .venv/bin/activate` on macOS/Linux, then install:
 
 ```bash
-python -m pip install -e ".[notebooks]"
+python -m pip install -e ".[splitting]"
 ```
 
-Conda users can use their existing environment instead. `requirements.txt` remains
-an equivalent convenience entry point. Dependencies have compatibility ranges;
-there is not yet a frozen environment lock.
+Conda users can use their existing environment instead. The `splitting` extra pins
+the tested numerical dependencies for exact reproduction. The core installation
+includes the pinned tokenizer dependency; splitting does not require model weights.
+Install `python -m pip install -e ".[splitting,notebooks]"` if you need notebooks.
 
 Place the two private source CSVs in `data/provided/` as described in
 [data setup](data/README.md). Do not commit the datasets.
@@ -34,22 +35,15 @@ Place the two private source CSVs in `data/provided/` as described in
 ## Run the workflow
 
 ```bash
-python -m catalogiq --output-dir data/processed/my_run
-python -m catalogiq.check_structure --output-dir data/processed/structural_run
-python -m unittest discover -s tests -v
-python -m jupyterlab
+python -m catalogiq --mode integrated --output-dir data/processed/cleaned
+python -m scripts.split_data --input data/processed/cleaned/training_candidate.csv --output-dir data/processed/splits
+python -m scripts.split_data --verify data/processed/splits
 ```
 
-`catalogiq-clean` is the equivalent installed cleaning command. Each run requires
-a new output directory. The command writes source fingerprints, changes, review
-flags, and a summary beside its CSV outputs. See the [cleaning guide](docs/target_cleaning.md).
-
-For combined feature/target/structural processing, use `--mode integrated` and a new run directory:
-
-```bash
-python -m catalogiq --mode integrated --output-dir data/processed/integration_run
-python -m catalogiq.integration_validation --output-dir data/processed/integration_run
-```
+Run from the repository root and use new output directories. Verification checks
+complete source and assignment hashes against the committed October 9 protocol;
+an incompatible dataset or assignment fails rather than creating a replacement test.
+No private split CSVs, exposure archive, model weights, or local cache need to be shared.
 
 Pass `--train` and `--target` if your local filenames differ from the defaults.
 This writes one candidate row mask plus candidate, quarantine and review-hold
@@ -64,107 +58,98 @@ preserve them. Category-level features remain deferred to feature engineering. S
 
 ### Create Segment model splits
 
-For continued Segment model development, use the corrected, frozen snapshot in
-`data/processed/split_finalization_20261009/frozen/`. It includes full-record
-`train.csv` and `validation.csv`. `test.csv` is reserved for the final evaluation;
-keep it closed during development. The guarded command checks the seal and
-loads training and validation only:
+`scripts.split_data` is the authoritative team splitter. It reproduces the
+finalized October 9 product groups and split membership, using corrected V4 rules,
+identical transformer-input constraints, fixed seed **42**, and the frozen
+exposure exclusions. The target ratio remains **70/15/15**; the protected test
+contains **12,160 records (14.49%)** because previously exposed records cannot
+pad it. Train has 59,111 records and validation has 12,667.
+
+The source of truth is the packaged
+[`segment-final-20261009` manifest](src/catalogiq/resources/segment_final_20261009/manifest.json):
+grouping version `rule-final-v4`, split version `segment-final-splits-v1`, full
+source and membership hashes, and the recorded exposure selectors. Commands
+regenerate assignments locally and verify every membership against that protocol.
+
+Use these generated files:
+
+| File in `data/processed/splits/` | Purpose |
+|---|---|
+| `train.csv`, `validation.csv` | Full cleaned records ready for model development; no assignment join |
+| `test.csv` | Reserved final evaluation; keep closed during development |
+| `assignments.csv` | Authoritative provenance, record ID, product group, and split mapping |
+| `rule_assignments.csv` | Identical alias of the final assignments, retained for compatibility |
+| `protected_final_test.csv` | Test IDs and groups only, used by development guards |
+| `grouping_freeze.json`, `completion.json`, `summary.json` | Protocol identity, integrity seals, and diagnostics |
+| `model_config.json`, `tokenizer/`, `model_inputs.csv` | Frozen text/tokenizer contract and input-equality evidence |
+
+The guarded development command checks the authoritative seal and opens only
+training and validation:
 
 ```bash
-python -m scripts.train_frozen_segment --tokenize --output-dir data/processed/segment_development_preparation
+python -m scripts.train_frozen_segment --output-dir data/processed/segment_development_preparation
 ```
 
-Add `--train` and choose a new output directory when starting a fresh transformer
-run. Model features, tokenizer, and text limits must match the frozen input
-contract; optimizer settings can change during validation-based development.
-Install `requirements-training.txt` for tokenization/training. The private
-snapshot and saved tokenizer must be available locally.
-
-The classical Segment baseline uses ordinary word TF-IDF + logistic regression.
-The normal package installation is sufficient; no Hugging Face tokenizer, weights
-or GPU are needed. It joins cleaned candidates to an explicitly selected shared
-assignment file using `dataset + source_sha256 + source_row`:
-
-```bash
-python -m scripts.train_segment_baseline --input path/to/training_candidate.csv --assignments path/to/agreed_assignments.csv --assignments-sha256 FULL_64_CHARACTER_SHA256 --features compare --output-dir data/processed/segment_classical_check
-```
-
-By default this only checks hashes, row coverage and group isolation. Once the
-team's split version is settled, add `--train` and use a new output directory to
-compare the four fields with and without concatenated `ProductCategory`. TF-IDF
-fits on train only; predictions and metrics cover validation only. These checks
-do not verify the frozen seal or exposure history. Older rule-v3 assignments
-are not a substitute for the protected final snapshot. See the
-[baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
-for the completed preflight, outputs and pending real-data training.
-
-The [split finalization note](docs/findings/02_splitting/02_finalization_20261009.md)
-records fixes, integrity results, residual risks, and the test reservation policy.
-The policy reserves all eligible groups from the earlier unscored test after
-excluding recorded reviews, prior model use, and their historical related
-families. It accepts a smaller test instead of using exposed records to reach 15%.
-Grouping is frozen before reserving the test. Do not select new grouping rules
-or model settings using that test.
-
-Verify the saved snapshot without creating another split:
-
-```bash
-python -m scripts.finalize_splits --verify data/processed/split_finalization_20261009/frozen
-```
-
-`scripts.finalize_splits` creates a new sealed snapshot only when given the
-archived exposure registry, effective-input cache, original assignments, and
-review fixtures. Its `--config` accepts `split`, `rule`, `model`, and `allocation`
-JSON sections; resolved configuration and source/input hashes are sealed before
-test selection. Preserve the adopted snapshot during model development.
-
-The earlier general splitting command below remains a **rule-v3 research
-export**, without the corrected grouping, transformer equality constraints, or
-historical exposure exclusions. Its outputs should not replace the frozen test.
-
-Create train, validation, and test datasets from the integrated cleaner's
-`training_candidate.csv` export:
-
-```bash
-python -m scripts.split_data --input data/processed/integration_run/training_candidate.csv --output-dir data/processed/my_splits
-```
-
-Use a new output directory for each run. This command uses rule-v3 product groups,
-seed **42**, and a **70/15/15** target ratio, balancing `Segment` where practical.
-Groups stay within one split, so actual proportions may differ from the targets.
-This command preserves the earlier experimental grouping behavior.
-
-The output contains `train.csv`, `validation.csv`, and `test.csv`, with all input
-columns plus `record_id`, `group_id`, and `split`; no assignment join is needed.
-`rule_assignments.csv` remains available for tracing records. Matching edges,
-group sizes, and Segment distributions accompany `summary.json`, which records
-diagnostics, isolation checks, runtime, package versions, and output hashes.
-`input_manifest.json`, `split_config.json`, and `rule_refinement_config.json`
-capture input fingerprints and resolved settings for reproduction.
-
-Use `--seed`, `--config path/to/split_config.json`, or
-`--grouping-config path/to/rule_config.json` to change settings.
-`--identifiers path/to/identifiers.csv` supplies source-keyed identifiers;
-otherwise they are recovered from the cleaned-export manifest when available.
-
-Read the saved datasets as strings to preserve original values. Missing Segment
-values are preserved; exclude blank/`null` labels when fitting a supervised model:
+This prepares supervised development records without training a model. Blank or
+`null` Segment labels remain in the CSVs and are excluded from supervision.
+For Python model code, use the same guard:
 
 ```python
-import pandas as pd
+from catalogiq.segment_frozen_development import load_frozen_development
 
-train = pd.read_csv("data/processed/my_splits/train.csv",
-                    dtype=str, keep_default_na=False, encoding="utf-8")
-train = train.loc[~train["Segment"].str.strip().str.casefold().isin(["", "null"])]
+development = load_frozen_development("data/processed/splits")
+train = development.frame.iloc[development.train_indices]
+validation = development.frame.iloc[development.validation_indices]
 X_train = train[["ProductName", "ProductBrand", "ProductDescription", "ProductContents"]]
 y_train = train["Segment"]
 ```
 
-Load validation the same way; reserve test loading for final evaluation.
-IDs, group/split columns, provenance,
-identifiers, and other target columns are audit data, not model inputs.
+For future transformer runs, install `python -m pip install -r requirements-training.txt`
+and supply the pinned pretrained encoder through the existing model-cache process.
+`--tokenize` verifies development tokenization; `--train` explicitly trains a fresh
+baseline. Model features, tokenizer, and text limits must match the sealed contract;
+optimizer settings can change using validation. Choose a new output directory.
+Pass an experiment configuration with `--model-config path/to/model_config.json`;
+leave the generated split artifacts unchanged.
 
-Compare rule-based and TF-IDF product groups on the retained cleaned training export:
+IDs, grouping metadata, identifiers, provenance, and other target columns are
+audit data, never model inputs. Do not select grouping rules or model settings
+using the reserved test. The [portable workflow note](docs/findings/02_splitting/03_portable_workflow_20261010.md)
+identifies the committed protocol and verification evidence; the
+[October 9 finalization](docs/findings/02_splitting/02_finalization_20261009.md)
+records its remaining leakage risks.
+
+### Classical Segment baseline
+
+The word TF-IDF + logistic-regression baseline uses the same sealed training and
+validation records. Its model does not need Hugging Face weights or tokenization;
+the shared splitter still uses its packaged tokenizer to reproduce product groups.
+
+```bash
+python -m scripts.train_segment_baseline --split-dir data/processed/splits --features compare --output-dir data/processed/segment_classical_check
+python -m scripts.train_segment_baseline --split-dir data/processed/splits --features compare --train --output-dir data/processed/segment_classical_run
+```
+
+The first command verifies and prepares only. The second fits both the four-field
+baseline and the experiment with ProductCategory concatenated into the same text.
+Vocabulary and IDF fit only on train; predictions and comparisons cover validation.
+Both commands reuse the authoritative seal verifier and never open or hash test.csv.
+The category arm is a validation experiment, with the split protocol unchanged.
+See the [baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
+for outputs and limitations.
+
+### Historical research
+
+Earlier comparison/refinement `rule_assignments.csv` files and
+`data/processed/split_finalization_20261009/frozen/` are historical artifacts.
+The filename alone does not identify a protocol; verify the generated directory
+with `scripts.split_data --verify`. The existing
+`scripts.finalize_splits` entry point preserves the local historical protocol;
+it is not the portable team workflow. Use the files generated by the official
+`scripts.split_data` command above for continued development.
+
+Rule/TF-IDF comparison remains available for historical research on the separately
+exported `training_cleaned.csv`:
 
 ```bash
 python -m scripts.compare_splits --output-dir data/processed/split_comparison
@@ -172,38 +157,9 @@ python -m scripts.compare_splits --show data/processed/split_comparison
 python -m scripts.compare_splits --verify data/processed/split_comparison
 ```
 
-The experiment saves separate 70/15/15 assignments, matching links, Segment
-distributions, disagreements, and a shared independent character-shingle leakage
-audit. It repeats both grouping/splitting computations by default. `--config`
-accepts JSON parameter overrides; resolved settings, input hashes and package
-versions are saved with each new run. `--input` and `--identifiers` select another
-cleaned export and its source-keyed identifier artifact. No cleaning rules or
-source records change. The missing Segment stratum stays visible as `<MISSING>`.
-
-Set `"grouping_version": 2` in the configuration for the refined matchers. V2
-uses title/core/formulation guards and packaging-family normalization. Its rules
-use `rule_family_threshold` and `rule_family_edit_threshold`; TF-IDF uses
-`tfidf_name_threshold`, `tfidf_family_threshold`, and the two supporting-text
-thresholds. Title features are uncapped by default. V2 uses only the description
-and contents entries of `tfidf_weights`; title/brand weights, `tfidf_threshold`,
-and `tfidf_max_df` retain their v1 meaning and do not control v2 title matching.
-The independent leakage evaluator and split allocator are shared across versions.
-
-For diagnostic refinement, reserve identifier-only pairs with
-`catalogiq.split_review_validation.reserve_holdout` before changing matchers.
-It excludes whole baseline components touched by the diagnostic annotations.
-Call `seal_refinement` after the completed run and before inspecting held-out
-product details. Then compare saved runs and weak pair judgments:
-
-```bash
-python -m scripts.compare_refinement --baseline data/processed/split_comparison_20261008 --refined data/processed/split_refinement_20261008_final --diagnostic data/processed/split_pair_review_20261008/annotated_pair_review.csv --holdout-dir data/processed/split_refinement_holdout_20261008 --output data/processed/split_refinement_comparison_20261008
-```
-
-Add `--heldout-annotations path/to/annotated_pairs.csv` after the blind review.
-The comparison verifies identical input records, evaluator pairs/scores, and
-the frozen run; it reports diagnostic and held-out errors separately. These
-selected weak judgments are not population accuracy estimates. Keep held-out
-judgments out of subsequent tuning of the same experiment.
+These commands produce experimental assignments and never replace the protected
+team test. Grouping refinement has stopped; model development uses training and
+validation only.
 
 The separate [structural check](docs/structural_check.md) screens both original
 datasets and records row decisions and raw evidence without changing rows or

@@ -6,6 +6,7 @@ history or seal. It neither generates splits nor substitutes for that protocol.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 import re
 
@@ -24,6 +25,49 @@ MISSING_LABELS = {"", "null", "none", "nan"}
 class BaselineDevelopment:
     frame: pd.DataFrame
     audit: dict
+
+
+def load_official_development(directory, *, include_category=False):
+    """Reuse the team's sealed loader, then attach allowlisted development data.
+
+    Only train.csv and validation.csv supply labels/features. The category arm
+    is an explicit validation experiment; it never edits the split contract.
+    """
+    from .segment_frozen_development import load_frozen_development
+
+    directory = Path(directory).resolve()
+    guarded = load_frozen_development(directory)
+    if guarded.audit["split_format"] != "catalogiq-portable-split-v1":
+        raise ValueError("Use the authoritative portable split workflow")
+    consumed = guarded.audit["consumed_artifact_sha256"]
+    wanted = [*PROVENANCE, "record_id", "group_id", "split", "Segment", *MODEL_FIELDS]
+    if include_category:
+        wanted.append("ProductCategory")
+    roles = []
+    for role in ("train", "validation"):
+        path = directory / f"{role}.csv"
+        if sha256(path) != consumed[path.name]:
+            raise ValueError("Sealed development export changed during loading")
+        roles.append(pd.read_csv(path, dtype=str, keep_default_na=False, usecols=wanted))
+        if sha256(path) != consumed[path.name]:
+            raise ValueError("Sealed development export changed during loading")
+    exported = pd.concat(roles, ignore_index=True).set_index("record_id", verify_integrity=True)
+    frame = exported.loc[guarded.frame.record_id].reset_index()
+    pd.testing.assert_frame_equal(frame[guarded.frame.columns], guarded.frame)
+    freeze = json.loads((directory / "grouping_freeze.json").read_text(encoding="utf-8"))
+    counts = guarded.audit["export_records"]
+    return BaselineDevelopment(frame, {
+        "split_directory": str(directory), "protocol_id": freeze["protocol_id"],
+        "assignment_sha256": sha256(directory / "assignments.csv"),
+        "complete_one_to_one_rows": sum(counts.values()) + len(guarded.protected_record_ids),
+        "group_isolation": True, "assignment_counts": {**counts, "test": len(guarded.protected_record_ids)},
+        "labeled_development_counts": guarded.audit["supervised_records"],
+        "excluded_missing_label_counts": guarded.audit["missing_target_records_excluded_from_supervised_view"],
+        "separate_test_export_opened": False,
+        "final_snapshot_seal_or_exposure_history_verified": True,
+        "guarded_development": guarded.audit,
+        "category_mode": "validation feature experiment" if include_category else "base fields only",
+    })
 
 
 def _fingerprint(path, expected=None):

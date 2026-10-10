@@ -1,2 +1,2 @@
 # Dependencies are maintained in pyproject.toml. Run from the repository root.
--e .[notebooks]
+-e .[splitting,notebooks]

@@ -29,7 +29,7 @@ from sklearn.pipeline import Pipeline
 
 from .cleaning import PROVENANCE
 from .features import sha256
-from .segment_baseline_data import MISSING_LABELS, load_development
+from .segment_baseline_data import MISSING_LABELS, load_development, load_official_development
 from .segment_transformer import MODEL_FIELDS, ModelConfig, _hash_items, build_product_texts
 from .splitting import check_assignments
 
@@ -175,7 +175,8 @@ def _save_variant(directory, frame, config, include_category):
 
 
 def run_baseline(input_path, assignments_path, expected_assignments_sha256, output_dir,
-                 config=None, *, expected_input_sha256=None, features="compare", train=False, progress=print):
+                 config=None, *, expected_input_sha256=None, features="compare", train=False,
+                 split_dir=None, progress=print):
     """Prepare explicit shared assignments; fitting requires train=True.
 
     Preparation does not fit or score. Supplying an older research assignment
@@ -190,7 +191,12 @@ def run_baseline(input_path, assignments_path, expected_assignments_sha256, outp
         raise ValueError("features must be base, category or compare")
     if progress:
         progress("Checking input hashes, source-key coverage and group isolation.")
-    development = load_development(input_path, assignments_path, expected_assignments_sha256, expected_input_sha256)
+    if split_dir is not None:
+        if any(value is not None for value in (input_path, assignments_path, expected_assignments_sha256, expected_input_sha256)):
+            raise ValueError("Choose a sealed split directory or a historical source-key preparation, not both")
+        development = load_official_development(split_dir, include_category=features != "base")
+    else:
+        development = load_development(input_path, assignments_path, expected_assignments_sha256, expected_input_sha256)
     frame = development.frame
     if features != "base" and "ProductCategory" not in frame:
         raise ValueError("Category experiment requires a ProductCategory column")
@@ -206,7 +212,8 @@ def run_baseline(input_path, assignments_path, expected_assignments_sha256, outp
         "training_record_ids_sha256": _hash_items(frame.loc[frame.split.eq("train"), "record_id"].tolist()),
         "validation_record_ids_sha256": _hash_items(frame.loc[frame.split.eq("validation"), "record_id"].tolist()),
         "source_sha256": {name: sha256(Path(__file__).with_name(name)) for name in
-                          ("segment_baseline.py", "segment_baseline_data.py", "segment_transformer.py", "splitting.py")},
+                          ("segment_baseline.py", "segment_baseline_data.py", "segment_transformer.py", "splitting.py",
+                           "segment_frozen_development.py", "split_protocol.py")},
         "python_version": platform.python_version(),
         "package_versions": {name: version(name) for name in ("numpy", "pandas", "scipy", "scikit-learn", "joblib")},
     }
