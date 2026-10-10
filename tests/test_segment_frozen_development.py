@@ -8,7 +8,7 @@ import pandas as pd
 
 from catalogiq.features import sha256
 from catalogiq.model_input_groups import model_view_contract
-from catalogiq.segment_frozen_development import load_frozen_development
+from catalogiq.segment_frozen_development import load_frozen_development, main
 from catalogiq.segment_transformer import MODEL_FIELDS, ModelConfig
 
 
@@ -47,7 +47,70 @@ def fake_verifier(directory, *, verify_exports):
     return {"checks_passed": True}
 
 
+def portable_fixture(directory):
+    from catalogiq.split_protocol import portable_model_view_contract
+
+    directory = Path(directory)
+    tokenizer = fixture(directory)
+    config = ModelConfig()
+    (directory / "model_config.json").write_text(json.dumps(config.to_dict()), encoding="utf8")
+    freeze = {"format": "catalogiq-portable-split-v1",
+              "model_view_contract": portable_model_view_contract(config, tokenizer_dir=tokenizer)}
+    (directory / "grouping_freeze.json").write_text(json.dumps(freeze), encoding="utf8")
+    reseal(directory)
+    return tokenizer
+
+
 class FrozenDevelopmentTests(unittest.TestCase):
+    def test_portable_defaults_select_authoritative_verifier_without_test_access(self):
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder)
+            portable_fixture(directory)
+            real_read = pd.read_csv
+            real_hash = sha256
+
+            def guarded_read(path, **kwargs):
+                if Path(path).name == "test.csv":
+                    raise AssertionError("Read final test export")
+                if Path(path).name == "protected_final_test.csv":
+                    self.assertEqual(kwargs.get("usecols"), ["record_id", "group_id"])
+                return real_read(path, **kwargs)
+
+            def guarded_hash(path):
+                if Path(path).name == "test.csv":
+                    raise AssertionError("Hashed final test export")
+                return real_hash(path)
+
+            with patch("catalogiq.split_protocol.verify_protocol_splits", side_effect=fake_verifier) as verifier, \
+                    patch("catalogiq.segment_frozen_development.model_view_contract", side_effect=AssertionError("Legacy contract")), \
+                    patch("catalogiq.segment_frozen_development.pd.read_csv", side_effect=guarded_read), \
+                    patch("catalogiq.segment_frozen_development.sha256", side_effect=guarded_hash):
+                development = load_frozen_development(directory)
+            verifier.assert_called_once_with(directory.resolve(), verify_exports=False)
+            self.assertEqual(development.frame.record_id.tolist(), list("abde"))
+            self.assertEqual(development.audit["split_format"], "catalogiq-portable-split-v1")
+            self.assertTrue(development.audit["no_final_test_csv_read_or_hashed"])
+
+    def test_portable_command_prepares_with_generated_config_and_tokenizer_defaults(self):
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder)
+            portable_fixture(directory)
+            output = directory / "preparation"
+            with patch("catalogiq.split_protocol.verify_protocol_splits", side_effect=fake_verifier), \
+                    patch("builtins.print"):
+                main(["--split-dir", str(directory), "--output-dir", str(output)])
+            ready = json.loads((output / "ready.json").read_text(encoding="utf8"))
+            self.assertFalse(ready["model_trained"])
+            self.assertFalse(ready["final_test_read_or_scored"])
+            self.assertEqual(ready["mode"], "prepare_only")
+
+    def test_portable_representation_drift_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder)
+            portable_fixture(directory)
+            with self.assertRaisesRegex(ValueError, "representation"):
+                load_frozen_development(directory, ModelConfig(sequence_length=64), verifier=fake_verifier)
+
     def test_development_only_preserves_unknown_targets_and_excludes_metadata_features(self):
         with tempfile.TemporaryDirectory() as folder:
             directory = Path(folder)

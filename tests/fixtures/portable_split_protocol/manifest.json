@@ -1,0 +1,387 @@
+{
+  "schema_version": 1,
+  "protocol_id": "synthetic-segment-final-protocol-v1",
+  "grouping_version": "rule-final-v4",
+  "split_version": "segment-final-splits-v1",
+  "source": {
+    "dataset": "synthetic_training.csv",
+    "source_sha256": "58af5653c2abc4e70e655deb52c6c801589932d645386d8df05b40b7b8389bcc",
+    "input_rows": 360,
+    "record_ids_sha256": "50df87de724bdbcb032cb25d61935610fc6c682fec61e8f07f4dfb0fefafab02",
+    "provenance_sha256": "db604538a109a3843cb2009714b5b64cb63dddea8c22678c18d8a29687ea5360",
+    "group_fields": [
+      "ProductName",
+      "ProductDescription",
+      "ProductContents",
+      "ProductBrand",
+      "Retailer",
+      "ProductUrl",
+      "Sku",
+      "Upc",
+      "ProductModelNumber",
+      "MDM_Id",
+      "JoiningKey"
+    ],
+    "group_features_sha256": "b6d34835da2af92011b421724a0cf9f340a09fa52c14a95bcf95731f829cdf54",
+    "development_labels_sha256": "350c4529cafe976d4cdf5b5eaf99c399e67dad924736d8e1fdc3bb54c3626561"
+  },
+  "split_config": {
+    "grouping_version": 2,
+    "seed": 42,
+    "ratios": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "rule_token_threshold": 0.82,
+    "rule_edit_threshold": 0.88,
+    "identifier_name_threshold": 0.5,
+    "block_tokens": 2,
+    "max_block_size": 300,
+    "tfidf_threshold": 0.88,
+    "tfidf_weights": [
+      3.0,
+      1.0,
+      1.0,
+      0.5
+    ],
+    "tfidf_max_features": 100000,
+    "tfidf_max_df": 0.2,
+    "description_chars": 1500,
+    "contents_chars": 1000,
+    "cosine_chunk_size": 128,
+    "evaluation_threshold": 0.85,
+    "evaluation_shingle_size": 5,
+    "evaluation_min_name_chars": 12,
+    "split_restarts": 3,
+    "split_refinement_passes": 2,
+    "size_weight": 1.0,
+    "rare_class_max_rows": 100,
+    "disagreement_examples": 40,
+    "rule_family_threshold": 0.78,
+    "rule_family_edit_threshold": 0.85,
+    "tfidf_name_threshold": 0.86,
+    "tfidf_family_threshold": 0.9,
+    "tfidf_supported_name_threshold": 0.78,
+    "tfidf_support_threshold": 0.5,
+    "tfidf_name_max_features": null,
+    "core_min_overlap": 0.35,
+    "brand_override_name_threshold": 0.75,
+    "family_strip_package_sizes": true,
+    "brand_alias_suffixes": [
+      "health products",
+      "organic oils",
+      "products",
+      "health",
+      "research",
+      "nutrition",
+      "naturals",
+      "formulas",
+      "inc",
+      "llc",
+      "ltd",
+      "company"
+    ]
+  },
+  "rule_final_config": {
+    "candidate": {
+      "block_tokens": 3,
+      "max_exhaustive_block": 96,
+      "large_block_window": 12,
+      "sorted_neighbor_window": 12,
+      "line_prefix_words": 2,
+      "global_rare_token_frequency": 32,
+      "char_candidate_threshold": 0.45,
+      "char_top_k": 12,
+      "max_character_comparisons": null,
+      "character_cache_size": 4096
+    },
+    "line_anchor_tokens": 2,
+    "generic_line_min_tokens": 3,
+    "informative_containment": 0.75,
+    "informative_dice": 0.55,
+    "shared_line_min_tokens": 2,
+    "shared_head_min_tokens": 3,
+    "cross_brand_min_shared_tokens": 4,
+    "cross_brand_run_min_shared_tokens": 2,
+    "cross_brand_run_min_tokens": 12,
+    "cross_brand_min_name_chars": 90,
+    "cross_brand_name_similarity": 0.7,
+    "template_min_titles": 12,
+    "template_min_distinct_heads": 4,
+    "template_document_fraction": 0.7,
+    "template_head_fraction": 0.1,
+    "component_representatives": 4,
+    "component_pair_support_fraction": 1.0,
+    "comparison_noise": [
+      "com",
+      "net",
+      "org",
+      "www",
+      "extract",
+      "extracts",
+      "herbal",
+      "herb",
+      "herbs",
+      "root",
+      "roots"
+    ],
+    "generic_device_categories": [
+      "motion sickness"
+    ],
+    "device_families": [
+      [
+        "eyewear",
+        [
+          "glasses",
+          "eyeglasses",
+          "goggles"
+        ]
+      ],
+      [
+        "acupressure",
+        [
+          "wristband",
+          "wristbands",
+          "band",
+          "bands",
+          "bracelet",
+          "bracelets"
+        ]
+      ]
+    ]
+  },
+  "development_allocation_config": {
+    "seed": 42,
+    "validation_fraction": 0.17647058823529413,
+    "restarts": 5,
+    "refinement_passes": 6,
+    "exchange_passes": 2,
+    "margin_weights": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "max_retailer_fraction_delta": 0.02,
+    "max_group_size_fraction_delta": 0.02,
+    "max_segment_fraction_delta": 0.005,
+    "max_validation_fraction_delta": 0.001
+  },
+  "model_config": {
+    "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+    "sequence_length": 128,
+    "epochs": 3,
+    "learning_rate": 3e-05,
+    "batch_size": 32,
+    "evaluation_batch_size": 64,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.1,
+    "seed": 42,
+    "device": "auto",
+    "threads": 4,
+    "precision": "fp32",
+    "dropout": 0.1,
+    "field_character_limits": [
+      1024,
+      512,
+      4000,
+      2000
+    ],
+    "local_files_only": true,
+    "log_every_steps": 50
+  },
+  "model_view_contract": {
+    "version": "exact-effective-input-groups-v1",
+    "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+    "features": [
+      "ProductName",
+      "ProductBrand",
+      "ProductDescription",
+      "ProductContents"
+    ],
+    "field_character_limits": [
+      1024,
+      512,
+      4000,
+      2000
+    ],
+    "sequence_length": 128,
+    "tokenizer_kwargs": {
+      "truncation": true,
+      "max_length": 128,
+      "padding": false,
+      "return_attention_mask": true
+    },
+    "tokenizer_fingerprint": {
+      "tokenizer.json": "79ea220416a57ca8acdf069d71875d5d2ddadef66021aeb6c120a7c546c04344",
+      "tokenizer_config.json": "5810debc47bb4eeb5424b5a484242124cd7deff57d40ef83ec346f910e4557f7"
+    },
+    "preprocessor_source_sha256": "e974f53121fad3eba81b16683a9157cbe447ff7dc25bf1738755f42a3b3adfc1",
+    "signature_implementation_source_sha256": "f3056357196e261310921a7f46c4bf4f904aa54e603c50a56022d6e4d4af03cd",
+    "signature_fields": [
+      "input_ids",
+      "attention_mask",
+      "token_type_ids"
+    ],
+    "signature_recipe": "field name; colon;4-bytebiglength;little-endianint32array;SHA256",
+    "cache_invalidation": "Any representation, source-universe or tokenization implementation drift requires regenerating grouping and split seals.",
+    "contract_sha256": "9a54889ee5fb68c70ed6910b99e470f61f2f183a7399ea412c7b754b8def4f24"
+  },
+  "algorithm_source_sha256_lf": {
+    "features.py": "24e87ca9437430fae1cc7dd4ee6a1bf4df8cdf42100384ccc6559d8d05915ce9",
+    "cleaning.py": "eee66bd8c8a00e5241c17a2d73db54bb1a905692b2e37f4a57d4c402e8bbcbea",
+    "splitting.py": "625c993b36991dcc1dd055f2f34578fcd67452c5bd631b89f8f9e697fd0ea5f5",
+    "split_matching.py": "c3246fbef331816787682d14dd7ab6537d3347d969b4e223069ceb232f157e39",
+    "split_rules_v2.py": "a56fd054e1b4e4d89eda9c507b9a17d3abcf779f274681f985ef83c96403a27b",
+    "split_rules_v3.py": "fbd8c91f924f3e8d9d06218c7fff2fafaeebb1064a832fb0d899aef71c8d7214",
+    "split_rules_v4.py": "a525d3b77089f0606b95cfd5eea0677a310a988d74aafc3c552efc9fb84bedc9",
+    "split_rule_evidence_v3.py": "304b0ff4c70102392606c2c1f78f4f76c7f5f58b8419df5cdb048479fdf7d538",
+    "split_rule_candidates_v3.py": "37f6db3586fa35f210a5a98566a19fa2784ec33fe1157a95a46df0e1722ef318",
+    "split_rule_components.py": "e84974e4caf87b8cf1796945466fa6da52111e89e253d75d76ebee0c24b6e3ce",
+    "segment_development_allocation.py": "63a1b9e04c378c0e95f9c96994d6d3f825f7d4668c03fe40b8bd934c006dcdde",
+    "segment_transformer.py": "e974f53121fad3eba81b16683a9157cbe447ff7dc25bf1738755f42a3b3adfc1",
+    "model_input_groups.py": "f3056357196e261310921a7f46c4bf4f904aa54e603c50a56022d6e4d4af03cd"
+  },
+  "historical_snapshot": {
+    "assignments_csv_sha256": "f7781ff07cfd5e60299ebf192fdda3700a6a5f6e7efc178f4355de1d5cc0e66a",
+    "grouping_freeze_sha256": "be6768c4239cdb0e7481f4a443dba64ee2af79473a0a392de3b8a5993ee231e8",
+    "completion_sha256": "6f2d40347f1d2349af860022fe1f127de343a20f77ba08dd34f7e61517d01c01",
+    "grouping_assignments_csv_sha256": "c6b4768b0bc1fd7cda88995f6f97adfdbd0bdf7fcd5da02ac78983a1bcc6e517",
+    "protected_final_test_csv_sha256": "634e2458f1b3cfce2b85f40f7098d134ddcd8c3616ad656336fca1083fa046e3",
+    "segment_distributions_csv_sha256": "3527b4b752879ec4105227acf9843761b3bdc193363defa52c50814554a571b2"
+  },
+  "exposure_provenance": {
+    "policy": {
+      "candidate_test_universe": "Only the original unscored protected rule-v3 final-test IDs. No replacement using historically trained/validated rows or unlabeled development rows.",
+      "direct_review_exposure": "All endpoints and presented member/path IDs in saved annotated/review/diagnostic product-text artifacts, including whole named disagreement tables and whole named member tables. Presence is conservatively treated as exposure even if not every row was read.",
+      "eligibility_levels": {
+        "direct": "old protected test minus directly presented records and historical model-seen records",
+        "review_family": "old protected test minus historical-family closure of direct review exposure, and minus direct historical model-seen IDs; root must also exclude updated frozen components touching review/model-seen records",
+        "strict_historical_family": "old protected test minus historical-family closure of the union of direct review exposure and model-seen IDs"
+      },
+      "excluded_from_direct_exposure": "Source datasets, full raw/candidate pools not known to have been reviewed, automatic duplicate tables without presented text, assignment/distribution tables, and new-finalization outputs. The balanced 210-candidate pool and earlier reserved 64/60 are included because their full sets were subsequently annotated.",
+      "historical_family_closure": "Connected components of the union of all distinct full-universe saved rule/TF-IDF assignment partitions from v1, v2 preliminary/final, and v3, plus all saved independent near-name links. A reviewed record excludes every member of its historical union component.",
+      "model_seen_exposure": "Every historical train/validation assignment ID and every saved prediction ID, for reduced-pool and full-development transformer runs. Train and validation were tokenized together; validation is model-seen.",
+      "qualifications": [
+        "Unreviewed means absent from the conservatively inventoried recorded product-review artifacts, not proof of no undocumented exposure.",
+        "Old false-positive merges can exclude otherwise legitimate test families; no claim that historical closure is true product identity.",
+        "Earlier all-universe aggregate audits and unsupervised feature construction cannot be erased by this registry.",
+        "This registry reserves no final test and makes no final allocation decisions. Corrected/frozen groups must additionally be checked against it.",
+        "Automated Segment counts describe eligibility only; no test predictions or test product content are displayed or scored."
+      ],
+      "registry_script_sha256": "328407b1b0e7ebf5820a8dd189c83d805ace1b2fb310e5aa2561d20150b903b0",
+      "version": "recorded-exposure-conservative-v1"
+    },
+    "registry_artifact_sha256": {
+      "automated_eligibility_class_counts.csv": "721a0a0a6642369a6d462afeb3e191db90e5e2fea66d86d0c3d672e9e8782cbd",
+      "build_exposure_registry.py": "328407b1b0e7ebf5820a8dd189c83d805ace1b2fb310e5aa2561d20150b903b0",
+      "direct_reviewed_records.csv": "5472763591ca6b816b573b989e297e4ef5bac6c88b89f06728fa4d3a02d4dfda",
+      "eligible_direct_record_ids.csv": "8eab7ccb51bb26f3f564e5d63060e1d93805683fb6d80ec1d91ac77acbc84688",
+      "eligible_review_family_record_ids.csv": "b9a91ab9f273798d6869a9276241256c0904688cd9f288246733bc0af189fa04",
+      "eligible_strict_historical_family_record_ids.csv": "9a6554bb4039e45011bb61742c961be71e6abfc4ff95c8787359337d84d887c4",
+      "historical_family_exposed_records.csv": "47902063fd20739aef758e9fc08eb14d90d08b502d408f0796f78d9833ea6dd6",
+      "historical_family_graph_inputs.json": "3569d0abd7a24d58a1730183fd8f41598b99bc5f90828c10246a4e8fbccb671c",
+      "historical_model_seen_records.csv": "0e77d64c81864c57fac360664d6edb8bc1dd8ac1fab4bed7c2587a7453ee8261",
+      "model_seen_inputs.json": "e8b908f951c80904e83ff5f4a60cd3c2dd04e9be1a8ad24f4f065541f4f3b401",
+      "old_test_eligibility.csv": "9134ac9c3b932aeb220e065e765f82da5c384cd51326a4d588cf05ba1e90119d",
+      "policy.json": "70bf19a94ea9446d4a9746485f61dcafd9b967169c95b57798d98c2615b3434f",
+      "registry_manifest.json": "be736abbc21bf172aefb451ce9f5d1eb6d811e705a9763a2b7d09f862114a47b",
+      "review_artifact_catalog.csv": "e20188f2ea076594c50e1eed4b314753e33c969aa0695b7542e3c6248608c872",
+      "summary.json": "17ed052a7dd51c1ba05feb34b2bcbfbda733d0031330c87b8461e2899aa294ce"
+    },
+    "meaning": "Selectors reproduce the recorded strict historical-family eligibility decision. Full local historical artifacts are not required on teammate machines."
+  },
+  "expected": {
+    "assignment_sha256": "2135128dbd6b1f9182fcd0ed5929e47f4086f7c49b703c4c14be3660ce4109fe",
+    "product_group_sha256": "2b895ca73fb3a6a0799c1ddeeba81b11a1eca3ead59c56351796565157c72178",
+    "effective_input_group_sha256": "b2cc7591c093f63637846b06e5d86e906daf6a453ec6509c889433cd20133578",
+    "group_sha256": "f1f4ba003542a8227683e1eccd356ccd08a32a2fac2555e98dd57277f204caa6",
+    "splits": {
+      "train": {
+        "records": 252,
+        "groups": 125,
+        "record_ids_sha256": "f12fa9718659c38ffb91099ace81953e2812d0d825f061b861d11487d6790848",
+        "assignment_sha256": "73c5c31d80e1f03f34d54f98662f51c135630603e6fb4bb9e313d0a1d9338261"
+      },
+      "validation": {
+        "records": 54,
+        "groups": 27,
+        "record_ids_sha256": "0d5265be1c0936e03a88a47932c2fdf6720a67844a08475b7a2c3003464d425a",
+        "assignment_sha256": "334f5fe70eadfaaf79657df21d45220842f0edbccbfa1566226f1eee12aa19f8"
+      },
+      "test": {
+        "records": 54,
+        "groups": 27,
+        "record_ids_sha256": "eecde78d64d4cb36bded22750ffedd13ab2c3286ef91f129c33eeeff3a58e58c",
+        "assignment_sha256": "5afa8ec82c6d3426318f30c007fb359d4d5a921dbb316b90e2a294ca54ebbc9d"
+      }
+    },
+    "test_reservation": {
+      "policy": "reserve_all_wholly_eligible_groups_without_label_or_outcome_selection",
+      "original_unscored_test_records": 60,
+      "historically_eligible_records": 55,
+      "removed_by_corrected_or_effective_input_group_closure": 1,
+      "final_test_records": 54,
+      "final_test_groups": 27,
+      "previously_model_seen_records_used_to_pad_test": 0
+    }
+  },
+  "canonicalization": {
+    "version": "compact-json-lines-record-id-sorted-v1",
+    "encoding": "UTF-8",
+    "order": "ascending record_id; stable sort; all CSV values retained as strings",
+    "row_encoding": "json.dumps(array,ensure_ascii=False,separators=(',',':'),allow_nan=False) + LF",
+    "record_id_fields": [
+      "dataset",
+      "source_sha256",
+      "source_row"
+    ],
+    "record_ids_digest_fields": [
+      "record_id"
+    ],
+    "provenance_digest_fields": [
+      "dataset",
+      "source_sha256",
+      "source_row"
+    ],
+    "group_features_digest_fields": [
+      "record_id",
+      "ProductName",
+      "ProductDescription",
+      "ProductContents",
+      "ProductBrand",
+      "Retailer",
+      "ProductUrl",
+      "Sku",
+      "Upc",
+      "ProductModelNumber",
+      "MDM_Id",
+      "JoiningKey"
+    ],
+    "development_labels_digest_fields": [
+      "record_id",
+      "Segment"
+    ],
+    "assignment_digest_fields": [
+      "record_id",
+      "group_id",
+      "split"
+    ],
+    "development_labels_scope": "All records outside the frozen actual final-test selector; no final-test individual labels are hashed or exported.",
+    "source_hash_normalization": "Replace CRLF with LF before SHA256; retain other bytes."
+  },
+  "test_protection": {
+    "rule": "Training/validation must match sealed role membership and exclude every final-test ID. No final-test scoring or grouping refinement during development.",
+    "representation": "The text fields, character limits, tokenizer bytes and sequence limit are frozen; representation changes require a new exposure-aware protocol."
+  },
+  "resources_sha256": {
+    "eligibility.json": "6f12b22ae1c2c517cc7dc25fba0c7afe6e6f029e088aa28d9513f143bf27015c",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "NOTICE": "426b9d4d8cd4dc9882c0eaaf55ae692ec347c0b01691bb315dda4acb6cb20513",
+    "tokenizer/tokenizer.json": "79ea220416a57ca8acdf069d71875d5d2ddadef66021aeb6c120a7c546c04344",
+    "tokenizer/tokenizer_config.json": "5810debc47bb4eeb5424b5a484242124cd7deff57d40ef83ec346f910e4557f7"
+  }
+}
