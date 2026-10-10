@@ -101,18 +101,18 @@ def splitting_main() -> None:
 
 
 def split_data_main(argv=None) -> int:
-    """Create full-record train/validation/test CSVs with rule-v3 grouping."""
-    from .split_export import export_splits
-    from .split_rules_v3 import RuleRefinementConfig
-    from .splitting import SplitConfig
+    """Reproduce or verify the finalized October 9 Segment partitions."""
+    from .split_protocol import export_final_splits, load_protocol, verify_protocol_splits
 
     parser = argparse.ArgumentParser(description=split_data_main.__doc__)
-    parser.add_argument("--input", type=Path, required=True, help="Cleaned CSV with source identity and Segment")
-    parser.add_argument("--output-dir", type=Path, required=True, help="New directory for split records and audits")
+    parser.add_argument("--input", type=Path, help="Integrated training_candidate.csv from the registered source data")
+    parser.add_argument("--output-dir", type=Path, help="New directory for final partitions and verification artifacts")
+    parser.add_argument("--verify", type=Path, help="Verify generated splits against the committed authoritative protocol")
+    parser.add_argument("--protocol-dir", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--identifiers", type=Path, help="Optional source-keyed identifier CSV; otherwise use the export manifest")
-    parser.add_argument("--seed", type=int, help="Override the configured random seed (default 42)")
-    parser.add_argument("--config", type=Path, help="JSON SplitConfig overrides, including ratios and seed")
-    parser.add_argument("--grouping-config", type=Path, help="JSON RuleRefinementConfig overrides for rule-v3")
+    parser.add_argument("--seed", type=int, help="Assert the frozen seed (42); changing it is rejected")
+    parser.add_argument("--config", type=Path, help="Assert frozen SplitConfig values; overrides are rejected")
+    parser.add_argument("--grouping-config", type=Path, help="Assert frozen RuleFinalConfig values; overrides are rejected")
     args = parser.parse_args(argv)
 
     def read_config(path):
@@ -125,13 +125,24 @@ def split_data_main(argv=None) -> int:
         return values
 
     try:
-        values = {"grouping_version": 2, **read_config(args.config)}
-        if args.seed is not None:
-            values["seed"] = args.seed
-        config = SplitConfig.from_dict(values)
-        grouping = RuleRefinementConfig.from_dict(read_config(args.grouping_config))
-        export_splits(args.input, args.output_dir, config, args.identifiers, grouping,
-                      config_paths=[path for path in (args.config, args.grouping_config) if path])
+        _, manifest = load_protocol(args.protocol_dir)
+        if args.seed is not None and args.seed != manifest["split_config"]["seed"]:
+            raise ValueError("The official split protocol has a frozen seed; --seed overrides are rejected")
+        for path, key in ((args.config, "split_config"), (args.grouping_config, "rule_final_config")):
+            frozen = manifest[key]
+            if path and {**frozen, **read_config(path)} != frozen:
+                raise ValueError(f"The official split protocol is frozen; {key} overrides are rejected")
+        if args.verify:
+            if args.input or args.output_dir or args.identifiers:
+                raise ValueError("--verify cannot be combined with split generation arguments")
+            summary = verify_protocol_splits(args.verify, protocol_dir=args.protocol_dir)
+            print(json.dumps({"verified": True, "protocol_id": summary["protocol_id"],
+                              "checks": summary["checks"]}, indent=2))
+        else:
+            if args.input is None or args.output_dir is None:
+                raise ValueError("Split generation requires --input and --output-dir")
+            export_final_splits(args.input, args.output_dir, protocol_dir=args.protocol_dir,
+                                identifier_path=args.identifiers)
     except (ValueError, OSError, RuntimeError, TypeError) as error:
         parser.exit(1, f"Error: {error}\n")
     return 0

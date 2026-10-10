@@ -14,8 +14,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install .
+      - run: python -m pip install ".[splitting]"
       - run: python -m unittest discover -s tests -v
       - run: python -m catalogiq --help
       - run: python -m catalogiq.check_structure --help
+      - run: python -m scripts.split_data --help
       - run: python -m pip wheel --no-deps --wheel-dir dist .

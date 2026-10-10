@@ -13,9 +13,16 @@ dependencies = [
     "pandas>=2.2,<4",
     "scipy>=1.11,<2",
     "scikit-learn>=1.4,<2",
+    "tokenizers==0.22.2",
 ]
 
 [project.optional-dependencies]
+splitting = [
+    "numpy==2.3.3",
+    "pandas==2.3.2",
+    "scipy==1.16.2",
+    "scikit-learn==1.7.2",
+]
 notebooks = [
     "ipykernel>=6,<8",
     "jupyterlab>=4,<5",
@@ -25,7 +32,11 @@ notebooks = [
 catalogiq-clean = "catalogiq.cli:main"
 catalogiq-check-structure = "catalogiq.cli:structural_main"
 catalogiq-compare-splits = "catalogiq.cli:splitting_main"
+catalogiq-split = "catalogiq.cli:split_data_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["catalogiq", "catalogiq.*"]
+
+[tool.setuptools.package-data]
+catalogiq = ["resources/segment_final_20261009/*", "resources/segment_final_20261009/tokenizer/*"]

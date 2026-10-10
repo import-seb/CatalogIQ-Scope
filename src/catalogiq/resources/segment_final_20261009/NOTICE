@@ -1,0 +1,13 @@
+Public tokenizer attribution
+
+Model: sentence-transformers/all-MiniLM-L6-v2
+Upstream revision: c9745ed1d9f207416be6d2e6f8de32d1f16199bf
+Upstream model card:
+https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/blob/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/README.md
+
+The upstream model card declares Apache-2.0. The license is included in LICENSE.
+The two tokenizer files are byte-identical to the local tokenizer saved for the
+October 9, 2026 Segment baseline (Transformers 5.3.0), including saved settings.
+They contain the public WordPiece vocabulary and tokenizer configuration.
+No CatalogIQ product data, target labels, model weights or predictions are
+included. These assets make splitting offline and independent of remote caches.

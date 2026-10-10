@@ -2,3 +2,9 @@
 # Preserve their original bytes on Linux and Windows for integrity checks.
 /tests/fixtures/grouping_review_75.json text eol=crlf
 /tests/fixtures/grouping_review_75_baseline.json text eol=crlf
+
+# The portable protocol verifies these resource bytes on every platform.
+/src/catalogiq/resources/** text eol=lf
+# Saved tokenizer configuration contains CRLF; its original bytes are frozen.
+/src/catalogiq/resources/segment_final_20261009/tokenizer/* -text -eol whitespace=cr-at-eol
+/tests/fixtures/portable_split_protocol/** text eol=lf

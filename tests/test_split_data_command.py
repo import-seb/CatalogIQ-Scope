@@ -1,11 +1,12 @@
-"""Exercise the public splitting command using small, synthetic CSV inputs.
+"""Run the authoritative CLI against a frozen, public synthetic protocol.
 
-These subprocess tests use the same invocation as teammates and CI. They do
-not patch matching, bypass argparse, require project datasets, or train models.
+Actual v4 grouping, packaged tokenization, eligibility and allocation are used.
+No matching is patched, private data required, or classifier trained.
 """
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -15,69 +16,27 @@ import unittest
 
 import pandas as pd
 
+from catalogiq.split_protocol import load_protocol
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 SPLITS = ("train", "validation", "test")
 PROVENANCE = ["dataset", "source_sha256", "source_row"]
 
 
+def fixture_builder():
+    path = Path(__file__).parent / "fixtures/portable_split_protocol/build_fixture.py"
+    spec = importlib.util.spec_from_file_location("portable_fixture", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def digest(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def read_csv(path):
     return pd.read_csv(path, dtype=str, keep_default_na=False, encoding="utf-8-sig")
-
-
-def write_csv(path, rows):
-    pd.DataFrame(rows).to_csv(path, index=False, lineterminator="\n")
-
-
-def synthetic_rows():
-    """Eighteen independent families, each with two packaging variants."""
-    families = [
-        ("Willow", "Mint Strong Lozenges"),
-        ("Acacia", "Northern Edge Vitamin C Tablets"),
-        ("Birch", "Citrus Blossom Hand Soap"),
-        ("Cedar", "Oat Meadow Facial Lotion"),
-        ("Dogwood", "Lavender Valley Bath Salts"),
-        ("Elm", "Chamomile Grove Tea Bags"),
-        ("Fir", "Copper Trail Drink Bottles"),
-        ("Hawthorn", "Bamboo Bristle Hair Brushes"),
-        ("Juniper", "Rose Garden Scented Candles"),
-        ("Larch", "Silicone Kitchen Baking Mats"),
-        ("Maple", "Cotton Coastal Beach Towels"),
-        ("Oak", "Ceramic Glazed Coffee Mugs"),
-        ("Pine", "Aluminum Folding Picnic Chairs"),
-        ("Redwood", "Wireless Optical Computer Mice"),
-        ("Spruce", "Waterproof Walking Trail Boots"),
-        ("Sycamore", "Peppermint Botanical Lip Balm"),
-        ("Walnut", "Honey Apricot Cleansing Gel"),
-        ("Yew", "Calendula Gentle Body Cream"),
-    ]
-    rows = []
-    for family, (brand, line) in enumerate(families):
-        for variant in range(2):
-            index = 2 * family + variant
-            name = (f"{brand} {line}, 38 Count" if variant == 0
-                    else f"3 Pack {brand} {line} 38 Count")
-            rows.append({
-                "dataset": "synthetic_training.csv",
-                "source_sha256": "synthetic-source-fingerprint",
-                "source_row": str(index),
-                "ProductName": name,
-                "ProductBrand": brand,
-                "ProductDescription": ("null" if family == 1 else
-                                       f"{line} — a precise, synthetic description."),
-                "ProductContents": "" if family == 2 else f"Contents for {line}",
-                "Retailer": "Synthetic Store",
-                "ProductUrl": f"https://store.example/products/{family}/{variant}",
-                "Segment": ("Vitamins", "Personal care", "Household")[family % 3],
-                "ProductCode": f"{index:06d}",
-                "SourceNote": 'NA' if family == 3 else 'Keep commas, quotes "and"\nnewlines.',
-            })
-    # Input order must not become an accidental record identity.
-    return rows[::2] + rows[1::2]
 
 
 class SplitDataCommandTests(unittest.TestCase):
@@ -85,179 +44,138 @@ class SplitDataCommandTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
-        self.input = self.root / "cleaned.csv"
-        self.rows = synthetic_rows()
-        write_csv(self.input, self.rows)
+        self.bundle = self.root / "relocated protocol"
+        production_bundle, _ = load_protocol()
+        self.frame, self.manifest = fixture_builder().materialize(self.bundle, production_bundle)
+        self.input = self.root / "training_candidate.csv"
+        self.frame.drop(columns="record_id").to_csv(self.input, index=False, lineterminator="\n")
 
-    def command(self, output, *options, input_path=None):
-        # In CI catalogiq comes from `pip install .`; do not inject src here.
-        return subprocess.run(
-            [sys.executable, "-m", "scripts.split_data", "--input",
-             str(input_path or self.input), "--output-dir", str(output),
-             *map(str, options)],
-            cwd=REPOSITORY, capture_output=True, text=True,
-            encoding="utf-8", errors="replace", timeout=60, check=False,
-        )
+    def command(self, output=None, *options, input_path=None, use_fixture=True):
+        args = [sys.executable, "-m", "scripts.split_data"]
+        if output is not None:
+            args += ["--input", str(input_path or self.input), "--output-dir", str(output)]
+        if use_fixture:
+            args += ["--protocol-dir", str(self.bundle)]
+        args += list(map(str, options))
+        # In CI catalogiq comes from pip install .; this does not inject src.
+        return subprocess.run(args, cwd=REPOSITORY, capture_output=True, text=True,
+                              encoding="utf8", errors="replace", timeout=90, check=False)
 
-    def run_command(self, output, *options):
-        result = self.command(output, *options)
+    def run_command(self, output, *options, input_path=None):
+        result = self.command(output, *options, input_path=input_path)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        return json.loads((output / "summary.json").read_text(encoding="utf-8"))
+        return json.loads((output / "summary.json").read_text(encoding="utf8"))
 
-    def exported_records(self, output):
-        frames = []
-        for split in SPLITS:
-            frame = read_csv(output / f"{split}.csv")
-            self.assertFalse(frame.empty, f"Synthetic {split} export is empty")
-            self.assertTrue(frame["split"].eq(split).all())
-            frames.append(frame)
-        return pd.concat(frames, ignore_index=True)
-
-    def test_command_exports_full_rows_and_reproducibility_metadata(self):
-        output = self.root / "run"
-        input_before = self.input.read_bytes()
-        summary = self.run_command(output)
-        expected = {
-            "train.csv", "validation.csv", "test.csv", "rule_assignments.csv",
-            "rule_matching_edges.csv", "rule_group_sizes.csv",
-            "segment_distributions.csv", "split_config.json",
-            "rule_refinement_config.json", "input_manifest.json", "summary.json",
-        }
-        self.assertTrue(expected.issubset({p.name for p in output.iterdir()}))
-
-        combined = self.exported_records(output)
-        assignments = read_csv(output / "rule_assignments.csv")
-        self.assertEqual(len(combined), len(self.rows))
-        self.assertTrue(combined["record_id"].is_unique)
-        self.assertEqual(set(combined["source_row"]), {row["source_row"] for row in self.rows})
-        self.assertTrue(combined.groupby("group_id")["split"].nunique().eq(1).all())
-        pd.testing.assert_frame_equal(
-            combined.set_index("record_id")[["group_id", "split"]].sort_index(),
-            assignments.set_index("record_id")[["group_id", "split"]].sort_index(),
-        )
-        original = read_csv(self.input).set_index("source_row").sort_index()
-        recovered = combined.set_index("source_row")[original.columns].sort_index()
-        pd.testing.assert_frame_equal(recovered, original)
-        indexed = combined.set_index("source_row")
-        self.assertEqual(indexed.at["0", "group_id"], indexed.at["1", "group_id"])
-        self.assertEqual(indexed.at["0", "split"], indexed.at["1", "split"])
-        for row in combined.to_dict("records"):
-            identity = json.dumps([row[c] for c in PROVENANCE],
-                                  ensure_ascii=False, separators=(",", ":"))
+    def test_command_exports_final_protocol_and_full_source_rows(self):
+        output = self.root / "splits"
+        before = self.input.read_bytes()
+        self.run_command(output)
+        required = {"assignments.csv", "rule_assignments.csv", "train.csv", "validation.csv", "test.csv",
+                    "protected_final_test.csv", "grouping_freeze.json", "summary.json", "completion.json"}
+        self.assertTrue(required.issubset({path.name for path in output.iterdir()}))
+        self.assertEqual((output / "assignments.csv").read_bytes(), (output / "rule_assignments.csv").read_bytes())
+        assignments = read_csv(output / "assignments.csv")
+        self.assertEqual(assignments.columns.tolist(), [*PROVENANCE, "record_id", "group_id", "split"])
+        self.assertEqual(len(assignments), 360)
+        self.assertTrue(assignments.record_id.is_unique)
+        self.assertEqual(assignments.groupby("group_id").split.nunique().max(), 1)
+        roles = []
+        for role in SPLITS:
+            frame = read_csv(output / (role + ".csv"))
+            self.assertTrue(frame.split.eq(role).all())
+            self.assertEqual(len(frame), self.manifest["expected"]["splits"][role]["records"])
+            roles.append(frame)
+        combined = pd.concat(roles, ignore_index=True).set_index("record_id").sort_index()
+        original = self.frame.set_index("record_id").sort_index()
+        pd.testing.assert_frame_equal(combined[original.columns], original)
+        pd.testing.assert_frame_equal(combined[["group_id", "split"]],
+                                      assignments.set_index("record_id")[["group_id", "split"]].sort_index())
+        by_source = combined.set_index("source_row")
+        self.assertNotEqual(by_source.at["0", "group_id"], by_source.at["2", "group_id"])
+        self.assertEqual(by_source.at["72", "group_id"], by_source.at["78", "group_id"])
+        self.assertEqual(by_source.at["72", "split"], by_source.at["78", "split"])
+        grouping = read_csv(output / "grouping_assignments.csv").set_index("record_id")
+        id_by_source = self.frame.set_index("source_row").record_id
+        left, right = id_by_source["72"], id_by_source["78"]
+        self.assertNotEqual(grouping.at[left, "product_group_id"], grouping.at[right, "product_group_id"])
+        self.assertEqual(grouping.at[left, "effective_input_group_id"], grouping.at[right, "effective_input_group_id"])
+        self.assertNotEqual(by_source.at["305", "split"], "test")
+        protected = read_csv(output / "protected_final_test.csv")
+        self.assertEqual(len(protected), 54)
+        self.assertNotIn("Segment", protected)
+        self.assertNotIn("ProductName", protected)
+        self.assertEqual(set(protected.record_id), set(self.frame.loc[self.frame.source_row.astype(int).ge(306), "record_id"]))
+        self.assertEqual(self.input.read_bytes(), before)
+        for row in assignments.to_dict("records"):
+            identity = json.dumps([row[field] for field in PROVENANCE], ensure_ascii=False, separators=(",", ":"))
             self.assertEqual(row["record_id"], hashlib.sha256(identity.encode()).hexdigest())
+        verified = self.command(None, "--verify", output)
+        self.assertEqual(verified.returncode, 0, verified.stdout + verified.stderr)
 
-        self.assertEqual(self.input.read_bytes(), input_before)
-        self.assertTrue(summary["version"])
-        self.assertEqual(summary["target"], "Segment")
-        self.assertEqual(summary["grouping_method"], "rule_v3")
-        self.assertEqual(summary["input"]["sha256"], digest(self.input))
-        self.assertEqual(summary["input"]["rows"], len(self.rows))
-        self.assertEqual(summary["split_config"]["seed"], 42)
-        self.assertEqual(summary["split_config"]["ratios"], [0.70, 0.15, 0.15])
-        for key, filename in (("input", "input_manifest.json"),
-                              ("split_config", "split_config.json"),
-                              ("rule_refinement_config", "rule_refinement_config.json")):
-            self.assertEqual(summary[key], json.loads((output / filename).read_text(encoding="utf-8")))
-        for check in ("complete_unique_coverage", "group_isolation", "export_values_preserved",
-                      "input_artifacts_unchanged", "labels_excluded_from_grouping"):
-            self.assertTrue(summary["checks"][check], check)
-        self.assertTrue(summary["environment"])
-        self.assertTrue(summary["grouping"])
-        self.assertEqual(summary["metrics"]["rows"], len(self.rows))
-        self.assertGreater(summary["metrics"]["groups"]["count"], 0)
-        self.assertIn("size_summary", summary["metrics"]["groups"])
-        self.assertIn("near_duplicate", summary["metrics"])
-        self.assertIn("exact_payload", summary["metrics"])
-        self.assertEqual(summary["evaluation"]["method"], "independent_character_shingle_jaccard")
-        self.assertTrue(summary["evaluation"]["exhaustive_within_scope"])
-        self.assertTrue(summary["runtime_seconds"])
-        self.assertTrue(summary["output_sha256"])
-        for filename, expected_hash in summary["output_sha256"].items():
-            self.assertEqual(digest(output / filename), expected_hash, filename)
-
-    def test_repeated_command_is_byte_reproducible_and_records_custom_settings(self):
-        split_config = self.root / "split.json"
-        split_config.write_text(json.dumps({"grouping_version": 2, "seed": 11,
-                                           "split_restarts": 1, "split_refinement_passes": 1}),
-                                encoding="utf-8")
-        grouping_config = self.root / "grouping.json"
-        grouping_config.write_text(json.dumps({"component_representatives": 3,
-                                               "candidate": {"char_top_k": 6}}), encoding="utf-8")
-        options = ("--config", split_config, "--grouping-config", grouping_config, "--seed", 123)
+    def test_row_order_and_csv_line_endings_reproduce_assignment_bytes(self):
         first, second = self.root / "first", self.root / "second"
-        summary = self.run_command(first, *options)
-        self.run_command(second, *options)
-        self.assertEqual(summary["split_config"]["seed"], 123)
-        self.assertEqual(summary["split_config"]["split_restarts"], 1)
-        self.assertEqual(summary["rule_refinement_config"]["component_representatives"], 3)
-        self.assertEqual(summary["rule_refinement_config"]["candidate"]["char_top_k"], 6)
-        csv_names = {path.name for path in first.glob("*.csv")}
-        self.assertEqual(csv_names, {path.name for path in second.glob("*.csv")})
-        for name in csv_names:
+        self.run_command(first, "--seed", "42")
+        shuffled = self.root / "shuffled_candidate.csv"
+        self.frame.drop(columns="record_id").sample(frac=1, random_state=19).to_csv(
+            shuffled, index=False, lineterminator="\r\n")
+        self.run_command(second, input_path=shuffled)
+        for name in ("assignments.csv", "rule_assignments.csv", "protected_final_test.csv", "train.csv", "validation.csv", "test.csv"):
             self.assertEqual((first / name).read_bytes(), (second / name).read_bytes(), name)
 
-    def test_optional_identifiers_are_joined_by_complete_provenance_and_exported(self):
-        identifiers = self.root / "identifiers.csv"
-        rows = [{**{key: row[key] for key in PROVENANCE},
-                 "Sku": "000" + row["source_row"],
-                 "Upc": "036000291452" if row["source_row"] in {"0", "1"} else "",
-                 "MDM_Id": "trace-" + row["source_row"]}
-                for row in reversed(self.rows)]
-        rows.append({"dataset": "synthetic_prediction.csv", "source_sha256": "other-source",
-                     "source_row": "0", "Sku": "wrong-record", "Upc": "", "MDM_Id": "wrong-record"})
-        write_csv(identifiers, rows)
-        before = {path: path.read_bytes() for path in (self.input, identifiers)}
-        output = self.root / "with-identifiers"
-        summary = self.run_command(output, "--identifiers", identifiers)
-        combined = self.exported_records(output).set_index("source_row")
-        self.assertEqual(len(combined), len(self.rows))
-        for row in self.rows:
-            self.assertEqual(combined.at[row["source_row"], "Sku"], "000" + row["source_row"])
-            self.assertEqual(combined.at[row["source_row"], "MDM_Id"], "trace-" + row["source_row"])
-        self.assertEqual(combined.at["0", "Upc"], "036000291452")
-        self.assertEqual(combined.at["1", "Upc"], "036000291452")
-        self.assertEqual(summary["input"]["fingerprints"][str(identifiers.resolve())], digest(identifiers))
-        self.assertIn("Upc", summary["input"]["joined_identifier_columns"])
-        self.assertEqual({path: path.read_bytes() for path in before}, before)
+    def test_default_protocol_rejects_another_population_without_creating_a_split(self):
+        output = self.root / "wrong-population"
+        result = self.command(output, use_fixture=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(output.exists())
+        self.assertNotIn("Traceback", result.stderr)
 
-    def test_existing_output_is_refused_without_modifying_it(self):
+    def test_frozen_settings_cannot_be_overridden(self):
+        config = self.root / "changed.json"
+        config.write_text('{"seed": 123}', encoding="utf8")
+        grouping = self.root / "grouping.json"
+        grouping.write_text('{"component_representatives": 3}', encoding="utf8")
+        for name, options in (("seed", ("--seed", "123")), ("split-config", ("--config", config)),
+                              ("group-config", ("--grouping-config", grouping))):
+            with self.subTest(name=name):
+                output = self.root / name
+                result = self.command(output, *options)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertFalse(output.exists())
+
+    def test_existing_output_is_refused_without_modification(self):
         output = self.root / "existing"
         output.mkdir()
-        sentinel = output / "train.csv"
-        sentinel.write_bytes(b"An existing experiment must stay untouched.\n")
+        (output / "train.csv").write_bytes(b"An existing experiment must stay untouched.\n")
         before = {path.name: path.read_bytes() for path in output.iterdir()}
         result = self.command(output)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("already exists", result.stderr.lower())
         self.assertEqual({path.name: path.read_bytes() for path in output.iterdir()}, before)
+        self.assertNotIn("Traceback", result.stderr)
 
-    def test_invalid_input_and_configs_fail_usefully_without_output(self):
-        missing_segment = self.root / "missing-segment.csv"
-        missing_identity = self.root / "missing-identity.csv"
-        frame = read_csv(self.input)
-        frame.drop(columns="Segment").to_csv(missing_segment, index=False)
-        frame.drop(columns="source_sha256").to_csv(missing_identity, index=False)
-        malformed = self.root / "malformed.json"
-        malformed.write_text('{"seed":', encoding="utf-8")
-        unknown = self.root / "unknown.json"
-        unknown.write_text('{"misspelled_parameter": 1}', encoding="utf-8")
-        invalid_candidate = self.root / "invalid-candidate.json"
-        invalid_candidate.write_text('{"candidate": {"char_top_k": 0}}', encoding="utf-8")
-        cases = [
-            ("missing-segment", missing_segment, (), "Segment"),
-            ("missing-identity", missing_identity, (), "source"),
-            ("malformed-json", self.input, ("--config", malformed), "config"),
-            ("unknown-config", self.input, ("--config", unknown), "misspelled_parameter"),
-            ("invalid-candidate", self.input, ("--grouping-config", invalid_candidate), "char_top_k"),
-        ]
-        for name, input_path, options, expected_message in cases:
+    def test_input_identity_features_and_record_ids_fail_closed(self):
+        source = self.frame.drop(columns="record_id")
+        cases = {"missing-provenance": source.drop(columns="source_sha256"),
+                 "missing-target": source.drop(columns="Segment")}
+        altered = source.copy()
+        altered.loc[0, "ProductName"] = "Unexpected different formula"
+        cases["changed-features"] = altered
+        altered = source.copy()
+        altered.loc[0, "source_sha256"] = "0" * 64
+        cases["changed-source"] = altered
+        altered = self.frame.copy()
+        altered.loc[0, "record_id"] = "0" * 64
+        cases["invalid-record-id"] = altered
+        cases["duplicate-source-row"] = pd.concat([source, source.iloc[[0]]], ignore_index=True)
+        for name, frame in cases.items():
             with self.subTest(name=name):
+                candidate = self.root / (name + ".csv")
+                frame.to_csv(candidate, index=False, lineterminator="\n")
                 output = self.root / name
-                result = self.command(output, *options, input_path=input_path)
+                result = self.command(output, input_path=candidate)
                 self.assertNotEqual(result.returncode, 0)
-                self.assertIn(expected_message.lower(), result.stderr.lower())
+                self.assertFalse(output.exists())
                 self.assertNotIn("Traceback", result.stderr)
-                self.assertFalse(output.exists(), result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

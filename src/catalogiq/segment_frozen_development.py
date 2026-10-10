@@ -58,7 +58,7 @@ def _validate_identity(frame, name):
         raise ValueError(f"{name} has duplicate record IDs")
 
 
-def load_frozen_development(directory, config=None, *, tokenizer_dir, verifier=None,
+def load_frozen_development(directory, config=None, *, tokenizer_dir=None, verifier=None,
                             label_names=SEGMENT_LABELS):
     """Verify a split seal and construct supervised development without test data.
 
@@ -68,17 +68,31 @@ def load_frozen_development(directory, config=None, *, tokenizer_dir, verifier=N
     The verifier injection point is for synthetic tests only.
     """
     directory = Path(directory).resolve()
-    config = config or ModelConfig()
-    if verifier is None:
-        from .split_finalization import verify_final_splits
-        verifier = verify_final_splits
-    verified = verifier(directory, verify_exports=False)
     completion = json.loads((directory / "completion.json").read_text(encoding="utf8"))
     freeze_path = directory / "grouping_freeze.json"
     if sha256(freeze_path) != _hash_from_completion(completion, freeze_path.name):
         raise ValueError("Final grouping freeze has changed")
     freeze = json.loads(freeze_path.read_text(encoding="utf8"))
-    current = model_view_contract(config, tokenizer_dir=tokenizer_dir)
+    portable = freeze.get("format") == "catalogiq-portable-split-v1"
+    if portable:
+        from .split_protocol import portable_model_view_contract, verify_protocol_splits
+        config = config or ModelConfig.from_dict(json.loads(
+            (directory / "model_config.json").read_text(encoding="utf8")))
+        tokenizer_dir = Path(tokenizer_dir) if tokenizer_dir is not None else directory / "tokenizer"
+        contract_builder = portable_model_view_contract
+    else:
+        config = config or ModelConfig()
+        if tokenizer_dir is None:
+            raise ValueError("Historical snapshots require their explicit saved tokenizer directory")
+        contract_builder = model_view_contract
+    if verifier is None:
+        if portable:
+            verifier = verify_protocol_splits
+        else:
+            from .split_finalization import verify_final_splits
+            verifier = verify_final_splits
+    verified = verifier(directory, verify_exports=False)
+    current = contract_builder(config, tokenizer_dir=tokenizer_dir)
     if current != freeze.get("model_view_contract"):
         raise ValueError("Model representation differs from the sealed groups; rebuild grouping and final splits")
     if tuple(current["features"]) != MODEL_FIELDS:
@@ -142,6 +156,7 @@ def load_frozen_development(directory, config=None, *, tokenizer_dir, verifier=N
              "no_final_test_csv_read_or_hashed": True, "final_test_target_features_or_predictions_read": False,
              "record_and_group_isolation_passed": True,
              "source_and_cache_verifier_passed": bool(verified is not None),
+             "split_format": freeze.get("format", "historical-local-finalization"),
              "class_counts": {role: supervised.loc[supervised.split.eq(role), "Segment"].value_counts().sort_index().to_dict()
                               for role in ("train", "validation")}}
     return FrozenDevelopment(supervised, train_indices, validation_indices, names,
@@ -150,10 +165,12 @@ def load_frozen_development(directory, config=None, *, tokenizer_dir, verifier=N
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--split-dir", type=Path, default=Path("data/processed/split_finalization_20261009/frozen"))
-    parser.add_argument("--model-config", type=Path, default=Path("data/processed/segment_full_development_20261009/random/model_config.json"))
-    parser.add_argument("--tokenizer-dir", type=Path, default=Path("data/processed/segment_full_development_20261009/random/tokenizer"))
-    parser.add_argument("--output-dir", type=Path, default=Path("data/processed/split_finalization_20261009/development_preparation"))
+    parser.add_argument("--split-dir", type=Path, default=Path("data/processed/splits"))
+    parser.add_argument("--model-config", type=Path,
+                        help="Model settings; default: the generated split directory's model_config.json")
+    parser.add_argument("--tokenizer-dir", type=Path,
+                        help="Saved tokenizer; default: the generated split directory's tokenizer/")
+    parser.add_argument("--output-dir", type=Path, default=Path("data/processed/segment_development_preparation"))
     parser.add_argument("--tokenize", action="store_true", help="Verify development tokenization without training")
     parser.add_argument("--train", action="store_true", help="Explicitly run a fresh fixed-epoch Segment baseline")
     parser.add_argument("--device", help="Override training device, retaining frozen model representation")
@@ -161,10 +178,20 @@ def main(argv=None):
     output = args.output_dir.resolve()
     if output.exists() and any(output.iterdir()):
         raise FileExistsError("Use a new empty preparation/training output directory")
-    config = ModelConfig.from_dict(json.loads(args.model_config.read_text(encoding="utf8")))
+    freeze = json.loads((args.split_dir / "grouping_freeze.json").read_text(encoding="utf8"))
+    portable = freeze.get("format") == "catalogiq-portable-split-v1"
+    if portable:
+        model_path = args.model_config or args.split_dir / "model_config.json"
+        tokenizer_dir = args.tokenizer_dir or args.split_dir / "tokenizer"
+    else:
+        # Retain the historical command's explicit/local snapshot compatibility.
+        historical = Path("data/processed/segment_full_development_20261009/random")
+        model_path = args.model_config or historical / "model_config.json"
+        tokenizer_dir = args.tokenizer_dir or historical / "tokenizer"
+    config = ModelConfig.from_dict(json.loads(model_path.read_text(encoding="utf8")))
     if args.device:
         config = replace(config, device=args.device)
-    development = load_frozen_development(args.split_dir, config, tokenizer_dir=args.tokenizer_dir)
+    development = load_frozen_development(args.split_dir, config, tokenizer_dir=tokenizer_dir)
     output.mkdir(parents=True, exist_ok=True)
     protocol = {"created_utc": datetime.now(timezone.utc).isoformat(), "policy": "validation only; no final-test API",
                 "mode": "explicit_training" if args.train else "tokenization_only" if args.tokenize else "prepare_only",
@@ -176,7 +203,7 @@ def main(argv=None):
     if args.tokenize or args.train:
         from transformers import AutoTokenizer
         from .segment_transformer import tokenize_corpus
-        tokenizer = AutoTokenizer.from_pretrained(str(args.tokenizer_dir), local_files_only=True)
+        tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_dir), local_files_only=True)
         frame = development.frame[["record_id", "Segment", *MODEL_FIELDS]]
         corpus = tokenize_corpus(frame, development.label_names, config, tokenizer=tokenizer)
         _write_json(output / "tokenization.json", {"records": len(corpus), "text_sha256": corpus.text_sha256,

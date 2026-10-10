@@ -8,10 +8,11 @@
 - [Data contract](data_contract.md): current ingestion assumptions and unknowns.
 - [Integration contract](integration/cleaning_contract.md): shared identity, candidate mask, and handoff artifacts.
 - [Contribution workflow](../CONTRIBUTING.md): analysis-to-code process.
+- [Portable Segment split workflow](findings/02_splitting/03_portable_workflow_20261010.md): authoritative cleaning/splitting commands, generated files, and membership verification.
 
 ## Evidence
 
-- [Finalized Segment splits](findings/02_splitting/02_finalization_20261009.md): confirmed fixes, the protected test, integrity checks, and remaining risks.
+- [October 9 finalized Segment splits](findings/02_splitting/02_finalization_20261009.md): unchanged grouping and test decisions, integrity findings, and remaining risks; its local snapshot commands are historical.
 - [Split leakage audit](findings/02_splitting/01_leakage_audit_20261009.md): independent duplicate checks, reviewed misses and groups, and frozen-test integrity.
 - [Current combined cleaning validation](findings/01_cleaning/05_current_policy_validation.md): agreed Exclude handling, integrated structural decisions, exports and reproducibility.
 
