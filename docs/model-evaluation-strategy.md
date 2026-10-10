@@ -105,11 +105,19 @@ settled at 49 Sub-Segments.
 ### 2.5 Target dataset dtype — resolved
 
 No classification column reads as `float64` in the v4 output, so the
-empty-column trap — a silent label-join failure — is not present. Four feature
-columns move from string to numeric in the export (`ProductRating`, `XRatXRev`,
-`ProductReviewsCount`, `ReviewsCount`); see cleaning audit §3.6.
+empty-column trap — a silent label-join failure — is not present.
 
-Still load identifiers as string to preserve leading zeros.
+**Corrected.** An earlier version of this line said four feature columns "move
+from string to numeric in the export". They do not. The candidate partition and
+the export store byte-identical values in `ProductRating`, `XRatXRev`,
+`ProductReviewsCount` and `ReviewsCount` — checked across all 83,938 rows with
+`dtype="string"` and `keep_default_na=False`. What changes is what **pandas
+infers** when you read either file without an explicit dtype, which turns a
+stored `5` into the float `5.0` in memory. See cleaning audit §3.2.
+
+The practical rule is unchanged and now applies for the right reason: pass
+`dtype="string"` and `keep_default_na=False` whenever the stored text matters,
+and always load identifiers as string to preserve leading zeros.
 
 ### 2.6 Train and target are the same population — confirmed
 
