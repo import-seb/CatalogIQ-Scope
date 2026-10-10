@@ -11,6 +11,8 @@
 
 ## Evidence
 
+- [Finalized Segment splits](findings/02_splitting/02_finalization_20261009.md): confirmed fixes, the protected test, integrity checks, and remaining risks.
+- [Split leakage audit](findings/02_splitting/01_leakage_audit_20261009.md): independent duplicate checks, reviewed misses and groups, and frozen-test integrity.
 - [Current combined cleaning validation](findings/01_cleaning/05_current_policy_validation.md): agreed Exclude handling, integrated structural decisions, exports and reproducibility.
 
 - [Initial profile](findings/00_data_profile/01_profile_results.md)
