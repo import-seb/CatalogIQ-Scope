@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=2.2,<4",
     "scipy>=1.11,<2",
     "scikit-learn>=1.4,<2",
+    "joblib>=1.4,<2",
     "tokenizers==0.22.2",
 ]
 
@@ -32,6 +33,7 @@ notebooks = [
 catalogiq-clean = "catalogiq.cli:main"
 catalogiq-check-structure = "catalogiq.cli:structural_main"
 catalogiq-compare-splits = "catalogiq.cli:splitting_main"
+catalogiq-segment-baseline = "catalogiq.cli:segment_baseline_main"
 catalogiq-split = "catalogiq.cli:split_data_main"
 
 [tool.setuptools.packages.find]

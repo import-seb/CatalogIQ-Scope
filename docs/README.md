@@ -12,6 +12,8 @@
 
 ## Evidence
 
+- [Classical Segment validation results](findings/03_modeling/02_classical_segment_results_20261010.md): first four-field/category comparison on authoritative splits, metrics, checks and evaluator handoff.
+- [Classical Segment baseline](findings/03_modeling/01_classical_segment_baseline.md): word TF-IDF, category comparison and validation artifacts on the authoritative shared partitions.
 - [October 9 finalized Segment splits](findings/02_splitting/02_finalization_20261009.md): unchanged grouping and test decisions, integrity findings, and remaining risks; its local snapshot commands are historical.
 - [Split leakage audit](findings/02_splitting/01_leakage_audit_20261009.md): independent duplicate checks, reviewed misses and groups, and frozen-test integrity.
 - [Current combined cleaning validation](findings/01_cleaning/05_current_policy_validation.md): agreed Exclude handling, integrated structural decisions, exports and reproducibility.

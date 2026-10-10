@@ -119,6 +119,25 @@ identifies the committed protocol and verification evidence; the
 [October 9 finalization](docs/findings/02_splitting/02_finalization_20261009.md)
 records its remaining leakage risks.
 
+### Classical Segment baseline
+
+The word TF-IDF + logistic-regression baseline uses the same sealed training and
+validation records. Its model does not need Hugging Face weights or tokenization;
+the shared splitter still uses its packaged tokenizer to reproduce product groups.
+
+```bash
+python -m scripts.train_segment_baseline --split-dir data/processed/splits --features compare --output-dir data/processed/segment_classical_check
+python -m scripts.train_segment_baseline --split-dir data/processed/splits --features compare --train --output-dir data/processed/segment_classical_run
+```
+
+The first command verifies and prepares only. The second fits both the four-field
+baseline and the experiment with ProductCategory concatenated into the same text.
+Vocabulary and IDF fit only on train; predictions and comparisons cover validation.
+Both commands reuse the authoritative seal verifier and never open or hash test.csv.
+The category arm is a validation experiment, with the split protocol unchanged.
+See the [baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
+for outputs and limitations.
+
 ### Historical research
 
 Earlier comparison/refinement `rule_assignments.csv` files and

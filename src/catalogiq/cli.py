@@ -7,6 +7,37 @@ from pathlib import Path
 from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 
+def segment_baseline_main(argv=None) -> int:
+    """Prepare or train a word TF-IDF Segment baseline on explicit shared assignments."""
+    parser = argparse.ArgumentParser(description=segment_baseline_main.__doc__)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--split-dir", type=Path, help="Authoritative portable split directory (preferred)")
+    source.add_argument("--input", type=Path, help="Historical candidate CSV; preparation only")
+    parser.add_argument("--assignments", type=Path, help="Historical assignments for --input preparation")
+    parser.add_argument("--assignments-sha256", help="Expected full SHA-256 of historical assignments")
+    parser.add_argument("--input-sha256", help="Optional expected full SHA-256 of the cleaned candidate")
+    parser.add_argument("--features", choices=("base", "category", "compare"), default="compare")
+    parser.add_argument("--train", action="store_true", help="Fit and evaluate validation; otherwise check inputs only")
+    parser.add_argument("--config", type=Path, help="Optional BaselineConfig JSON; never changes assignments")
+    parser.add_argument("--output-dir", type=Path, required=True, help="New run directory")
+    args = parser.parse_args(argv)
+    try:
+        from .segment_baseline import BaselineConfig, run_baseline
+        values = json.loads(args.config.read_text(encoding="utf-8")) if args.config else {}
+        if not isinstance(values, dict):
+            raise ValueError("Baseline configuration must be a JSON object")
+        if args.input and (not args.assignments or not args.assignments_sha256):
+            raise ValueError("--input preparation requires --assignments and --assignments-sha256")
+        if args.train and not args.split_dir:
+            raise ValueError("Training requires --split-dir from the authoritative portable workflow")
+        run_baseline(args.input, args.assignments, args.assignments_sha256, args.output_dir,
+                     BaselineConfig(**values), expected_input_sha256=args.input_sha256,
+                     features=args.features, train=args.train, split_dir=args.split_dir)
+    except (ValueError, OSError, RuntimeError, TypeError, Warning) as error:
+        parser.exit(1, f"Error: {error}\n")
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--train", type=Path, default=TRAIN_PATH, help="Training CSV")
