@@ -3,10 +3,10 @@
 Product classification research and auditable preparation of six CatalogIQ labels:
 `Mnfr`, `Brand`, `Platform`, `Segment`, `Sub-Segment`, and `TargetAgeGroup`.
 
-**Current stage: data understanding and preparation.** The repo contains exploratory
-audits, a tested cleaning command, and experimental grouped evaluation splits.
-A splitting policy has not yet been adopted; a trained production classifier,
-frozen model-evaluation split, and deployment are not implemented here yet.
+**Current stage: Segment model development.** The repo contains audited cleaning,
+grouping experiments, a first transformer baseline, and a frozen evaluation
+protocol. Use the protected snapshot described below for further model work.
+A production classifier and deployment remain future work.
 
 ## Start here
 
@@ -64,6 +64,46 @@ preserve them. Category-level features remain deferred to feature engineering. S
 
 ### Create Segment model splits
 
+For continued Segment model development, use the corrected, frozen snapshot in
+`data/processed/split_finalization_20261009/frozen/`. It includes full-record
+`train.csv` and `validation.csv`. `test.csv` is reserved for the final evaluation;
+keep it closed during development. The guarded command checks the seal and
+loads training and validation only:
+
+```bash
+python -m scripts.train_frozen_segment --tokenize --output-dir data/processed/segment_development_preparation
+```
+
+Add `--train` and choose a new output directory when starting a fresh transformer
+run. Model features, tokenizer, and text limits must match the frozen input
+contract; optimizer settings can change during validation-based development.
+Install `requirements-training.txt` for tokenization/training. The private
+snapshot and saved tokenizer must be available locally.
+
+The [split finalization note](docs/findings/02_splitting/02_finalization_20261009.md)
+records fixes, integrity results, residual risks, and the test reservation policy.
+The policy reserves all eligible groups from the earlier unscored test after
+excluding recorded reviews, prior model use, and their historical related
+families. It accepts a smaller test instead of using exposed records to reach 15%.
+Grouping is frozen before reserving the test. Do not select new grouping rules
+or model settings using that test.
+
+Verify the saved snapshot without creating another split:
+
+```bash
+python -m scripts.finalize_splits --verify data/processed/split_finalization_20261009/frozen
+```
+
+`scripts.finalize_splits` creates a new sealed snapshot only when given the
+archived exposure registry, effective-input cache, original assignments, and
+review fixtures. Its `--config` accepts `split`, `rule`, `model`, and `allocation`
+JSON sections; resolved configuration and source/input hashes are sealed before
+test selection. Preserve the adopted snapshot during model development.
+
+The earlier general splitting command below remains a **rule-v3 research
+export**, without the corrected grouping, transformer equality constraints, or
+historical exposure exclusions. Its outputs should not replace the frozen test.
+
 Create train, validation, and test datasets from the integrated cleaner's
 `training_candidate.csv` export:
 
@@ -74,7 +114,7 @@ python -m scripts.split_data --input data/processed/integration_run/training_can
 Use a new output directory for each run. This command uses rule-v3 product groups,
 seed **42**, and a **70/15/15** target ratio, balancing `Segment` where practical.
 Groups stay within one split, so actual proportions may differ from the targets.
-This is an experimental grouping option; no splitting policy has been adopted.
+This command preserves the earlier experimental grouping behavior.
 
 The output contains `train.csv`, `validation.csv`, and `test.csv`, with all input
 columns plus `record_id`, `group_id`, and `split`; no assignment join is needed.
@@ -102,7 +142,8 @@ X_train = train[["ProductName", "ProductBrand", "ProductDescription", "ProductCo
 y_train = train["Segment"]
 ```
 
-Load validation and test the same way. IDs, group/split columns, provenance,
+Load validation the same way; reserve test loading for final evaluation.
+IDs, group/split columns, provenance,
 identifiers, and other target columns are audit data, not model inputs.
 
 Compare rule-based and TF-IDF product groups on the retained cleaned training export:
