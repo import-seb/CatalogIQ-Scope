@@ -80,19 +80,23 @@ contract; optimizer settings can change during validation-based development.
 Install `requirements-training.txt` for tokenization/training. The private
 snapshot and saved tokenizer must be available locally.
 
-For the classical Segment baseline (TF-IDF + logistic regression), install
-`python -m pip install -e ".[baseline]"` and run:
+The classical Segment baseline uses ordinary word TF-IDF + logistic regression.
+The normal package installation is sufficient; no Hugging Face tokenizer, weights
+or GPU are needed. It joins cleaned candidates to an explicitly selected shared
+assignment file using `dataset + source_sha256 + source_row`:
 
 ```bash
-python -m scripts.train_segment_baseline --split-dir data/processed/split_finalization_20261009/frozen --tokenizer-dir data/processed/segment_full_development_20261009/random/tokenizer --model-config data/processed/segment_full_development_20261009/random/model_config.json --output-dir data/processed/segment_classical_01
+python -m scripts.train_segment_baseline --input path/to/training_candidate.csv --assignments path/to/agreed_assignments.csv --assignments-sha256 FULL_64_CHARACTER_SHA256 --features compare --output-dir data/processed/segment_classical_check
 ```
 
-This uses the same frozen four-field text/token inputs and train/validation
-records, fits TF-IDF on training only, and leaves test closed. It needs the
-private sealed snapshot and its referenced verification artifacts; code alone
-cannot reproduce the team's exposure history. No GPU or neural model weights
-are required. See the [baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
-for outputs, checks, limitations and the pending real-data run.
+By default this only checks hashes, row coverage and group isolation. Once the
+team's split version is settled, add `--train` and use a new output directory to
+compare the four fields with and without concatenated `ProductCategory`. TF-IDF
+fits on train only; predictions and metrics cover validation only. These checks
+do not verify the frozen seal or exposure history. Older rule-v3 assignments
+are not a substitute for the protected final snapshot. See the
+[baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
+for the completed preflight, outputs and pending real-data training.
 
 The [split finalization note](docs/findings/02_splitting/02_finalization_20261009.md)
 records fixes, integrity results, residual risks, and the test reservation policy.

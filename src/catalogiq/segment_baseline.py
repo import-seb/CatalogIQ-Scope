@@ -1,18 +1,18 @@
-"""Classical Segment baseline on the sealed transformer development inputs.
+"""Word TF-IDF + logistic regression, with an optional category text ablation.
 
-TF-IDF and logistic regression learn from training only. The frozen tokenizer is
-used as a deterministic text adapter, without a neural encoder or model weights.
-There is no test-scoring, split-generation, or unsealed-CSV fallback here.
+All learned preprocessing fits on train. Only validation is scored. No Hugging
+Face tokenizer, model weights, split generation or test-scoring API is needed.
 """
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import version
 import json
 import math
 from pathlib import Path
 import platform
+import re
 import time
 import warnings
 
@@ -27,10 +27,11 @@ from sklearn.metrics import (accuracy_score, classification_report, confusion_ma
                              f1_score, log_loss, recall_score)
 from sklearn.pipeline import Pipeline
 
+from .cleaning import PROVENANCE
 from .features import sha256
-from .segment_frozen_development import load_frozen_development
-from .segment_transformer import (MODEL_FIELDS, ModelConfig, TokenizedCorpus,
-                                  _hash_items, _validate_indices, tokenize_corpus)
+from .segment_baseline_data import MISSING_LABELS, load_development
+from .segment_transformer import MODEL_FIELDS, ModelConfig, _hash_items, build_product_texts
+from .splitting import check_assignments
 
 
 @dataclass(frozen=True)
@@ -57,30 +58,28 @@ class BaselineConfig:
             raise ValueError("seed must be a nonnegative 32-bit integer")
 
 
-def token_documents(corpus: TokenizedCorpus) -> list[str]:
-    """Preserve frozen token boundaries/IDs, including special tokens.
+def build_baseline_texts(frame, *, include_category=False):
+    """Allowlisted four-field text; category joins the same document/vectorizer.
 
-    A word token such as t123 is an opaque vocabulary ID, not an ordinal numeric
-    feature. No decoding, second normalization, or extra product text is added.
-    The resulting bag of uni/bigrams is deliberately a classical representation.
+    Retains the shared builder's character limits (1024/512/4000/2000), but does
+    not apply a transformer token limit. Category uses Maria's hierarchy spacing;
+    nulls become empty. Input records are never modified.
     """
-    documents = []
-    if len(corpus.input_ids) != len(corpus) or len(corpus.attention_mask) != len(corpus):
-        raise ValueError("Token arrays do not cover the development records")
-    for ids, mask in zip(corpus.input_ids, corpus.attention_mask):
-        ids, mask = np.asarray(ids), np.asarray(mask)
-        if (ids.ndim != 1 or ids.dtype.kind not in "iu" or not len(ids)
-                or len(ids) > corpus.sequence_length or mask.shape != ids.shape
-                or np.any(ids < 0) or not np.all(mask == 1)):
-            raise ValueError("Expected nonnegative unpadded frozen token sequences")
-        documents.append(" ".join(f"t{int(value)}" for value in ids))
-    return documents
+    texts = build_product_texts(frame)
+    if include_category:
+        if "ProductCategory" not in frame:
+            raise ValueError("Category experiment requires a ProductCategory column")
+        for i, value in enumerate(frame.ProductCategory):
+            value = "" if pd.isna(value) else str(value).strip()
+            value = "" if value.casefold() in MISSING_LABELS else re.sub(r"\s*>\s*", " > ", value)
+            # Keep the same field marker in all category-experiment documents.
+            texts[i] += " [ProductCategory] " + value
+    return texts
 
 
-def make_pipeline(config: BaselineConfig) -> Pipeline:
+def make_pipeline(config):
     return Pipeline([
-        ("tfidf", TfidfVectorizer(lowercase=False, token_pattern=r"(?u)\bt\d+\b",
-                                 ngram_range=(1, config.ngram_max), min_df=config.min_df,
+        ("tfidf", TfidfVectorizer(ngram_range=(1, config.ngram_max), min_df=config.min_df,
                                  max_features=config.max_features, sublinear_tf=True)),
         ("classifier", LogisticRegression(C=config.c, solver="lbfgs", max_iter=config.max_iter,
                                           class_weight=config.class_weight, random_state=config.seed)),
@@ -107,132 +106,134 @@ def _write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
 
-def fit_baseline(corpus, train_indices, validation_indices, config=None):
-    """Fit on the given training records and return validation predictions only."""
+def fit_baseline(frame, config=None, *, include_category=False):
+    """Fit training records and return validation predictions with source keys."""
     config = config or BaselineConfig()
-    train_indices, validation_indices = _validate_indices(corpus, train_indices, validation_indices)
-    names = tuple(corpus.label_names)
-    labels = np.asarray(corpus.label_ids)
-    if (len(names) < 2 or len(set(names)) != len(names) or labels.shape != (len(corpus),)
-            or labels.dtype.kind not in "iu" or labels.min() < 0 or labels.max() >= len(names)):
-        raise ValueError("Invalid development labels or class order")
-    if set(labels[train_indices]) != set(range(len(names))):
-        raise ValueError("Every declared class must have training examples")
-    documents = token_documents(corpus)
-    training_text = [documents[i] for i in train_indices]
-    validation_text = [documents[i] for i in validation_indices]
+    required = {*PROVENANCE, "record_id", "group_id", "split", "Segment", *MODEL_FIELDS}
+    if not required.issubset(frame.columns) or set(frame.split) != {"train", "validation"}:
+        raise ValueError("Provide labeled train/validation records only, with source keys and product fields")
+    check_assignments(frame, frame.record_id)
+    if frame[PROVENANCE].duplicated().any() or frame.Segment.isna().any():
+        raise ValueError("Duplicate source keys or missing labels")
+    labels = frame.Segment.astype(str).str.strip()
+    if labels.str.casefold().isin(MISSING_LABELS).any():
+        raise ValueError("Missing labels must be removed before supervised fitting")
+    train = frame.split.eq("train").to_numpy()
+    validation = ~train
+    names = tuple(sorted(labels.loc[train].unique()))
+    if len(names) < 2 or not set(labels.loc[validation]).issubset(names):
+        raise ValueError("At least two classes are required; every validation class needs training examples")
+    label_ids = labels.map({name: i for i, name in enumerate(names)}).to_numpy(dtype=int)
+    documents = build_baseline_texts(frame, include_category=include_category)
+    training_text = [text for text, selected in zip(documents, train) if selected]
+    validation_text = [text for text, selected in zip(documents, validation) if selected]
     model = make_pipeline(config)
     with warnings.catch_warnings():
-        # A nonconverged fit is not a completed baseline. Retry with an explicit
-        # recorded configuration in a new run directory, never silently continue.
         warnings.simplefilter("error", ConvergenceWarning)
-        model.fit(training_text, labels[train_indices])
+        model.fit(training_text, label_ids[train])
     if not np.array_equal(model.classes_, np.arange(len(names))):
         raise AssertionError("Classifier probability columns changed class order")
     probabilities = model.predict_proba(validation_text)
-    dummy = DummyClassifier(strategy="most_frequent").fit(np.zeros((len(train_indices), 1)), labels[train_indices])
-    dummy_probabilities = dummy.predict_proba(np.zeros((len(validation_indices), 1)))
-    predictions = pd.DataFrame({
-        "record_id": [corpus.record_ids[i] for i in validation_indices],
-        "true_label": [names[i] for i in labels[validation_indices]],
-        "predicted_label": [names[i] for i in probabilities.argmax(axis=1)],
-        "confidence": probabilities.max(axis=1),
-    })
+    dummy = DummyClassifier(strategy="most_frequent").fit(np.zeros((int(train.sum()), 1)), label_ids[train])
+    dummy_probabilities = dummy.predict_proba(np.zeros((int(validation.sum()), 1)))
+    predictions = frame.loc[validation, [*PROVENANCE, "record_id", "group_id", "split"]].reset_index(drop=True)
+    predictions["true_label"] = labels.loc[validation].to_numpy()
+    predictions["predicted_label"] = [names[i] for i in probabilities.argmax(axis=1)]
+    predictions["confidence"] = probabilities.max(axis=1)
     for i in range(len(names)):
         predictions[f"probability_{i}"] = probabilities[:, i]
     metrics = {
         "primary_metric": "macro_f1", "partition": "validation", "label_names": list(names),
-        "baseline": score_predictions(labels[validation_indices], probabilities, names),
-        "majority_class": score_predictions(labels[validation_indices], dummy_probabilities, names),
+        "baseline": score_predictions(label_ids[validation], probabilities, names),
+        "majority_class": score_predictions(label_ids[validation], dummy_probabilities, names),
         "majority_class_selected_on_training": names[int(dummy.class_prior_.argmax())],
         "confidence_status": "uncalibrated model probabilities; no automatic review or acceptance threshold",
     }
     return model, predictions, metrics
 
 
-def run_baseline(split_dir, tokenizer_dir, model_config_path, output_dir, config=None, *, progress=print):
-    """Run against the existing frozen snapshot, failing closed on missing files."""
-    started = time.perf_counter()
-    config = config or BaselineConfig()
-    split_dir, tokenizer_dir = Path(split_dir).resolve(), Path(tokenizer_dir).resolve()
-    model_config_path, output_dir = Path(model_config_path).resolve(), Path(output_dir).resolve()
-    if output_dir.exists():
-        raise FileExistsError("Use a new output directory; prior runs are never overwritten")
-    for source in (split_dir, tokenizer_dir):
-        if output_dir == source or output_dir.is_relative_to(source):
-            raise ValueError("Output must be outside the frozen inputs and tokenizer directories")
-    required = [split_dir / name for name in ("completion.json", "grouping_freeze.json", "train.csv",
-                                             "validation.csv", "protected_final_test.csv")]
-    required += [tokenizer_dir / "tokenizer.json", tokenizer_dir / "tokenizer_config.json", model_config_path]
-    missing = [str(path) for path in required if not path.is_file()]
-    if missing:
-        raise FileNotFoundError("Frozen development inputs are unavailable. Obtain the shared sealed snapshot, "
-                                "its referenced verification artifacts, model_config.json and tokenizer from the split owner. "
-                                "Do not substitute scripts.split_data or a fresh random split. Missing: " + ", ".join(missing))
-    model_config = ModelConfig.from_dict(json.loads(model_config_path.read_text(encoding="utf-8")))
-    if not model_config.local_files_only:
-        raise ValueError("The baseline requires the frozen offline tokenizer")
-    if progress:
-        progress("Verifying the sealed training/validation snapshot; final test remains closed.")
-    development = load_frozen_development(split_dir, model_config, tokenizer_dir=tokenizer_dir)
-    try:
-        from transformers import AutoTokenizer
-    except ImportError as error:
-        raise RuntimeError('Install the baseline extra: python -m pip install -e ".[baseline]"') from error
-    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_dir), local_files_only=True)
-    corpus = tokenize_corpus(development.frame, development.label_names, model_config, tokenizer=tokenizer)
-    output_dir.mkdir(parents=True, exist_ok=False)
-    protocol = {
-        "created_utc": datetime.now(timezone.utc).isoformat(), "target": "Segment",
-        "model": "TF-IDF frozen token ngrams + logistic regression", "config": asdict(config),
-        "model_input_config": model_config.to_dict(), "development": development.audit,
-        "policy": "train fit only; validation evaluation only; no final-test API",
-        "representation": "Same frozen product text/tokenization/128-token default as the transformer; different learned feature representation.",
-        "features": list(MODEL_FIELDS), "feature_engineering": "No additional research features enabled",
-        "text_sha256": corpus.text_sha256, "token_sha256": corpus.token_sha256,
-        "training_record_ids_sha256": _hash_items([corpus.record_ids[i] for i in development.train_indices]),
-        "validation_record_ids_sha256": _hash_items([corpus.record_ids[i] for i in development.validation_indices]),
-        "source_sha256": {name: sha256(Path(__file__).with_name(name)) for name in
-                          ("segment_baseline.py", "segment_frozen_development.py", "segment_transformer.py", "model_input_groups.py")},
-        "python_version": platform.python_version(), "package_versions": {},
-        "reproducibility_scope": "same frozen inputs, tokenizer, configuration, software versions and ordering",
-    }
-    for package in ("numpy", "pandas", "scipy", "scikit-learn", "joblib", "transformers", "tokenizers"):
-        try:
-            protocol["package_versions"][package] = version(package)
-        except PackageNotFoundError:
-            protocol["package_versions"][package] = "unavailable"
-    _write_json(output_dir / "protocol.json", protocol)
-    if progress:
-        progress(f"Fitting baseline: {len(development.train_indices):,} training, {len(development.validation_indices):,} validation records.")
-    model, predictions, metrics = fit_baseline(corpus, development.train_indices, development.validation_indices, config)
-    validation = development.frame.iloc[development.validation_indices]
-    if (predictions.record_id.tolist() != validation.record_id.tolist()
-            or set(predictions.record_id) & development.protected_record_ids):
-        raise AssertionError("Predictions must cover validation only")
-    predictions.insert(1, "group_id", validation.group_id.to_numpy())
-    predictions.insert(2, "split", "validation")
-    predictions.to_csv(output_dir / "predictions.csv", index=False)
-    predictions.loc[predictions.true_label.ne(predictions.predicted_label)].to_csv(output_dir / "validation_errors.csv", index=False)
-    matrix = confusion_matrix(predictions.true_label, predictions.predicted_label, labels=development.label_names)
-    pd.DataFrame(matrix, index=pd.Index(development.label_names, name="true_label"),
-                 columns=development.label_names).to_csv(output_dir / "confusion_matrix.csv")
-    _write_json(output_dir / "metrics.json", metrics)
-    _write_json(output_dir / "label_mapping.json", {f"probability_{i}": label for i, label in enumerate(development.label_names)})
-    joblib.dump({"pipeline": model, "label_names": development.label_names,
-                 "model_input_config": model_config.to_dict(), "config": asdict(config),
-                 "input_adapter": "catalogiq.segment_baseline.token_documents"}, output_dir / "model.joblib")
-    summary = {
-        "status": "completed", "target": "Segment", "primary_metric": "macro_f1",
-        "training_rows": len(development.train_indices), "validation_rows": len(development.validation_indices),
-        "final_test_read_or_scored": False, "new_splits_created": False,
+def _save_variant(directory, frame, config, include_category):
+    directory.mkdir()
+    model, predictions, metrics = fit_baseline(frame, config, include_category=include_category)
+    names = metrics["label_names"]
+    predictions.to_csv(directory / "predictions.csv", index=False)
+    predictions.loc[predictions.true_label.ne(predictions.predicted_label)].to_csv(directory / "validation_errors.csv", index=False)
+    matrix = confusion_matrix(predictions.true_label, predictions.predicted_label, labels=names)
+    pd.DataFrame(matrix, index=pd.Index(names, name="true_label"), columns=names).to_csv(directory / "confusion_matrix.csv")
+    _write_json(directory / "metrics.json", metrics)
+    _write_json(directory / "label_mapping.json", {f"probability_{i}": label for i, label in enumerate(names)})
+    joblib.dump({"pipeline": model, "label_names": names, "config": asdict(config),
+                 "include_category": include_category,
+                 "input_adapter": "catalogiq.segment_baseline.build_baseline_texts"}, directory / "model.joblib")
+    return {
+        "validation": metrics["baseline"], "majority_class": metrics["majority_class"],
         "vocabulary_features": len(model.named_steps["tfidf"].vocabulary_),
         "optimizer_iterations": model.named_steps["classifier"].n_iter_.tolist(),
-        "validation": metrics["baseline"], "majority_class": metrics["majority_class"],
-        "runtime_seconds": time.perf_counter() - started,
-        "artifact_sha256": {path.name: sha256(path) for path in sorted(output_dir.iterdir()) if path.is_file()},
+        "training_text_sha256": _hash_items(build_baseline_texts(frame.loc[frame.split.eq("train")], include_category=include_category)),
+        "validation_text_sha256": _hash_items(build_baseline_texts(frame.loc[frame.split.eq("validation")], include_category=include_category)),
     }
+
+
+def run_baseline(input_path, assignments_path, expected_assignments_sha256, output_dir,
+                 config=None, *, expected_input_sha256=None, features="compare", train=False, progress=print):
+    """Prepare explicit shared assignments; fitting requires train=True.
+
+    Preparation does not fit or score. Supplying an older research assignment
+    does not verify or replace the project's protected final snapshot.
+    """
+    started = time.perf_counter()
+    config = config or BaselineConfig()
+    output_dir = Path(output_dir).resolve()
+    if output_dir.exists():
+        raise FileExistsError("Use a new output directory; prior runs are never overwritten")
+    if features not in {"base", "category", "compare"}:
+        raise ValueError("features must be base, category or compare")
+    if progress:
+        progress("Checking input hashes, source-key coverage and group isolation.")
+    development = load_development(input_path, assignments_path, expected_assignments_sha256, expected_input_sha256)
+    frame = development.frame
+    if features != "base" and "ProductCategory" not in frame:
+        raise ValueError("Category experiment requires a ProductCategory column")
+    counts = development.audit["labeled_development_counts"]
+    protocol = {
+        "created_utc": datetime.now(timezone.utc).isoformat(), "target": "Segment",
+        "model": "word TF-IDF + logistic regression", "config": asdict(config),
+        "development": development.audit, "features": features,
+        "base_fields": list(MODEL_FIELDS), "category_mode": "concatenated into the same text/vectorizer",
+        "field_character_limits": dict(zip(MODEL_FIELDS, ModelConfig().field_character_limits)),
+        "transformer_token_limit_applied": False,
+        "policy": "train fit only; validation evaluation only; no test-scoring API",
+        "training_record_ids_sha256": _hash_items(frame.loc[frame.split.eq("train"), "record_id"].tolist()),
+        "validation_record_ids_sha256": _hash_items(frame.loc[frame.split.eq("validation"), "record_id"].tolist()),
+        "source_sha256": {name: sha256(Path(__file__).with_name(name)) for name in
+                          ("segment_baseline.py", "segment_baseline_data.py", "segment_transformer.py", "splitting.py")},
+        "python_version": platform.python_version(),
+        "package_versions": {name: version(name) for name in ("numpy", "pandas", "scipy", "scikit-learn", "joblib")},
+    }
+    output_dir.mkdir(parents=True, exist_ok=False)
+    _write_json(output_dir / "protocol.json", protocol)
+    summary = {
+        "status": "prepared", "model_training_performed": False, "target": "Segment",
+        "primary_metric": "macro_f1", "training_rows": counts["train"], "validation_rows": counts["validation"],
+        "test_scored": False, "new_splits_created": False, "variants": {},
+    }
+    if train:
+        variants = {"base": False, "category": True} if features == "compare" else {features: features == "category"}
+        for name, include_category in variants.items():
+            if progress:
+                progress(f"Fitting {name}: {counts['train']:,} train / {counts['validation']:,} validation records.")
+            summary["variants"][name] = _save_variant(output_dir / name, frame, config, include_category)
+        rows = [{"variant": name, **{key: result["validation"][key] for key in ("accuracy", "macro_f1", "weighted_f1")}}
+                for name, result in summary["variants"].items()]
+        pd.DataFrame(rows).to_csv(output_dir / "comparison.csv", index=False)
+        if features == "compare":
+            base, category = (summary["variants"][name]["validation"] for name in ("base", "category"))
+            summary["category_minus_base_percentage_points"] = {key: 100 * (category[key] - base[key]) for key in ("accuracy", "macro_f1")}
+        summary.update(status="completed", model_training_performed=True)
+    summary["runtime_seconds"] = time.perf_counter() - started
+    summary["artifact_sha256"] = {path.relative_to(output_dir).as_posix(): sha256(path)
+                                  for path in sorted(output_dir.rglob("*")) if path.is_file()}
     _write_json(output_dir / "summary.json", summary)
     if progress:
-        progress(f"Validation macro-F1 {metrics['baseline']['macro_f1']:.4f}; accuracy {metrics['baseline']['accuracy']:.4f}. Final test not scored.")
+        progress("Validation artifacts saved; test not scored." if train else "Prepared only; no model trained or scored.")
     return summary

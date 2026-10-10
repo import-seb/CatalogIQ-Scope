@@ -8,12 +8,15 @@ from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 
 def segment_baseline_main(argv=None) -> int:
-    """Train TF-IDF + logistic regression using frozen Segment development only."""
+    """Prepare or train a word TF-IDF Segment baseline on explicit shared assignments."""
     parser = argparse.ArgumentParser(description=segment_baseline_main.__doc__)
-    parser.add_argument("--split-dir", type=Path, default=DATA_PATH / "processed/split_finalization_20261009/frozen")
-    parser.add_argument("--tokenizer-dir", type=Path, required=True, help="The saved tokenizer used by the frozen split")
-    parser.add_argument("--model-config", type=Path, required=True, help="The frozen transformer's model_config.json")
-    parser.add_argument("--config", type=Path, help="Optional BaselineConfig JSON; never changes splits or model inputs")
+    parser.add_argument("--input", type=Path, required=True, help="Cleaned training_candidate.csv")
+    parser.add_argument("--assignments", type=Path, required=True, help="Team-agreed assignments CSV; never regenerated")
+    parser.add_argument("--assignments-sha256", required=True, help="Expected full SHA-256 of that assignment file")
+    parser.add_argument("--input-sha256", help="Optional expected full SHA-256 of the cleaned candidate")
+    parser.add_argument("--features", choices=("base", "category", "compare"), default="compare")
+    parser.add_argument("--train", action="store_true", help="Fit and evaluate validation; otherwise check inputs only")
+    parser.add_argument("--config", type=Path, help="Optional BaselineConfig JSON; never changes assignments")
     parser.add_argument("--output-dir", type=Path, required=True, help="New run directory")
     args = parser.parse_args(argv)
     try:
@@ -21,7 +24,9 @@ def segment_baseline_main(argv=None) -> int:
         values = json.loads(args.config.read_text(encoding="utf-8")) if args.config else {}
         if not isinstance(values, dict):
             raise ValueError("Baseline configuration must be a JSON object")
-        run_baseline(args.split_dir, args.tokenizer_dir, args.model_config, args.output_dir, BaselineConfig(**values))
+        run_baseline(args.input, args.assignments, args.assignments_sha256, args.output_dir,
+                     BaselineConfig(**values), expected_input_sha256=args.input_sha256,
+                     features=args.features, train=args.train)
     except (ValueError, OSError, RuntimeError, TypeError, Warning) as error:
         parser.exit(1, f"Error: {error}\n")
     return 0

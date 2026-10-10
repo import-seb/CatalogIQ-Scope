@@ -17,9 +17,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-baseline = [
-    "transformers>=4.45,<6",
-]
 notebooks = [
     "ipykernel>=6,<8",
     "jupyterlab>=4,<5",

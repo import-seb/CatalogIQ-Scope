@@ -1,142 +1,158 @@
 # Classical Segment baseline: implementation and handoff
 
-Date: 2026-10-09. Based on main revision `5486ae6` and the
-[final split protocol](../02_splitting/02_finalization_20261009.md).
+Updated 2026-10-10, based on main revision `5486ae6`.
 
-**Status: implemented; synthetic validation and local cleaning validation only.**
-The shared private frozen snapshot and its tokenizer are not present in this
-checkout. No real-data model has been trained or scored in this work. There is
-no CatalogIQ accuracy/F1 result yet. The final test has not been opened.
+Status: word TF-IDF pipeline and ProductCategory comparison implemented.
+Synthetic model checks and a real-data preparation run are complete. No real
+CatalogIQ model was trained or scored; there is no new accuracy/F1 result.
 
-## Model and comparison protocol
+## Model and feature comparison
 
-- First target: `Segment`, using the same eight declared classes as the
-  transformer's guarded development loader.
-- Product inputs: `ProductName`, `ProductBrand`, `ProductDescription`, and
-  `ProductContents`. Other target columns, category, IDs, retailer, timestamps,
-  Exclude and audit metadata cannot enter the model.
-- Reuse the existing HTML/whitespace handling, field limits, saved tokenizer and
-  sequence limit from the sealed model configuration (128 tokens in the adopted
-  snapshot). No pretrained neural encoder is loaded or fitted.
-- Convert the frozen token IDs into opaque terms, then use TF-IDF unigrams and
-  bigrams, sublinear term frequency, minimum document frequency 2, at most
-  100,000 features, and L2 normalization. Vocabulary and IDF fit on train only.
-- Classifier: logistic regression, C=1, lbfgs, maximum 1,000 iterations, no class
-  weighting by default. Fail on nonconvergence rather than reporting a finished
-  run. Settings may be changed explicitly in a recorded baseline configuration.
-- Primary metric: macro-F1. Also export weighted-F1, macro recall, accuracy,
+- Target: Segment. Sorted class names are learned from training labels, with a
+  saved probability-column mapping. Validation classes absent from train stop
+  the run. Missing Segment values are excluded from supervision.
+- Base text: ProductName, ProductBrand, ProductDescription, ProductContents.
+  Reuses the shared builder's HTML/whitespace handling, field markers and
+  character limits (1024, 512, 4000, 2000 respectively).
+- Category experiment: append ` [ProductCategory] ` and the category to that same
+  text. Normalize whitespace around `>`; blank/null categories are empty.
+  There is one TF-IDF vectorizer, not a separately weighted category block.
+- No Hugging Face tokenization or 128-token truncation. Labels, source keys,
+  retailer, ratings, review counts, timestamps and audit fields are excluded
+  from model text. No transformer weights or GPU are required.
+- Word TF-IDF unigrams/bigrams, lowercase, sublinear TF, min_df=2, at most
+  100,000 terms, L2 normalization; vocabulary and IDF fit on train only.
+- Logistic regression, C=1, lbfgs, max_iter=1000, no class weighting, seed=42.
+  Nonconvergence fails the run. Both variants use identical settings and rows,
+  so their difference measures the effect of category within this pipeline.
+- Primary metric: macro-F1. Also save accuracy, weighted-F1, macro recall,
   per-class precision/recall/F1/support, confusion counts, log loss and summed
-  multiclass Brier score (mean over records; not divided by number of classes).
-- Compare against the training-derived most-frequent class on exactly the same
-  validation records. Missing Segment labels are excluded from supervision by
-  the existing loader; original exports are not modified.
-- Probability outputs are **uncalibrated**. No operational confidence threshold
-  or automatic review routing is claimed. Maria can use the saved probabilities
-  for calibration, uncertainty and error analysis.
+  multiclass Brier score. Compare with a majority class chosen on train.
+- Saved confidence values are uncalibrated probabilities. No acceptance or
+  human-review threshold has been selected.
 
-This is a matched-input classical baseline, not an ordinary full-document word
-TF-IDF run: it inherits the transformer's truncation. Its learned bag of ngrams
-also discards order beyond the configured ngram width. Frozen product/effective
-input groups do not prove an absence of all semantic leakage or collisions in
-the fitted sparse representation. The split report's residual risks still apply.
-Changing input fields, limits or tokenizer requires a separately agreed protocol;
-this command will not silently rebuild or replace the held-out test.
+This replaces the initial local HF-token-ID baseline. Ordinary TF-IDF does not
+need a transformer tokenizer. Maria's research uses LinearSVC, an 80,000-term
+cap and balanced class weights; this logistic-regression comparison is not an
+exact replication of her reported 80.84 / 91.29 validation macro-F1 scores.
+Software versions, row order, text hashes, inputs and settings are recorded.
+Cross-platform differences should be investigated rather than attributed to a
+guaranteed floating-point tolerance.
 
-The sparse text approach follows the
-[scikit-learn text classification example](https://scikit-learn.org/stable/auto_examples/text/plot_document_classification_20newsgroups.html).
-The project's [evaluation proposal](../../model-evaluation-strategy%20(1).md)
-motivates macro-F1, a majority comparator and per-class reporting. Its proposed
-category lookup and future feature engineering are not enabled by this change:
-the current agreed input contract contains only the four fields above.
+## Shared assignments and current preparation
 
-## Required private handoff
+The loader uses an explicit cleaned candidate and assignment CSV, not a random
+split or a local reallocation. It checks:
 
-Use the **existing** `split_finalization_20261009/frozen` snapshot. The older
-`python -m scripts.split_data` command in the chat produces rule-v3 research
-splits and must not replace it.
+1. Full expected assignment SHA-256, and optionally the expected candidate hash.
+2. Unique source keys and canonical record IDs; exact one-to-one coverage of
+   dataset + source_sha256 + source_row, regardless of CSV row order.
+3. Valid split names, nonempty group IDs and group isolation across all splits.
+4. Training/validation label availability and unchanged file hashes after loading.
 
-Obtain the sealed directory, the effective-input cache and every referenced
-verification artifact, plus the corresponding saved tokenizer and
-`model_config.json`, from the split owner through the team's private channel.
-The current upstream verifier embeds absolute paths in `source_sha256`,
-`input_sha256`, and `model_input_cache`; a copied folder may therefore need an
-owner-supported portable handoff. Merely copying train/validation CSVs is not
-enough. Do not edit checksums, bypass verification, or reserve a new test to get
-past that limitation. The baseline reuses the existing verifier unchanged.
+It ignores Segment values in the assignment file. Reading the combined candidate
+CSV necessarily parses all records, including test records; test rows are then
+discarded before label normalization, text construction, fitting or scoring.
+The separate test export is never opened. Prediction exports contain validation
+records only. These are membership/integrity checks, not proof that a holdout
+has never been used historically.
+
+The locally reproduced rule-v3 assignment file has SHA-256:
+
+`c2f0e76684630b0394511d77de7331ccb86b6aa5d032f9c4bcb9606854b08b9d`
+
+Its first eight characters match the prefix Maria supplied. She has not supplied
+a full hash for comparison. The cleaned candidate hash is:
+
+`1878e3948e8a840b3922780b7304e33d39d0f1e3b5d7a579bf56639d3cdf8fb4`
+
+Preparation verified all 83,938 candidate rows:
+
+| Partition | Assigned rows | Labeled development rows | Missing labels omitted |
+|---|---:|---:|---:|
+| Train | 58,756 | 55,443 | 3,313 |
+| Validation | 12,591 | 11,881 | 710 |
+| Test | 12,591 | Not processed for supervision | Not calculated |
+
+Local evidence:
+
+- `data/processed/maria-split-check-20261010.json`
+- `data/processed/segment-classical-preflight-20261010/protocol.json`
+- `data/processed/segment-classical-preflight-20261010/summary.json`
+
+The current README requires the newer protected final snapshot; the chat/research
+commands refer to the older rule-v3 exports. Before actual fitting, confirm with
+the split owner which assignment version and development protocol this comparison
+should use. Do not train against the older assignments as a workaround: their
+training membership can differ from the newer test reservation. No frozen seals,
+split assignments or exposure records were changed here. The preparation report
+explicitly records that it does not verify the final seal or exposure history.
+
+## Run
+
+Install the normal package: `python -m pip install -e .`.
+
+Prepare the selected inputs, without training:
 
 ```bash
-python -m pip install -e ".[baseline]"
-python -m scripts.train_segment_baseline --split-dir data/processed/split_finalization_20261009/frozen --tokenizer-dir data/processed/segment_full_development_20261009/random/tokenizer --model-config data/processed/segment_full_development_20261009/random/model_config.json --output-dir data/processed/segment_classical_01
+python -m scripts.train_segment_baseline --input path/to/training_candidate.csv --assignments path/to/agreed_assignments.csv --assignments-sha256 FULL_64_CHARACTER_SHA256 --features compare --output-dir data/processed/segment_classical_check
 ```
 
-The installed `catalogiq-segment-baseline` command has the same arguments.
-PyTorch/GPU/model weights are not required. Tokenization is offline. The new
-output directory must be outside the immutable inputs. Missing inputs cause an
-actionable error before tokenization or output creation; there is no random-split
-or unsealed-input fallback. No CLI option scores test.
+Paths and the expected hash must identify the team-agreed files. Add
+`--input-sha256 FULL_64_CHARACTER_SHA256` to pin the candidate's exact contents.
+The installed `catalogiq-segment-baseline` command is equivalent.
 
-Optional `--config baseline.json` accepts only these classifier/vectorizer
-settings (not model input fields or split settings):
+For an actual run after selecting the shared protocol, add `--train` and use a
+new output directory. `--features compare` runs both variants; `base` or
+`category` runs just that variant. There is no test-scoring option.
+Existing run directories are never overwritten. A failed fit does not receive
+a completed summary.
+
+Optional `--config baseline.json`:
 
 ```json
 {"c": 1.0, "max_iter": 1000, "min_df": 2, "max_features": 100000,
  "ngram_max": 2, "class_weight": null, "seed": 42}
 ```
 
-## Outputs for evaluation
+## Outputs for Maria
 
-| File | Purpose |
+Preparation writes only `protocol.json` and a summary marked `prepared`.
+A trained comparison additionally produces:
+
+| Artifact | Contents |
 |---|---|
-| `protocol.json` | Frozen split seal, input/class/configuration hashes, source hashes and package versions |
-| `predictions.csv` | Validation `record_id`, `group_id`, `split`, `true_label`, `predicted_label`, `confidence`, `probability_0` through `probability_7` |
-| `label_mapping.json` | Exact class name for every probability column; same order as the transformer |
-| `validation_errors.csv` | Incorrect validation predictions, with the same columns |
-| `confusion_matrix.csv` | True classes as rows, predicted classes as columns, raw counts |
-| `metrics.json` | Baseline and majority comparator on the same records |
-| `model.joblib` | Fitted TF-IDF/classifier pipeline, class order and input configuration |
-| `summary.json` | Completion marker, metrics, counts, timing and artifact hashes |
+| `base/`, `category/` | Each variant's model and validation artifacts |
+| `predictions.csv` in each variant | Source keys, record_id, group_id, split, true/predicted label, confidence and probability columns |
+| `label_mapping.json` | Exact class name corresponding to every probability column |
+| `validation_errors.csv` | Incorrect validation predictions |
+| `confusion_matrix.csv`, `metrics.json` | Confusion counts, baseline metrics and majority comparator |
+| `model.joblib` | Fitted pipeline, class order, configuration and category-mode flag |
+| `comparison.csv` | Side-by-side validation accuracy, macro-F1 and weighted-F1 |
+| `summary.json` | Completion status, counts, category-minus-base percentage-point changes and artifact hashes |
 
-Join predictions to shared validation rows by `record_id`, retaining `group_id`
-for group-aware uncertainty estimates. All generated outputs and private data
-stay ignored under `data/processed/`. The saved pipeline consumes the opaque
-token documents produced by `token_documents`; it must not be fed raw text.
-Keep the frozen tokenizer/configuration with the experiment for later inference.
+The saved pipeline consumes strings from
+`build_baseline_texts(frame, include_category=saved["include_category"])`.
+Use that adapter on future product records; no tokenizer directory is involved.
+Source-key columns make prediction joins auditable. Private rows, predictions
+and trained artifacts remain ignored under `data/processed/`.
 
-## Local verification and remaining work
+## Verification
 
-New offline tests exercise train-only vocabulary/IDF, class ordering, probability
-exports, persistence, deterministic reruns, metadata exclusion, overlap and
-tampering rejection, missing snapshots, and a complete synthetic run through the
-existing seal verifier without opening `test.csv`. A real saved-tokenizer test
-runs when the baseline extra is installed; it blocks network connections.
-Synthetic metrics are not evidence of CatalogIQ model quality.
+Synthetic checks cover train-only vocabulary/IDF, no validation-label influence
+on the fitted model, one-vectorizer category inclusion, missing categories,
+metadata exclusion, source-key reordering, hash mismatches, missing/duplicate
+rows, cross-split group rejection, missing labels, validation-only exports,
+model persistence, no HF/network dependency, no test export access, and failure
+on nonconvergence. They do not measure real CatalogIQ model quality.
 
-Executed on Windows with Python 3.12.14, NumPy 2.3.5, pandas 3.0.1,
-scikit-learn 1.9.1 and Transformers 5.19.0: **380 tests passed, 5 skipped**
-(385 discovered). All 10 new baseline tests passed; the five skips are existing
-optional PyTorch transformer-training tests. The wheel build, CLI help,
-`pip check`, and diff whitespace check passed. Logs are saved locally as
-`data/processed/baseline-tests-20261009.log` and
-`data/processed/baseline-build-20261009.log`.
+On Python 3.12.14 / scikit-learn 1.9.1, all 13 baseline tests pass. The full
+suite discovers 388 tests: 383 pass and five existing optional PyTorch tests
+are skipped. The wheel builds, CLI help, dependency and whitespace checks pass.
+The real-data preparation above fits no model and scores no partition.
+Full-suite results are in `data/processed/baseline-tests-20261010.log`; build
+output is in `data/processed/baseline-build-20261010.log`.
 
-The current integrated cleaner was rerun on both original private files, then
-independently reconciled with `catalogiq.integration_validation`:
-
-| Dataset | Input rows | Candidate | Quarantine | Review hold |
-|---|---:|---:|---:|---:|
-| Training | 84,552 | 83,938 | 614 | 0 |
-| Target | 28,082 | 27,870 | 212 | 0 |
-
-All 112,634 source records, provenance keys, protected values, corrections,
-partitions, audit decisions and export hashes passed reconciliation. Source
-`Exclude` uses the agreed `keep` policy. Seven audited label corrections remain.
-The training candidate count matches the documented frozen population; that
-count alone does not establish byte-for-byte snapshot equality or permission
-to construct a replacement split.
-
-Local artifacts: `data/processed/cleaned-baseline-20261009/` and sibling
-`cleaned-baseline-20261009-verification.json`. These are cleaning results, not a
-model run. Remaining work is obtaining/verifying the shared private snapshot,
-running the first real baseline, and giving Maria the validation artifacts.
-No new agreed feature-engineering experiments were found in the repository;
-those remain pending the team's decisions.
+Next: settle the shared assignment/protocol version, run both variants, then
+give Maria the validation predictions and comparison. Category inclusion remains
+an experiment, not a deployed model decision.
