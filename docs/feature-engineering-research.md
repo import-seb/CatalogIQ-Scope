@@ -31,6 +31,12 @@ below comes from it.
 > +10.45pp — closer to what Max measured independently. **What was withdrawn:**
 > the retailer-skew feedback in §7; the finalized allocator fixed it. **What did
 > not change:** every conclusion and every recommendation.
+>
+> **Version 4, October 15.** E1 and E2 are both implemented and measured on the
+> transformer, and the retailer holdout I asked for in §7 was run. Those results
+> are recorded in §1.1 and §3.3, and they **correct one of my own claims** —
+> see §3.3. The team's own documents are the source for every transformer figure
+> here; I did not re-run anything.
 
 ---
 
@@ -89,8 +95,59 @@ single change available.
    gets 82.92 macro F1; all four get 84.32 — **+1.40pp for three fields**, two
    of which are empty on most rows and one of which is largely redundant.
 3. **A linear model on text already reaches 95.36% accuracy and 92.46% macro
-   F1.** That is the bar the transformer has to clear, and it means Max's
-   classical baseline is not a formality.
+   F1.** That was the bar the transformer had to clear. It cleared it — see
+   §1.1 — but by 1.99pp, not by a landslide, so the classical baseline stays a
+   real reference point rather than a formality.
+
+### 1.1 Both recommendations are now measured on the transformer
+
+**Measured, not adopted.** On `main`, `MODEL_FIELDS` in
+`segment_transformer.py` is still the same four fields and `sequence_length` is
+still 128. The five-field, 256-token view lives in a separate module,
+`segment_category_ablation.py`, which builds `(ProductCategory, *MODEL_FIELDS)`
+for its own arm. The team's findings say the same thing three times over: an
+experimental model for comparison, no official model selected, no default
+promoted. So E1 and E2 have been *answered*, and the default configuration has
+not changed.
+
+The results are in
+`docs/findings/03_modeling/01_minilm_256_reproducibility_20261015.md`. Five
+fields with `ProductCategory` first, 256 tokens, MiniLM-L6-v2 at the pinned
+revision, three fixed epochs, scored on the same 11,952 validation records:
+
+| Validation, 11,952 records | Accuracy | Macro F1 |
+|---|---|---|
+| Four fields, 256 tokens — comparison arm | 91.2734% | 85.8788% |
+| **Five fields, 256 tokens — with `ProductCategory`** | **96.9461%** | **94.4490%** |
+
+**The category path is worth +8.57pp macro F1 on the transformer.** Three
+independent measurements of the same change now exist, on three different
+models:
+
+| Model | Without | With | Gain |
+|---|---|---|---|
+| Logistic regression, TF-IDF (Max) | 83.90 | 91.00 | +7.10pp |
+| Linear SVM, TF-IDF (this document) | 84.32 | 92.46 | +8.14pp |
+| **MiniLM, 256 tokens (Sebastian)** | **85.88** | **94.45** | **+8.57pp** |
+
+They agree within 1.5pp on a change worth 7 to 9 points. That is as settled as
+a finding gets on this project.
+
+**Two notes on how E2 was handled, both better than what I proposed.** The
+256-token view is a **separate experimental representation**: the V4 exact-input
+grouping contract stays at 128 tokens, so nothing was refrozen. And rather than
+assume that was safe, an equality audit re-tokenized all 83,938 frozen records at
+256 tokens and found **zero identical effective inputs crossing any partition**
+(`02_minilm_256_equality_audit_20261015.md`). My worry in E2 about having to
+refreeze the splits was real but is now resolved by measurement.
+
+`ProductCategory` was also placed **first** in the field order, ahead of
+`ProductName`. E1 suggested putting it early; first is further than I proposed
+and is the right call, since it is short and it is the second strongest signal.
+
+**This is not a model selection.** The team's own documents say so plainly:
+MiniLM is an experimental comparison candidate and no official model has been
+chosen. Choosing one is the evaluation ticket.
 
 ### On reproducing these numbers
 
@@ -232,9 +289,45 @@ does not hurt. An earlier exploratory run of mine said it hurt; §3.4 explains
 why.
 
 **What does not survive the move is the overall level.** The best cross-retailer
-macro F1 is 76.32 against 92.46 in-distribution. **A ~16pp drop is what moving
-to a new retailer costs**, whatever features we use, and it belongs next to the
-headline number whenever we quote one to the PO.
+macro F1 here is 76.32 against 92.46 in-distribution.
+
+**My reading of that 16-point gap was wrong, and the team's holdout experiment
+is the reason.** I compared an Amazon-trained model scored on other retailers
+against a mixed-trained model scored on a mostly-Amazon validation set. Two
+different training sets *and* two different test sets, so the gap mixes "the
+model was trained without this retailer" with "these records are simply harder".
+
+`docs/references/research/catalogiq_modeling_findings.md` separates them. Two
+MiniLM models — one trained on the mixed pool, one on all 43,969 Amazon training
+records — scored on **the same** 2,511 other-retailer validation records:
+
+| Scored on | Mixed-retailer model | Amazon-only model | Drop |
+|---|---|---|---|
+| Other retailers, 2,511 records — accuracy | 94.46% | 87.10% | **−7.37pp** |
+| Same records — macro F1 | 89.92% | 77.96% | **−11.96pp** |
+| Amazon control, 9,441 records — accuracy | 97.61% | 97.61% | 0.00pp |
+
+**So the cost of training without a retailer is 7.37pp accuracy and 11.96pp
+macro F1, not 16pp.** The 95% paired group-bootstrap interval on the accuracy
+drop is 5.57–9.44pp. The Amazon control coming out identical is what makes the
+comparison trustworthy — the two models are equally good where their training
+overlaps.
+
+**The right number to quote the PO is 94.46%**, which is the mixed model's
+accuracy on other-retailer records, not the 96.95% that covers the whole
+validation pool.
+
+One corroboration worth noting. The holdout reports that **Internal Analgesics,
+Digestive Health and Allergy account for 80.5% of the additional errors** — and
+those are three of the four classes where §3.2 measures the largest gains from
+the category path (+13.2pp, +11.5pp, +12.0pp). The classes that lean hardest on
+the breadcrumb are the ones that suffer most when its vocabulary is unseen. Same
+mechanism from two directions.
+
+The team is careful about what this does and does not show, and so should we be:
+training volume, class mix, assortment and wording all changed alongside the
+category paths, so the experiment demonstrates weaker retailer transfer without
+isolating category memorization as the cause. It is one training seed.
 
 ### 3.4 How the path is represented decides whether it is safe
 
@@ -352,32 +445,40 @@ gets asserted instead of measured.
 | | |
 |---|---|
 | **Change** | Add `ProductCategory` to `MODEL_FIELDS` so `build_product_texts` concatenates it into the same stream. Not a separate block, not one-hot |
-| **Expected payoff** | **+7.10pp macro F1** on a logistic regression, **+8.14pp** on a linear SVM, in-distribution. **+2.03pp** cross-retailer and **+8.55pp** on wholly unseen category paths. Biggest gains on Internal Analgesics (+13.2pp), Allergy (+12.0pp), Digestive Health (+11.5pp), CCFS (+11.1pp) |
+| **Measured payoff** | **+7.10pp** on logistic regression, **+8.14pp** on a linear SVM, **+8.57pp** on MiniLM at 256 tokens. Biggest gains on Internal Analgesics (+13.2pp), Allergy (+12.0pp), Digestive Health (+11.5pp), CCFS (+11.1pp) |
 | **Cost** | One tuple entry plus a character limit. One retrain |
 | **Risk** | Low, given §3.4 — concatenated, it helps in all three evaluations. As a separate block it is harmful cross-retailer |
-| **Status** | **Already done on the classical baseline**, PR 20. Still open on the transformer |
-| **How we know** | Validation macro F1 and per-class F1 against the current four-field run |
+| **Status** | **Measured on three models, adopted on one.** Max's classical baseline has it (PR 20). On the transformer it is an ablation arm in `segment_category_ablation.py` (PR 21), with the path first in the field order — `MODEL_FIELDS` itself is unchanged, so the default transformer still runs on four fields |
+| **How we know** | Validation macro F1 and per-class F1 against a four-field arm, run three times on three models |
 
-This is the whole document in one line. Everything else is a rounding error next
-to it. The remaining question is only whether the transformer gets the same
-column, since the baseline already has it — until it does, the two models are
-not being compared on the same input.
+This was the whole document in one line, and it is now closed. Three models, three
+independent measurements, agreement within 1.5pp on a change worth 7 to 9 points.
 
 ### E2 — Fix the 128-token truncation
 
 | | |
 |---|---|
 | **Change** | Per-field token budgets instead of truncating the concatenation, or raise `sequence_length` to 256 |
-| **Expected payoff** | Not measurable from here, but bounded: it can only affect the 38.2% of rows that overflow, and the field it recovers is present on 38.47% |
+| **Status** | **Measured at 256 tokens** in a separate experimental view (PR 21). The default `sequence_length` is still 128 |
+| **Measured payoff** | Not separable from E1, because the two shipped together. The four-field arm at 256 tokens scores 85.88 macro F1 against 84.32 for the four fields at 128 on a linear model — but that compares two different model families, so it is not a clean read on the window alone |
 | **Cost** | Config change. 256 tokens roughly doubles transformer training time |
-| **How we know** | Validation macro F1 **split by whether the row overflows 128 tokens**. If the gain is only on overflow rows, it is real. If it is spread evenly, something else changed |
+| **Still worth doing** | Split validation macro F1 by whether the row overflows 128 tokens. 16,404 training and 3,510 validation inputs reach the 256-token limit, so the question of what truncation costs is still open, just at a different boundary |
 
-Do E2 before concluding anything about whether description and contents are
-useful. Right now we cannot distinguish a weak field from a truncated one.
+**What this closed and what it did not.** `ProductContents` can now reach the
+model on far more rows, so "weak field or truncated field" is answerable where
+it was not before. Nobody has answered it yet: no run isolates the window from
+the extra field. That is a small, cheap experiment and it belongs to whoever
+next touches the transformer.
 
-One caution: the frozen 128-token input equality is a **grouping constraint** in
-the finalized protocol — `model_view_contract` in the protocol manifest pins the
-tokenizer and the signature recipe. Changing `sequence_length` changes what
+**The caution below was real and has been resolved.** The frozen 128-token input
+equality is a **grouping constraint** in the finalized protocol —
+`model_view_contract` in the protocol manifest pins the tokenizer and the
+signature recipe. It was handled by keeping the 256-token view separate from the
+grouping contract and then auditing it: all 83,938 frozen records were
+re-tokenized at 256 tokens and **zero identical effective inputs cross any
+partition**. Nothing had to be refrozen. Original text follows.
+
+Changing `sequence_length` changes what
 counts as an identical input, so this is not a free config flip. It needs
 Sebastian's call on whether the splits would have to be refrozen.
 
@@ -492,8 +593,19 @@ Not near-duplicate rows. **Unseen taxonomies.**
 | Non-Amazon rows whose category path is unseen in Amazon | **100.0%** |
 
 The split that would stress this model is a **retailer holdout**, and it is not
-one of the three we have. §3.3 is the closest thing to it and it shows a ~16pp
-macro F1 drop. That number deserves to be on the record next to the 92.46.
+one of the three we have.
+
+**That one has now been run, properly.** Two MiniLM models — one on the mixed
+pool, one on Amazon only — compared on the same 2,511 other-retailer validation
+records: **−7.37pp accuracy and −11.96pp macro F1**, with an identical 97.61%
+on the Amazon control. §3.3 has the detail, including the correction to my own
+cruder estimate. The number to carry alongside the 96.95% headline is **94.46%**,
+the mixed model's accuracy on other-retailer records.
+
+A retailer holdout still is not one of the standing three splits. It does not
+need to be — it is an experiment, not a partition — but it should be re-run
+whenever the feature set changes, because it is the only measurement that says
+what the model does on a retailer it has not seen.
 
 ---
 
@@ -525,8 +637,10 @@ Short, because the measurements above are the actual argument.
 
 Stated so nobody reads a gap as a finding.
 
-- **No transformer.** Everything here is TF-IDF plus a linear SVM. A floor, not
-  a prediction for MiniLM.
+- **I ran no transformer.** Everything I measured is TF-IDF plus a linear SVM —
+  a floor. Every MiniLM figure in §1.1 and §3.3 is taken from the team's own
+  findings documents, cited in Sources; I did not reproduce them, and anyone
+  relying on them should read those documents rather than this summary of them.
 - **No hyperparameter tuning.** `C=1.0` and defaults throughout. A tuned
   baseline would score higher.
 - **The reserved test is not read anywhere.** This was not true of the first
@@ -550,24 +664,43 @@ Stated so nobody reads a gap as a finding.
 
 ## 10. Open questions
 
-1. **Does `ProductCategory` join `MODEL_FIELDS` for the transformer?** The
-   classical baseline already has it (PR 20) and gained +7.10pp macro F1.
-   Leaving it out of the transformer means the two models are not being compared
-   on the same input. (§3, E1)
-2. **Is `sequence_length = 128` deliberate, and can it change?** It cuts
-   `ProductContents` off on most of the rows that have it. But the frozen
-   128-token input equality is a grouping constraint in the finalized protocol,
-   so changing it may mean refreezing the splits. Sebastian's call. (§4, E2)
-3. **Will the model score products from these six retailers, or new ones?** It
-   does not change E1 any more, but it decides whether 92.46 or 76.32 is the
-   number we quote to the PO. (§3.3)
-4. **Should there be a retailer-holdout split**, given that it is the only one
-   that stresses the actual generalization risk? (§7)
-5. **Has anyone measured what the V4 grouping buys on Segment scores?** My own
+### Answered by measurement
+
+1. ~~**Is the category path worth adding on the transformer?**~~ **Yes, +8.57pp
+   macro F1**, with the path first in the field order. (§1.1, E1)
+2. ~~**Can `sequence_length` go to 256 without refreezing the splits?**~~
+   **Yes.** The experimental view is separate from the 128-token grouping
+   contract, and the equality audit found no identical inputs crossing a
+   partition. (§1.1, E2)
+3. ~~**Should there be a retailer-holdout experiment?**~~ **Run.** −7.37pp
+   accuracy and −11.96pp macro F1 against an identical Amazon control, and it
+   corrected my own estimate. (§3.3, §7)
+
+### Still open
+
+4. **Does `ProductCategory` actually join `MODEL_FIELDS`, and does
+   `sequence_length` become 256 by default?** Question 1 settled whether it is
+   worth it. This is the separate question of whether anyone changes the
+   configuration, and on `main` nobody has — the default transformer still runs
+   four fields at 128 tokens, and the five-field view is an ablation module. A
+   measured win that stays in an experiment buys nothing. (§1.1)
+5. **Will the model score products from these six retailers, or new ones?** This
+   is the one that matters most now, because it decides which number we quote:
+   **96.95%** accuracy over the whole validation pool, or **94.46%** on
+   other-retailer records. Only the PO can answer it.
+6. **Which model do we actually pick?** MiniLM at 94.45 macro F1, Max's logistic
+   regression at 91.00, a linear SVM at 92.46. The team's own documents say no
+   official model has been selected. That is the evaluation ticket, and the
+   choice is not only about the top number — the transformer beats the linear
+   baseline by 1.99pp and costs a GPU and a training run.
+7. **What does the 256-token window buy on its own?** The extra field and the
+   wider window were measured together, so nothing separates them. 16,404
+   training and 3,510 validation inputs still reach the 256-token limit. (E2)
+8. **Has anyone measured what the V4 grouping buys on Segment scores?** My own
    key says the gap is noise, which contradicts what I wrote in §2.7 of the
    evaluation strategy. The V4 method is much stronger than mine, so the number
-   may differ — but it has not been measured. (§7)
-6. **Does the first version of this notebook having fitted and scored test rows
+   may differ — but it still has not been measured. (§7)
+9. **Does the first version of this notebook having fitted and scored test rows
    matter to the reserved test?** Nothing was selected on them and no row was
    inspected. The finalized test is a strict subset of the old one, so all
    11,477 of its labelled rows were in the set that version touched. The leakage
@@ -577,6 +710,15 @@ Stated so nobody reads a gap as a finding.
 ---
 
 ## Sources
+
+Team documents, for every transformer figure in §1.1 and §3.3:
+
+- `docs/findings/03_modeling/01_minilm_256_reproducibility_20261015.md` — the five-field, 256-token experiment and its validation metrics.
+- `docs/findings/03_modeling/02_minilm_256_equality_audit_20261015.md` — the cross-partition identical-input audit at 256 tokens.
+- `docs/references/research/catalogiq_modeling_findings.md` — the Amazon-only retailer holdout and its paired intervals.
+- `docs/findings/02_splitting/03_portable_workflow_20261010.md` — the finalized split protocol these numbers rest on.
+
+External:
 
 - Gupta, V., Karnick, H., Bansal, A., & Jhala, P. (2016). [Product Classification in E-Commerce using Distributional Semantics](https://aclanthology.org/C16-1052/). *Proceedings of COLING 2016*.
 - Shopify Engineering. [Using Rich Image and Text Data to Categorize Products at Scale](https://shopify.engineering/using-rich-image-text-data-categorize-products).
