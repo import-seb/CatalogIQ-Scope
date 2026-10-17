@@ -139,6 +139,16 @@ The category arm is a validation experiment, with the split protocol unchanged.
 See the [baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
 for outputs and limitations.
 
+After a completed comparison, prepare the private evaluation handoff:
+
+```bash
+python -m scripts.package_segment_baseline --run-dir data/processed/segment_classical_run --split-dir data/processed/splits --output-dir data/processed/classical_evaluation_handoff
+```
+
+This verifies validation identities, probability columns and headline metrics,
+then writes a ZIP with both prediction sets. It does not train or open test.csv.
+See the [handoff checks and contents](docs/findings/03_modeling/03_classical_evaluation_handoff.md).
+
 ### Compare ProductCategory inputs
 
 This separate development experiment registers ProductCategory outside the frozen

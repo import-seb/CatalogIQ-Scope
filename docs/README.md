@@ -12,6 +12,7 @@
 
 ## Evidence
 
+- [Verified classical evaluation handoff](findings/03_modeling/03_classical_evaluation_handoff.md): package and verify baseline validation predictions for private team evaluation.
 - [Classical Segment validation results](findings/03_modeling/02_classical_segment_results_20261010.md): first four-field/category comparison on authoritative splits, metrics, checks and evaluator handoff.
 - [Classical Segment baseline](findings/03_modeling/01_classical_segment_baseline.md): word TF-IDF, category comparison and validation artifacts on the authoritative shared partitions.
 - [October 9 finalized Segment splits](findings/02_splitting/02_finalization_20261009.md): unchanged grouping and test decisions, integrity findings, and remaining risks; its local snapshot commands are historical.
