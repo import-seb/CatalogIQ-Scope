@@ -8,6 +8,55 @@ It accompanies the [split research paper summary](split_research_paper_summary.m
 The research summary describes external studies; this document describes what
 we implemented in CatalogIQ.
 
+## Current model comparison: October 10, 2026
+
+The new ProductCategory comparison uses **256 tokens for both models**, the same
+**55,776 training / 11,952 validation records**, seed 42, identical initial
+weights, and three fixed epochs. It uses the reproduced frozen split protocol;
+the October 9 experiments described below remain historical results.
+
+| Model inputs | Validation accuracy | Macro F1 |
+| --- | ---: | ---: |
+| Name, brand, description, contents | 91.27% | 85.88% |
+| Same fields with ProductCategory prefixed | 96.95% | 94.45% |
+
+Adding ProductCategory gained **5.67 percentage points of accuracy** (95% paired
+group bootstrap interval: **5.00–6.43**) and **8.57 points of macro F1**
+(**7.36–9.86**). All eight Segment classes improved in overall F1. This is a
+single-seed validation experiment; the intervals exclude training-seed and
+production uncertainty. The prefix can still displace product text within the
+shared 256-token budget.
+
+Grouping and split membership remain frozen under their original 128-token
+contract. Both experimental input views had zero identical-input crossings
+between training and validation. The final test was never opened or scored.
+
+Local checkpoints, predictions, comparison tables, and integrity metadata are in
+`data/processed/segment_category_ablation_256_20261010/`. See the
+[README command](../../../README.md#compare-productcategory-inputs) to reproduce
+the comparison. The new implementation is `src/catalogiq/segment_category_ablation.py`.
+
+### Retailer holdout: ProductCategory only
+
+We trained a fresh ProductCategory model on all **43,969 Amazon training records**,
+using 256 tokens, seed 42, three fixed epochs, and the original model's initialization.
+
+| Validation cohort | Training sources | Accuracy | Macro F1 |
+| --- | --- | ---: | ---: |
+| Five other retailers: 2,511 records | Mixed retailers, original model | 94.46% | 89.92% |
+| Same five retailers and records | Amazon only, new model | 87.10% | 77.96% |
+| Amazon control: 9,441 records | Mixed retailers, original model | 97.61% | 95.78% |
+| Same Amazon control and records | Amazon only, new model | 97.61% | 95.89% |
+
+Held-retailer accuracy dropped **7.37 points** (95% paired group interval: **5.57-9.44**);
+macro F1 dropped **11.96 points** (**8.59-16.10**). The compared validation IDs are identical.
+
+All held-retailer breadcrumbs are unseen in Amazon training. This shows a transfer
+gap, but training volume, assortment, and class mix also changed; it does not isolate
+taxonomy dependence. One training seed was used, and the final test stayed closed.
+Local outputs, including the new checkpoint and integrity seals, are in
+`data/processed/segment_retailer_holdout_category_20261010/`; original checkpoints were preserved.
+
 ## 1. The overall approach
 
 We separated the work into three stages:

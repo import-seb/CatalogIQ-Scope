@@ -107,8 +107,9 @@ y_train = train["Segment"]
 For future transformer runs, install `python -m pip install -r requirements-training.txt`
 and supply the pinned pretrained encoder through the existing model-cache process.
 `--tokenize` verifies development tokenization; `--train` explicitly trains a fresh
-baseline. Model features, tokenizer, and text limits must match the sealed contract;
-optimizer settings can change using validation. Choose a new output directory.
+baseline. For this guarded baseline, model features, tokenizer, and text limits
+must match the sealed contract; optimizer settings can change using validation.
+Choose a new output directory.
 Pass an experiment configuration with `--model-config path/to/model_config.json`;
 leave the generated split artifacts unchanged.
 
@@ -137,6 +138,78 @@ Both commands reuse the authoritative seal verifier and never open or hash test.
 The category arm is a validation experiment, with the split protocol unchanged.
 See the [baseline handoff](docs/findings/03_modeling/01_classical_segment_baseline.md)
 for outputs and limitations.
+
+### Compare ProductCategory inputs
+
+This separate development experiment registers ProductCategory outside the frozen
+four-field model contract. After installing the training dependencies and caching
+the pinned encoder, run:
+
+```bash
+python -m scripts.compare_segment_category --split-dir data/processed/splits --output-dir data/processed/segment_category_ablation --sequence-length 256 --device cuda
+```
+
+This trains two fresh models on the same full frozen development pool: **55,776
+training records and 11,952 validation records**. `baseline` uses ProductName,
+ProductBrand, ProductDescription, and ProductContents; `with_category` prefixes
+the retailer's ProductCategory breadcrumb. Defaults share the same initial weights,
+seed **42**, training order, optimizer, and fixed three-epoch schedule. The category
+representation is audited on development records only. The final test stays
+closed, and the split artifacts remain unchanged.
+
+Both experimental models use **256 tokens by default**, controlled by
+`--sequence-length`. The original splitting protocol keeps its **128-token**
+grouping contract and unchanged test membership. The category prefix shares the
+experimental token budget with product text and can still displace it. The default
+category limit is 512 characters; `--category-character-limit` configures it.
+
+Read `validation_comparison.csv` for overall metrics, `per_class_comparison.csv`
+for Segment results, and `validation_slices.csv` for retailer and category coverage
+results. `paired_differences.csv` and `paired_comparison.json` compare predictions
+on the same validation records with group bootstrap intervals. Each model's
+checkpoint and predictions are in `baseline/` or `with_category/`; `protocol.json`
+and `summary.json` record settings and integrity checks.
+
+Use a new output directory. Add `--prepare-only` to tokenize and audit inputs
+without training, then repeat the same command with `--resume` to continue.
+Resume validates the original configuration and reuses completed model runs;
+it does not resume an interrupted optimizer step. `--model-config` selects shared
+settings and preserves its configured token limit unless `--sequence-length`
+overrides it. `--bootstrap-samples` controls the paired comparison's sampling.
+
+The five-field MiniLM remains experimental; the team has not selected an official
+model. See the [verified settings and checkpoint-loading instructions](docs/findings/03_modeling/01_minilm_256_reproducibility_20261015.md)
+and [256-token equality audit](docs/findings/03_modeling/02_minilm_256_equality_audit_20261015.md).
+The frozen V4 four-field, 128-token contract and project defaults are unchanged.
+
+### Compare transfer to other retailers
+
+This separate development experiment trains on **all 43,969 Amazon records** in
+the frozen training split, without downsampling. It evaluates the whole original
+validation pool: **2,511 Walmart, Walgreens, CVS, Target, and Kroger records** form
+the retailer holdout endpoint; **9,441 Amazon records** provide an in-domain control.
+
+```bash
+python -m scripts.compare_segment_retailers --split-dir data/processed/split_integration_reproduced_20261010 --output-dir data/processed/segment_retailer_holdout_category_20261010 --reference-dir data/processed/segment_category_ablation_256_20261010 --device cuda --sequence-length 256
+```
+
+By default, this trains **only `with_category`**: the four product fields with
+the ProductCategory prefix, using **256 tokens**, seed **42**, and a fixed
+three-epoch schedule. `--reference-dir` optionally reuses the completed mixed-retailer
+ProductCategory model's predictions on the identical validation records. Settings
+and initial weights must match that reference. Omit it to run without the
+reference. Use your locally generated split and experiment paths.
+The frozen grouping and split artifacts remain unchanged; the final test stays closed.
+
+Read `validation_metrics.csv` for overall, holdout, control, and retailer metrics,
+`per_class_comparison.csv` for class results, and `paired_differences.csv` plus
+`paired_comparisons.json` for paired group bootstrap comparisons. `category_coverage.csv`
+and `category_slices.csv` show breadcrumb coverage. `with_category/` saves the
+new checkpoint and predictions; `protocol.json` and `summary.json` record settings
+and checks. Existing checkpoints are preserved.
+Use a new output directory; `--prepare-only` and `--resume` work as above.
+Retailer transfer also changes training volume, assortment, and class mix, so this
+is a diagnostic of transfer rather than a causal test of taxonomy dependence.
 
 ### Historical research
 
