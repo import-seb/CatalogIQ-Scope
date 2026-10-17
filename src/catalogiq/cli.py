@@ -38,6 +38,23 @@ def segment_baseline_main(argv=None) -> int:
     return 0
 
 
+def segment_baseline_handoff_main(argv=None) -> int:
+    """Verify both saved baseline arms and package validation artifacts for evaluation."""
+    parser = argparse.ArgumentParser(description=segment_baseline_handoff_main.__doc__)
+    parser.add_argument("--run-dir", type=Path, required=True, help="Completed classical comparison run")
+    parser.add_argument("--split-dir", type=Path, required=True, help="Authoritative portable split directory")
+    parser.add_argument("--output-dir", type=Path, required=True, help="New directory for evaluation.zip and summary.json")
+    args = parser.parse_args(argv)
+    try:
+        from .segment_baseline_handoff import package_baseline_handoff
+        result = package_baseline_handoff(args.run_dir, args.split_dir, args.output_dir)
+    except (ValueError, OSError, RuntimeError, TypeError, KeyError) as error:
+        parser.exit(1, f"Error: {error}\n")
+    print(f"Verified {result['validation_records_per_variant']:,} validation rows per variant. "
+          f"Saved {args.output_dir / 'evaluation.zip'}; no model fitting or test access.")
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--train", type=Path, default=TRAIN_PATH, help="Training CSV")
