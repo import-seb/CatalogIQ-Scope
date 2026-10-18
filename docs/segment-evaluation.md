@@ -44,20 +44,24 @@ baselines, class tiers and per-class tables all follow. The one thing that does
 not move: the team's trainer tokenizes a `Segment` column, so another target
 needs their trainer pointed at it before there are predictions to score.
 
-### Four things it enforces rather than assumes
+### Five things it enforces rather than assumes
 
 1. **The reserved test is refused.** If any `record_id` in a predictions file
    belongs to the test partition, the loader raises instead of scoring it.
-2. **The class order is read from the run's manifest and then checked against
+2. **A run that names its split is held to it.** §0.1 recomputes
+   `validation_record_ids_sha256` from our own split, and any run whose manifest
+   carries that field must match or it is refused rather than scored. §2 covers
+   the recipe and both directions of the test.
+3. **The class order is read from the run's manifest and then checked against
    the data.** If the argmax of the probability columns disagrees with
    `predicted_label` on more than 1% of rows, the order is wrong and the run is
    rejected. Reading an order out of a file and trusting it is how calibration
    numbers end up meaningless; this is the version that cannot be fooled by a
    mislabelled manifest.
-3. **The bootstrap resamples product groups, not rows.** Rows inside a group are
+4. **The bootstrap resamples product groups, not rows.** Rows inside a group are
    not independent, so a row bootstrap would give intervals that are too narrow.
-4. **Temperature scaling cannot change accuracy**, and §4 carries a real
-   `assert` on it rather than a comment saying so.
+5. **Temperature scaling cannot change accuracy**, and the notebook's §4 carries
+   a real `assert` on it rather than a comment saying so.
 
 ### It accepts however a teammate packages a run
 
@@ -111,18 +115,50 @@ scored against different labels. Checked first, all of it passing:
 | Argmax of probabilities equals `predicted_label` | every row |
 | `confidence` equals the max probability | exact |
 | **Accuracy, macro F1, weighted F1 recomputed from the raw predictions** | **identical to his manifest to 10 decimal places** |
+| `validation_record_ids_sha256` recomputed from our own split | matches, `47f60a59…` |
 
 So **94.45% macro F1 reproduces from the raw file**, on our splits, against our
 labels, with the test untouched.
 
-**One thing I could not verify, and it is not a discrepancy.** His manifest
-carries `validation_record_ids_sha256: 47f60a59…`. I tried 24 serialisation
-recipes — assignment order and sorted, newline/comma/concatenated/JSON, with and
-without a trailing newline — and none reproduce it. That hash is the single
-cleanest proof that he trained against our split, so it is worth asking him for
-the recipe and writing it next to the field. The substantive version of the same
-check passes independently: every one of his 11,952 `record_id`s is in our
-validation partition and the set matches exactly.
+### The record-id hash, and why it is now a guard
+
+That last row took two tries. The manifest carries
+`validation_record_ids_sha256: 47f60a59…` and my first attempt at it failed
+across 24 serialisation recipes — assignment order and sorted, with
+newline/comma/concatenated/JSON joins. All 24 were wrong for the same reason:
+none of them length-prefixes the ids. The real recipe is `_hash_items()` in
+`src/catalogiq/segment_transformer.py` — ids in order, each one's UTF-8 byte
+length written as **8 bytes big-endian** before the bytes themselves:
+
+```python
+digest = hashlib.sha256()
+for record_id in sorted(validation_record_ids):
+    payload = record_id.encode("utf-8")
+    digest.update(len(payload).to_bytes(8, "big"))
+    digest.update(payload)
+```
+
+Computed over the 11,952 **labelled** validation rows it reproduces `47f60a59…`
+exactly, from the split export and from his predictions file independently. (The
+unlabelled rows must be dropped first; over all 12,667 it does not match. For our
+export the sort is a no-op, because `assignments.csv` already lists validation
+rows in lexicographic order — but it is the documented recipe, so it stays.)
+
+**§0.1 now recomputes this from our split and checks every run that carries the
+field**, so a run trained against a different split is refused instead of
+scored. Tested in both directions: Sebastian's run reports
+`validation ids match this split (labelled validation rows)`, and a copy of it
+with a deliberately wrong hash is rejected with a message naming the mismatch
+and left out of the scoring. Two hashing conventions are accepted — over the
+labelled rows and over the whole validation partition — in case a teammate
+hashes before dropping unlabelled rows; anything else is a different split.
+
+The harness's own reference arms now write the field into their manifests too,
+so they are held to the same check rather than exempt from it: the run summary
+reports **3 of 3 runs** carrying it and matching. Rebuilding both arms from
+scratch to pick up the new manifest reproduced every number in this document
+unchanged — accuracy, macro F1, ECE, temperature and Brier to the digit — which
+is the check that the arms are actually deterministic rather than just seeded.
 
 ### The token-budget exposure, measured
 
@@ -512,7 +548,6 @@ rather than counting it as "neither" and quietly inflating that column.
 - **Max's arms are not scored yet** — my TF-IDF arms stand in for them until his
   handoff zip arrives. The loader now accepts his packaging.
 - **Only Segment**, and only validation. The reserved test stays closed.
-- **`validation_record_ids_sha256` is unverified** pending the recipe.
 - **Calibration is per target.** Segment's temperatures say nothing about
   Sub-Segment.
 
@@ -520,16 +555,14 @@ rather than counting it as "neither" and quietly inflating that column.
 
 ## 12. What I would do next, in order
 
-1. **Ask Sebastian for the `validation_record_ids_sha256` recipe** and document
-   it next to the field, so that check can run instead of being argued around.
-2. **Take the `Vitamins ↔ Digestive Health` boundary to the sponsor**, with the
+1. **Take the `Vitamins ↔ Digestive Health` boundary to the sponsor**, with the
    93-of-116 breadcrumb finding. It is a third of the best model's errors and it
    looks like a label-definition conflict rather than a model failure.
-3. **Set a review load target with the PO.** Every queue number is meaningless
+2. **Set a review load target with the PO.** Every queue number is meaningless
    without one. 9% load for a 21% miss rate may be excellent or unaffordable;
    only they know.
-4. **Drop Max's handoff zip into §1** in place of my stand-in arms, and give him
+3. **Drop Max's handoff zip into §1** in place of my stand-in arms, and give him
    back the calibrated confidence his packaging note says he does not have.
-5. **Measure inference latency** for MiniLM and the TF-IDF arm. Training cost is
+4. **Measure inference latency** for MiniLM and the TF-IDF arm. Training cost is
    settled; serving cost is the one that recurs.
-6. **Export R1–R6 machine-readably** so rule 5 stops being a blank.
+5. **Export R1–R6 machine-readably** so rule 5 stops being a blank.
