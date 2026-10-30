@@ -78,6 +78,9 @@ ID's unsigned 8-byte big-endian length. Other targets therefore need not have
 Segment's `47f60a59...` hash. The evaluator must recompute its target-specific
 mask, not compare every target to the Segment hash.
 
+Probability columns follow their numeric suffix, independent of the insertion
+or serialization order of keys in the explicit mapping.
+
 These names and mapping follow the team's October 27 agreement. This document
 describes this implementation and does not replace Maria's shared contract doc.
 Probabilities remain uncalibrated; Segment's temperature is not applied to other

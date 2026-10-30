@@ -75,7 +75,7 @@ The old October 10 combined wall time remains unchanged in historical outputs.
 
 ## Verification and private handoff
 
-- 468 tests discovered: 463 successful and 5 optional PyTorch skips.
+- Initial full suite: 468 tests discovered, 463 successful and 5 optional PyTorch skips.
 - Verified all eight real prediction files against their labeled validation
   identities, source keys, true labels, class order and probability sums.
 - Recomputed accuracy and macro-F1; loaded all eight with Maria's exact loader
@@ -100,3 +100,23 @@ The archive belongs in the private team channel, not Git. Recipient-side model
 loading uses the trusted `model.joblib` and `predict_classical` adapter from this
 change. The archive has eight model directories; it does not contain Brand or
 Sub-Segment models, raw product descriptions or final-test rows.
+
+## Independent follow-up review
+
+Two independent reviews checked the split/training code and the private handoff.
+Archive checksums, probability mappings, target-specific validation identities and
+reported accuracy/macro-F1 matched. The existing archive was not changed.
+
+The code review found an inference-adapter bug for a reordered mapping: probability
+values followed numeric class order but their column names followed dictionary
+insertion order. The adapter now uses numeric order for both. A 12-class regression
+with JSON-sorted keys failed before the fix and passes after it; all eight classical
+tests pass. The reviewer confirmed the fix and regression.
+
+The original models were saved in the correct order, so their predictions and
+metrics were unaffected. After the fix, every saved model was reloaded with a
+deliberately reordered mapping and matched its existing predictions on 300
+validation rows (247 for Platform). This compatibility check did not refit models
+or read reserved-test data. The archive's source fingerprints still identify its
+original training source at `02ef28d`; they were not rewritten to claim training
+with the later adapter fix.

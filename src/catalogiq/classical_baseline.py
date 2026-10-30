@@ -70,7 +70,8 @@ def predict_classical(bundle, frame):
     if frame.record_id.isna().any() or frame.record_id.astype(str).str.strip().eq("").any() or frame.record_id.duplicated().any():
         raise ValueError("Prediction record IDs must be nonblank and unique")
     mapping = bundle["label_mapping"]
-    names = [mapping[f"probability_{i}"] for i in range(len(mapping))]
+    probability_columns = [f"probability_{i}" for i in range(len(mapping))]
+    names = [mapping[column] for column in probability_columns]
     if not np.array_equal(bundle["pipeline"].classes_, np.arange(len(names))):
         raise ValueError("Saved probability order differs from label_mapping")
     texts = build_baseline_texts(frame, include_category=bundle["include_category"])
@@ -78,7 +79,7 @@ def predict_classical(bundle, frame):
     out = frame[["record_id"]].reset_index(drop=True).copy()
     out["predicted_label"] = np.asarray(names)[probabilities.argmax(axis=1)]
     out["confidence"] = probabilities.max(axis=1)
-    out = pd.concat([out, pd.DataFrame(probabilities, columns=list(mapping))], axis=1)
+    out = pd.concat([out, pd.DataFrame(probabilities, columns=probability_columns)], axis=1)
     return out
 
 

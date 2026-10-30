@@ -74,6 +74,22 @@ class ClassicalFitTests(unittest.TestCase):
         self.assertIsNone(metrics["baseline"]["multiclass_brier_sum"])
         self.assertLessEqual(metrics["baseline"]["accuracy"], 0.75)
 
+    def test_probability_mapping_is_independent_of_json_key_order(self):
+        frame = pd.concat([development()] * 3, ignore_index=True)
+        frame["source_row"] = [str(i) for i in range(len(frame))]
+        frame["group_id"] = [f"group-{i}" for i in range(len(frame))]
+        frame["record_id"] = record_ids(frame)
+        frame["split"] = ["train" if i < 24 else "validation" for i in range(len(frame))]
+        frame["Segment"] = [f"class-{i % 12:02d}" for i in range(len(frame))]
+        frame["ProductName"] = [f"product variant{i % 12} tablets" for i in range(len(frame))]
+        bundle, _, _, _ = fit_target(frame, "Segment", BaselineConfig(min_df=1), latency_repeats=1)
+        inputs = frame.loc[frame.split.eq("validation")].drop(columns=list(TARGETS))
+        expected = predict_classical(bundle, inputs)
+        # JSON key sorting places probability_10 before probability_2.
+        bundle["label_mapping"] = json.loads(json.dumps(bundle["label_mapping"], sort_keys=True))
+        actual = predict_classical(bundle, inputs)
+        pd.testing.assert_frame_equal(actual, expected)
+
     def test_invalid_supervised_views_and_leakage_fail(self):
         for fault in ("test", "duplicate", "group", "missing", "one_class"):
             with self.subTest(fault=fault):
