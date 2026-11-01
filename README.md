@@ -3,10 +3,15 @@
 Product classification research and auditable preparation of six CatalogIQ labels:
 `Mnfr`, `Brand`, `Platform`, `Segment`, `Sub-Segment`, and `TargetAgeGroup`.
 
-**Current stage: Segment model development.** The repo contains audited cleaning,
-grouping experiments, a first transformer baseline, and a frozen evaluation
+**Current stage: extending model development beyond Segment.** The repo contains audited cleaning,
+grouping experiments, transformer and classical baselines, and a frozen evaluation
 protocol. Generate the authoritative splits with the commands below for model work.
 A production classifier and deployment remain future work.
+
+The [classical multi-target workflow](docs/classical_multitarget.md) supports all six
+target names, target-specific missing-label masks, a shared prediction manifest,
+per-model cost measurements and fitted-model handoff. Use the agreed split for
+each target; new Brand/Sub-Segment allocations must arrive before their final runs.
 
 ## Start here
 

@@ -12,6 +12,9 @@
 
 ## Evidence
 
+- [October 31 classical contract revision](findings/03_modeling/05_classical_contract_20261031.md): union-class macro-F1, immutable prediction revision and the exact source-sidecar blocker for approved Brand/Sub-Segment allocations.
+- [October 29 classical multi-target results](findings/03_modeling/04_multitarget_baseline_20261029.md): eight measured variants, cost, sparse Platform limits and pending Brand/Sub-Segment splits.
+- [Classical multi-target workflow](classical_multitarget.md): target-specific supervised views, common prediction manifests, measured cost and private model handoff.
 - [Verified classical evaluation handoff](findings/03_modeling/03_classical_evaluation_handoff.md): package and verify baseline validation predictions for private team evaluation.
 - [Classical Segment validation results](findings/03_modeling/02_classical_segment_results_20261010.md): first four-field/category comparison on authoritative splits, metrics, checks and evaluator handoff.
 - [Classical Segment baseline](findings/03_modeling/01_classical_segment_baseline.md): word TF-IDF, category comparison and validation artifacts on the authoritative shared partitions.

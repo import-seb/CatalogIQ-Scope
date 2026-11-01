@@ -7,6 +7,56 @@ from pathlib import Path
 from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 
+def classical_main(argv=None) -> int:
+    """Prepare or train classical models for explicitly selected CatalogIQ targets."""
+    from .classical_data import TARGETS
+    parser = argparse.ArgumentParser(description=classical_main.__doc__)
+    parser.add_argument("--split-dir", type=Path, required=True)
+    parser.add_argument("--protocol-dir", type=Path, help="Authoritative compatible protocol bundle; default: registered Segment V4")
+    parser.add_argument("--allocation-handoff", type=Path, help="Reviewed Brand/Sub-Segment allocation handoff directory")
+    parser.add_argument("--allocation-manifest-sha256", help="Pinned handoff_manifest.json SHA-256; required with --allocation-handoff")
+    parser.add_argument("--targets", nargs="+", choices=TARGETS, default=["Segment"])
+    parser.add_argument("--features", choices=("base", "category", "compare"), default="compare")
+    parser.add_argument("--train", action="store_true")
+    parser.add_argument("--allow-unseen-validation", action="store_true",
+                        help="Keep unseen validation classes as errors; probabilistic metrics require separate handling")
+    parser.add_argument("--threads", type=int, default=2)
+    parser.add_argument("--config", type=Path)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    args = parser.parse_args(argv)
+    try:
+        from .classical_baseline import run_classical
+        from .segment_baseline import BaselineConfig
+        values = json.loads(args.config.read_text(encoding="utf-8")) if args.config else {}
+        if not isinstance(values, dict):
+            raise ValueError("Baseline configuration must be a JSON object")
+        result = run_classical(args.split_dir, args.output_dir, targets=args.targets,
+            config=BaselineConfig(**values), features=args.features, train=args.train,
+            protocol_dir=args.protocol_dir, allow_unseen_validation=args.allow_unseen_validation,
+            threads=args.threads, allocation_handoff=args.allocation_handoff,
+            allocation_manifest_sha256=args.allocation_manifest_sha256)
+    except (ValueError, OSError, RuntimeError, TypeError, KeyError, Warning) as error:
+        parser.exit(1, f"Error: {error}\n")
+    print(f"Run {result['status']}; see {args.output_dir / 'summary.json'}. Reserved test not opened.")
+    return 0 if result["status"] in ("prepared", "completed") else 1
+
+
+def classical_package_main(argv=None) -> int:
+    """Package completed classical validation outputs and optional model artifacts."""
+    parser = argparse.ArgumentParser(description=classical_package_main.__doc__)
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--output-zip", type=Path, required=True)
+    parser.add_argument("--include-models", action="store_true")
+    args = parser.parse_args(argv)
+    try:
+        from .classical_baseline import package_classical
+        result = package_classical(args.run_dir, args.output_zip, include_models=args.include_models)
+    except (ValueError, OSError, RuntimeError, TypeError, KeyError) as error:
+        parser.exit(1, f"Error: {error}\n")
+    print(json.dumps(result, indent=2))
+    return 0
+
+
 def segment_baseline_main(argv=None) -> int:
     """Prepare or train a word TF-IDF Segment baseline on explicit shared assignments."""
     parser = argparse.ArgumentParser(description=segment_baseline_main.__doc__)
