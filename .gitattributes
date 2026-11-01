@@ -16,3 +16,4 @@
 /tests/test_classical_*.py text eol=lf
 /docs/classical_multitarget.md text eol=lf
 /docs/findings/03_modeling/04_multitarget_baseline_20261029.md text eol=lf
+/docs/findings/03_modeling/05_classical_contract_20261031.md text eol=lf

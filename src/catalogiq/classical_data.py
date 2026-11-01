@@ -15,6 +15,23 @@ from .splitting import check_assignments, record_ids
 TARGETS = ("Segment", "Sub-Segment", "Brand", "Mnfr", "Platform", "TargetAgeGroup")
 
 
+def target_profile(view, target, missing_counts):
+    train = view.loc[view.split.eq("train"), target]
+    validation = view.loc[view.split.eq("validation"), target]
+    unseen = sorted(set(validation) - set(train))
+    return {
+        "training_rows": len(train), "validation_rows": len(validation),
+        "training_classes": train.nunique(), "validation_classes": validation.nunique(),
+        "training_class_counts": train.value_counts().sort_index().to_dict(),
+        "validation_class_counts": validation.value_counts().sort_index().to_dict(),
+        "unseen_validation_labels": unseen,
+        "unseen_validation_rows": int(validation.isin(unseen).sum()),
+        "missing_labels_excluded": missing_counts,
+        "training_record_ids_sha256": _hash_items(view.loc[view.split.eq("train"), "record_id"].tolist()),
+        "validation_record_ids_sha256": _hash_items(view.loc[view.split.eq("validation"), "record_id"].tolist()),
+    }
+
+
 def load_target_development(directory, targets, *, protocol_dir=None):
     """Verify the registered split, then filter missing labels separately per target.
 
@@ -62,25 +79,16 @@ def load_target_development(directory, targets, *, protocol_dir=None):
                                     *MODEL_FIELDS, "ProductCategory", target]].copy()
         view[target] = labels.loc[~missing]
         view = view.sort_values("record_id", kind="stable").reset_index(drop=True)
-        train = view.loc[view.split.eq("train"), target]
-        validation = view.loc[view.split.eq("validation"), target]
-        unseen = sorted(set(validation) - set(train))
-        profiles[target] = {
-            "training_rows": len(train), "validation_rows": len(validation),
-            "training_classes": train.nunique(), "validation_classes": validation.nunique(),
-            "training_class_counts": train.value_counts().sort_index().to_dict(),
-            "validation_class_counts": validation.value_counts().sort_index().to_dict(),
-            "unseen_validation_labels": unseen,
-            "unseen_validation_rows": int(validation.isin(unseen).sum()),
-            "missing_labels_excluded": {r: int((missing & joined.split.eq(r)).sum())
-                                         for r in ("train", "validation")},
-            "training_record_ids_sha256": _hash_items(view.loc[view.split.eq("train"), "record_id"].tolist()),
-            "validation_record_ids_sha256": _hash_items(view.loc[view.split.eq("validation"), "record_id"].tolist()),
-        }
+        profiles[target] = target_profile(view, target,
+            {r: int((missing & joined.split.eq(r)).sum()) for r in ("train", "validation")})
         views[target] = view
     return views, {
         "protocol_id": freeze["protocol_id"], "protocol_manifest_sha256": sha256(directory / "protocol_manifest.json"),
         "split_format": freeze["format"], "allocation_target": protocol.get("target", "Segment"),
+        "allocation_id": freeze["protocol_id"],
+        "source_completion_sha256": sha256(directory / "completion.json"),
+        "source_assignments_sha256": sha256(directory / "assignments.csv"),
+        "protected_registry_source_sha256": sha256(directory / "protected_final_test.csv"),
         "consumed_artifact_sha256": consumed,
         "protected_test_rows": len(protected), "test_opened": False,
         "record_and_group_isolation": True, "new_splits_created": False,

@@ -1,5 +1,9 @@
 # Classical multi-target development, October 29, 2026
 
+Historical observed-label results. The [October 31 contract revision](05_classical_contract_20261031.md)
+changes the headline macro-F1 denominator and records the new allocation handoff.
+Original predictions, models and the October 29 archive remain unchanged.
+
 The common trainer supports all six target names. Eight real models were fitted:
 four-field and category variants for Segment, Mnfr, TargetAgeGroup and Platform.
 Brand and Sub-Segment were profiled but not fitted because Sebastian's announced

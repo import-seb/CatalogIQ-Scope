@@ -18,13 +18,20 @@ The trainer reads `train.csv` and `validation.csv`; `test.csv` is neither opened
 nor hashed. Protected-test evidence is restricted to IDs and group membership.
 The new workflow does not allocate or reshuffle any rows.
 
-At the October 29 check, the remote branches still contain the October 9 Segment
-allocation. Sebastian announced replacement splits for Brand and Sub-Segment;
-those models must wait for the agreed exports before final comparison. Prepare
-their code and profile now, but do not present results from the superseded
-allocation as their new benchmark. `--protocol-dir` selects a compatible approved
-protocol bundle; an unregistered split format requires integration with its own
-verifier, not disabling checks or fabricating a completion manifest.
+The October 31 handoff supplies approved Brand and Sub-Segment development
+allocations. They preserve frozen groups and test membership but change development
+roles. Use `--allocation-handoff` with the reviewed `handoff_manifest.json` hash
+in `--allocation-manifest-sha256`. The adapter verifies the source completion,
+source bytes, allocation approval pins, labels, eligibility, class vocabulary,
+whole-group isolation and protected membership. It never executes supplied scripts.
+Brand/Sub-Segment training without this handoff is rejected. A dry-run of their
+old V4 profiles remains possible and does not authorize training.
+
+Our local source completion and grouping-freeze bytes differ from the source pins
+in the supplied handoff, so actual training remains blocked. Matching train and
+validation CSV bytes alone does not bypass that guard. Obtain the original source
+sidecars or reconcile the source through review before training; preserve the
+historical directory. See the [October 31 audit](findings/03_modeling/05_classical_contract_20261031.md).
 
 The existing allocation can support explicitly scoped development experiments on
 the other targets. `split_allocation_target` records that it was designed for
@@ -47,11 +54,11 @@ never silently drops the rows or adds validation-only classes to the fitted
 classifier. For an explicitly limited experiment, `--allow-unseen-validation`
 keeps them in validation and counts their predictions as errors.
 
-Primary macro-F1 follows sklearn's default union of observed validation true and
-predicted labels, matching Maria's evaluator. A secondary score covers the union
-of all training classes and validation labels. The label scopes are saved in
-`metrics.json`; classes absent from validation must not silently be interpreted
-as measured failures or successes.
+Primary macro-F1 follows the October 31 contract: the union of the entire model
+vocabulary and validation truth, with zero_division=0. Classes without validation
+support remain in the declared denominator. The previous sklearn observed-label
+score is retained as `observed_label_macro_f1`, with its label set. These figures
+are different conventions on the same predictions, not a model-quality change.
 
 If unseen labels exist, full-set log loss and multiclass Brier are `null`, and
 `calibration_requires_unseen_label_policy` is true. The evaluator must explicitly
@@ -82,7 +89,10 @@ Probability columns follow their numeric suffix, independent of the insertion
 or serialization order of keys in the explicit mapping.
 
 These names and mapping follow the team's October 27 agreement. This document
-describes this implementation and does not replace Maria's shared contract doc.
+also implements the October 31 additions from Maria's
+[shared contract](https://github.com/import-seb/CatalogIQ-Scope/blob/2345648/docs/predictions-contract.md).
+Each manifest declares the exact allocation, union macro-F1 class set and OOV
+truth-row policy. Each run also includes an ID-only protected test registry.
 Probabilities remain uncalibrated; Segment's temperature is not applied to other
 targets. No operating threshold or production model is selected here.
 
@@ -111,6 +121,9 @@ one excluded warm-up and three timed repeats. The manifest records all times,
 median batch time, amortized time per record, throughput, CPU description,
 logical CPU count, numerical thread limit, library versions and measurement
 boundaries. This is not a single-request p95 or cold model startup benchmark.
+The contract fields `inference_latency_ms=null` and `inference_latency_scope`
+explicitly identify unmeasured single-request latency; measured amortized batch
+cost is separate. `training_seconds_scope` gives the fit boundary.
 Compare models on the same machine, batch size and measurement scope; two
 different computers do not give a controlled latency comparison.
 
@@ -131,3 +144,17 @@ explicitly selected run files, a root manifest with checksums and a readme.
 `--include-models` supplies the fitted models as requested for integration;
 otherwise it includes prediction/evaluation files only. Keep these outputs in
 the team's private channel, outside Git. An existing archive is never replaced.
+
+For existing original-V4 outputs, create a metadata revision without training,
+model loading or rewriting predictions:
+
+```python
+from catalogiq.classical_contract import align_classical_contract
+align_classical_contract(old_run_dir, verified_v4_source_dir, new_run_dir)
+```
+
+This verifies saved artifacts against the source validation context, recalculates
+the declared metrics and creates new manifests, preserving historical source
+fingerprints and measured costs. Package the revision without `--include-models`
+for evaluation; scoring does not depend on unpickling a model. The original
+model package remains usable for inference with a compatible environment.

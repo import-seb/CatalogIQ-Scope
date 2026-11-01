@@ -13,6 +13,8 @@ def classical_main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=classical_main.__doc__)
     parser.add_argument("--split-dir", type=Path, required=True)
     parser.add_argument("--protocol-dir", type=Path, help="Authoritative compatible protocol bundle; default: registered Segment V4")
+    parser.add_argument("--allocation-handoff", type=Path, help="Reviewed Brand/Sub-Segment allocation handoff directory")
+    parser.add_argument("--allocation-manifest-sha256", help="Pinned handoff_manifest.json SHA-256; required with --allocation-handoff")
     parser.add_argument("--targets", nargs="+", choices=TARGETS, default=["Segment"])
     parser.add_argument("--features", choices=("base", "category", "compare"), default="compare")
     parser.add_argument("--train", action="store_true")
@@ -31,7 +33,8 @@ def classical_main(argv=None) -> int:
         result = run_classical(args.split_dir, args.output_dir, targets=args.targets,
             config=BaselineConfig(**values), features=args.features, train=args.train,
             protocol_dir=args.protocol_dir, allow_unseen_validation=args.allow_unseen_validation,
-            threads=args.threads)
+            threads=args.threads, allocation_handoff=args.allocation_handoff,
+            allocation_manifest_sha256=args.allocation_manifest_sha256)
     except (ValueError, OSError, RuntimeError, TypeError, KeyError, Warning) as error:
         parser.exit(1, f"Error: {error}\n")
     print(f"Run {result['status']}; see {args.output_dir / 'summary.json'}. Reserved test not opened.")

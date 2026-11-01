@@ -33,7 +33,7 @@ def write_json(path, value):
 
 def source_fingerprints():
     """Raw hashes explain history; LF-normalized hashes compare across platforms."""
-    names = ("classical_baseline.py", "classical_data.py", "segment_baseline.py",
+    names = ("classical_baseline.py", "classical_data.py", "classical_allocations.py", "segment_baseline.py",
              "segment_baseline_data.py", "segment_transformer.py", "split_protocol.py")
     result = {}
     for name in names:
@@ -92,10 +92,12 @@ def measure_scores(true, predictions, probabilities, names):
     all_classes = sorted(set(names) | set(true))
     scores = {
         "records": len(true), "accuracy": float(accuracy_score(true, predicted)),
-        "macro_f1": float(f1_score(true, predicted, average="macro", zero_division=0)),
+        "macro_f1": float(f1_score(true, predicted, labels=all_classes, average="macro", zero_division=0)),
+        "observed_label_macro_f1": float(f1_score(true, predicted, average="macro", zero_division=0)),
+        "observed_label_macro_f1_labels": observed,
         "weighted_f1": float(f1_score(true, predicted, average="weighted", zero_division=0)),
-        "macro_f1_label_scope": "union of observed true and predicted validation labels (sklearn default)",
-        "macro_f1_labels": observed,
+        "macro_f1_label_scope": "model_vocabulary_union_truth",
+        "macro_f1_labels": all_classes,
         "macro_f1_all_training_and_validation_labels": float(f1_score(true, predicted, labels=all_classes, average="macro", zero_division=0)),
         "per_class": classification_report(true, predicted, labels=all_classes, zero_division=0, output_dict=True),
         "unseen_validation_labels": sorted(set(true[~known])),
@@ -186,7 +188,7 @@ def fit_target(frame, target, config=None, *, include_category=False,
     return bundle, out, metrics, performance
 
 
-def _write_variant(directory, frame, target, config, audit, include_category, **options):
+def _write_variant(directory, frame, target, config, audit, include_category, *, protected_registry, **options):
     bundle, predictions, metrics, performance = fit_target(frame, target, config,
                                                            include_category=include_category, **options)
     directory.mkdir(parents=True, exist_ok=False)
@@ -198,6 +200,7 @@ def _write_variant(directory, frame, target, config, audit, include_category, **
     pd.DataFrame(matrix, index=pd.Index(matrix_labels, name="true_label"), columns=matrix_labels).to_csv(
         directory / "confusion_matrix.csv", lineterminator="\n")
     write_json(directory / "metrics.json", metrics)
+    protected_registry.to_csv(directory / "protected_test_identity_registry.csv", index=False, lineterminator="\n")
     joblib.dump(bundle, directory / "model.joblib", compress=3)
     profile = audit["profiles"][target]
     manifest = {
@@ -205,7 +208,10 @@ def _write_variant(directory, frame, target, config, audit, include_category, **
         "model": "word TF-IDF + logistic regression", "variant": directory.name,
         "partition": "validation", "label_mapping": bundle["label_mapping"],
         "protocol_id": audit["protocol_id"], "protocol_manifest_sha256": audit["protocol_manifest_sha256"],
-        "split_allocation_target": audit["allocation_target"],
+        "split_allocation_target": profile.get("allocation_id", audit["allocation_id"]),
+        "source_completion_sha256": audit["source_completion_sha256"],
+        "source_assignments_sha256": audit["source_assignments_sha256"],
+        "allocation_identity": profile.get("allocation_identity"),
         "training_rows": profile["training_rows"], "validation_rows": profile["validation_rows"],
         "training_record_ids_sha256": profile["training_record_ids_sha256"],
         "validation_record_ids_sha256": profile["validation_record_ids_sha256"],
@@ -214,15 +220,24 @@ def _write_variant(directory, frame, target, config, audit, include_category, **
         "missing_labels_excluded": profile["missing_labels_excluded"],
         "unseen_validation_labels": profile["unseen_validation_labels"],
         "unseen_validation_rows": profile["unseen_validation_rows"],
+        "macro_f1_class_set": "model_vocabulary_union_truth",
+        "out_of_vocabulary_true_labels": profile["unseen_validation_rows"],
+        "out_of_vocabulary_policy": "retained_as_errors",
         "calibration_requires_unseen_label_policy": bool(profile["unseen_validation_rows"]),
         "probabilities_calibrated": False, "test_opened": False, "new_splits_created": False,
         "input_fields": list(MODEL_FIELDS) + (["ProductCategory"] if include_category else []),
         "category_mode": "same text/vectorizer" if include_category else "excluded",
         "config": asdict(config), **performance,
+        "training_seconds_scope": performance["training_time_scope"],
+        "inference_latency_ms": None,
+        "inference_latency_scope": "single-request latency, unmeasured",
+        "amortized_inference_latency_ms": 1000 * performance["inference_latency"]["seconds_per_record"],
+        "amortized_inference_latency_scope": performance["inference_latency"]["scope"],
         "python_version": platform.python_version(),
         "package_versions": {name: version(name) for name in ("numpy", "pandas", "scipy", "scikit-learn", "joblib", "threadpoolctl")},
         "source_fingerprints": source_fingerprints(),
-        "source_hash_normalization": "sha256_lf replaces CRLF bytes with LF only; sha256_raw preserves actual bytes",
+        "source_hash_normalization": "raw_bytes",
+        "source_fingerprint_normalization": "sha256_lf replaces CRLF bytes with LF only; sha256_raw preserves actual bytes",
         "metrics": metrics["baseline"],
         "artifacts": {p.name: sha256(p) for p in sorted(directory.iterdir()) if p.is_file()},
     }
@@ -234,16 +249,30 @@ def _write_variant(directory, frame, target, config, audit, include_category, **
 
 def run_classical(split_dir, output_dir, *, targets=("Segment",), config=None,
                   features="compare", train=False, protocol_dir=None,
-                  allow_unseen_validation=False, threads=2, progress=print):
+                  allow_unseen_validation=False, threads=2, progress=print,
+                  allocation_handoff=None, allocation_manifest_sha256=None):
     output = Path(output_dir).resolve()
     if output.exists():
         raise FileExistsError("Use a new output directory; previous artifacts are immutable")
     if features not in ("base", "category", "compare"):
         raise ValueError("Unknown feature variant")
+    if train and set(targets) & {"Brand", "Sub-Segment"} and allocation_handoff is None:
+        raise ValueError("Brand/Sub-Segment training requires the approved allocation handoff and its manifest pin")
     config = config or BaselineConfig()
     if progress:
         progress("Verifying shared exports and building target-specific supervised views.")
-    views, audit = load_target_development(split_dir, targets, protocol_dir=protocol_dir)
+    if allocation_handoff is not None:
+        from .classical_allocations import load_approved_targets
+        views, audit = load_approved_targets(split_dir, allocation_handoff, targets,
+            manifest_sha256=allocation_manifest_sha256, protocol_dir=protocol_dir)
+    else:
+        if allocation_manifest_sha256 is not None:
+            raise ValueError("Allocation manifest hash requires a handoff directory")
+        views, audit = load_target_development(split_dir, targets, protocol_dir=protocol_dir)
+    registry_path = Path(split_dir) / "protected_final_test.csv"
+    registry = pd.read_csv(registry_path, dtype=str, keep_default_na=False, usecols=["record_id", "group_id"])
+    if sha256(registry_path) != audit["protected_registry_source_sha256"]:
+        raise ValueError("Protected registry changed during preparation")
     output.mkdir(parents=True, exist_ok=False)
     summary = {"status": "prepared", "created_utc": datetime.now(timezone.utc).isoformat(),
                "model_training_performed": False, "test_opened": False, "new_splits_created": False,
@@ -260,7 +289,7 @@ def run_classical(split_dir, output_dir, *, targets=("Segment",), config=None,
                 try:
                     summary["targets"][target][arm] = _write_variant(
                         output / target / arm, frame, target, config, audit, category,
-                        allow_unseen_validation=allow_unseen_validation, threads=threads)
+                        protected_registry=registry, allow_unseen_validation=allow_unseen_validation, threads=threads)
                 except (ValueError, RuntimeError, Warning) as error:
                     summary["targets"][target][arm] = {"status": "failed", "error": str(error)}
                 write_json(output / "summary.json", summary)
@@ -293,7 +322,8 @@ def package_classical(run_dir, output_zip, *, include_models=False):
             manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
             if manifest["target"] != target or manifest["partition"] != "validation" or manifest["test_opened"] is not False:
                 raise ValueError("Invalid prediction manifest")
-            for filename in sorted(allowed):
+            selected = allowed | ({"protected_test_identity_registry.csv"} if "protected_test_identity_registry.csv" in manifest["artifacts"] else set())
+            for filename in sorted(selected):
                 relative = f"{target}/{arm}/{filename}"
                 path = (root / relative).resolve()
                 if not path.is_relative_to(root) or sha256(path) != summary["artifact_sha256"][relative]:
