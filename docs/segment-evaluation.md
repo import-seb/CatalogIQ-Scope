@@ -44,7 +44,7 @@ baselines, class tiers and per-class tables all follow. The one thing that does
 not move: the team's trainer tokenizes a `Segment` column, so another target
 needs their trainer pointed at it before there are predictions to score.
 
-### Five things it enforces rather than assumes
+### Six things it enforces rather than assumes
 
 1. **The reserved test is refused.** If any `record_id` in a predictions file
    belongs to the test partition, the loader raises instead of scoring it.
@@ -59,8 +59,29 @@ needs their trainer pointed at it before there are predictions to score.
    numbers end up meaningless.
 4. **The bootstrap resamples product groups, not rows.** Rows inside a group are
    not independent, so a row bootstrap would give intervals that are too narrow.
-5. **Temperature scaling cannot change accuracy**, and the notebook's §4 carries
-   a real `assert` on it rather than a comment saying so.
+   The class set a macro average runs over is fixed before any resampling, so an
+   interval is an interval on one metric rather than on a moving denominator.
+5. **A `group_id` shipped in a predictions file is checked, not overwritten.**
+   The loader derives the group from the split registry and compares; a
+   disagreement raises instead of disappearing. It used to assign over whatever
+   arrived, which would have hidden exactly the thing the bootstrap depends on.
+6. **Temperature scaling cannot change accuracy**, and the notebook's §4 carries
+   a real `assert` on it rather than a comment saying so. The temperature is
+   fitted only on rows whose true class is in the model's vocabulary, because
+   the rest have no likelihood to optimise, but it is applied and scored on every
+   row — a row whose true class the model cannot emit is simply always wrong.
+
+### The macro average states which classes it runs over
+
+`MACRO_F1_CLASS_SET = "model_vocabulary_union_truth"`: every class the model can
+emit, plus every class that appears in the truth. The observed-label figure is
+reported beside it and never as the headline.
+
+On Segment all three defensible denominators agree, because every class has
+validation support — which is why this went unnoticed here. On a target with
+classes that have none they diverge badly, so stating the choice is not
+pedantry. The predictions contract (`docs/predictions-contract.md`) carries the
+numbers and the reasoning.
 
 ### It accepts however a teammate packages a run
 
@@ -248,25 +269,43 @@ to be compared against. Note that **the real TF-IDF arm clears it by only
 
 Intervals are 95% group-aware bootstrap, resampled over product groups.
 
-### Cost cannot be compared yet, and should not be faked
+### Cost, now that both runs report it per model
 
-MiniLM reports 1,356 seconds of training on a named RTX 3060 laptop GPU, 3
-epochs, 5,229 optimizer steps, 22.7M trainable parameters, fp32, deterministic
-algorithms on.
+The October packages reported cost in forms that could not be put in one column.
+Both have since been reissued against the predictions contract, and the figures
+below are per model with their measurement scopes attached.
 
-Max's run reports **53.38 seconds of combined wall time for both arms**, and his
-metadata is explicit about what that is not: it covers data loading, fitting,
-validation scoring and artifact writes for the two arms together,
-`per_arm_training_seconds` is null, `inference_latency_seconds` is null, hardware
-is "not recorded", and his `cost_note` says not to attribute the combined time to
-either model or treat it as a per-model benchmark.
+| | MiniLM, five fields | TF-IDF + logreg, five fields |
+|---|---|---|
+| Training | **1,356.1s** | **18.5s** |
+| Training scope | trainer runtime: init, 3 epochs, per-epoch validation, bookkeeping; input prep excluded | `pipeline.fit` on preformatted text: TF-IDF vocabulary/IDF and the classifier |
+| Device | RTX 3060 laptop GPU (cuda) | CPU, Windows 11, AMD64 |
+| Amortised inference | **1.465 ms/record** | **0.135 ms/record** |
+| Inference scope | batched validation seconds / rows; includes transfers and output assembly, excludes tokenizer and model init | warm in-memory batch: formatting, vectorisation, `predict_proba`, output frame; excludes model load and disk IO |
+| Single-request latency | `null` | `null` |
 
-So the honest statement is that **the two cost figures are not comparable**, and
-the figure that matters most for a daily pipeline — inference latency — is
-unmeasured for every run. An earlier version of this document put "37× the
-training time" in a table. That compared MiniLM's GPU training against *my own*
-stand-in arms on this container's CPU, which is not the team's baseline and not a
-controlled comparison. It is withdrawn.
+**Read the scopes before the ratios.** The headline arithmetic is 73× the
+training time and 10.8× the inference time, but the two training figures do not
+measure the same work — one includes a validation pass every epoch, the other is
+`fit` alone — and one ran on a GPU while the other ran on a laptop CPU. The
+inference comparison has the same device asymmetry, and it flatters the
+transformer, which got the accelerator.
+
+**In absolute terms none of this is expensive.** The longest training is 22.6
+minutes. A million-row catalogue at MiniLM's amortised rate is about 24 minutes
+on a GPU against 2.3 minutes on CPU. If this ran weekly, neither figure decides
+anything. **The real operational difference is the GPU dependency, not the
+seconds.**
+
+**Single-request latency is still `null` on both**, correctly flagged rather than
+guessed, and it is the figure a request-shaped product would actually pay. It is
+the one cost number still missing.
+
+An earlier version of this document put "37× the training time" in a table. That
+compared MiniLM's GPU training against *my own* stand-in arms on a container CPU,
+which was neither the team's baseline nor a controlled comparison, and it was
+withdrawn. The table above is the team's own runs, and the scopes are why it
+carries six rows instead of two numbers.
 
 ### My stand-in arms, and what they were wrong about
 
@@ -490,7 +529,10 @@ survive the cut (5,975 Vitamins rows and a single Allergy row) and at 25% only
 one does. The earlier version averaged over whatever classes were left and
 printed 50.00% at 50% coverage and 100.00% at 25% — non-monotonic, and read as
 the model collapsing when accuracy was 99.98%. The table now reports how many
-classes remain and withholds the average when any are missing.
+classes remain, and withholds the average once any class that was present at
+full coverage has dropped out of the answered subset. Comparing against the
+declared vocabulary instead would mark every row incomparable on any target that
+has a class with no validation support, including the 100% row.
 
 Both of Max's arms keep all 8 classes at every coverage point, which is why
 neither of them — and neither of my stand-ins — ever triggered the defect. **It
@@ -668,9 +710,11 @@ reviewability**, and the review rules in §9 cannot be read as if it were.
 
 ## 11. What this does not answer
 
-- **No model is selected.** Cost is the gap: MiniLM's training time and Max's
-  combined wall time are not comparable, and inference latency — the figure a
-  daily pipeline actually pays — is unmeasured for every run.
+- **No model is selected.** Cost is no longer the blocker — §4 has per-model
+  training time and amortised inference for both, with scopes — but the two were
+  measured on different devices, and single-request latency is still `null` on
+  both. The decision also needs a view on the GPU dependency, which is the real
+  operational difference rather than the seconds.
 - **Review rule 5 is unmeasured**, and the review load target is unset.
 - **Only Segment**, and only validation. The reserved test stays closed.
 - **Calibration is per target.** Segment's temperatures say nothing about
@@ -694,10 +738,12 @@ reviewability**, and the review rules in §9 cannot be read as if it were.
    without one. 9% load for a 21% miss rate may be excellent or unaffordable;
    only they know. It also decides the confidence-versus-margin question, which
    §5.1 shows depends on the operating point.
-3. **Measure inference latency** for MiniLM and for one TF-IDF arm, on the same
-   hardware. Training cost is recorded for MiniLM and deliberately not
-   attributable for the TF-IDF arms, so latency is the only cost number that can
-   be compared fairly.
+3. **Re-measure both on the same hardware**, and benchmark single-request
+   latency while doing it. Per-model training and amortised inference now exist
+   for both runs, but one was timed on a GPU and the other on a laptop CPU, so
+   the ratios in §4 carry a device difference as well as a model difference.
+   Single-request latency is `null` on both and is what a request-shaped product
+   pays.
 4. **Send Max the calibrated confidence.** His packaging note says his
    probabilities ship uncalibrated; §7 of this document gives both his arms a
    temperature and the

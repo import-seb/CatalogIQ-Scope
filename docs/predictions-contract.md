@@ -48,11 +48,9 @@ exactly this set; the other adds `dataset`, `source_sha256`, `source_row`,
 reason to make anyone strip them, so the contract requires a minimum rather than
 forbidding extras.
 
-One thing for whoever maintains the harness rather than for the producers: the
-loader currently derives `group_id` from the split registry and assigns it onto
-the frame, which overwrites a `group_id` column that arrived in the file. It
-should compare the two and raise on a mismatch instead, so a disagreement
-surfaces rather than disappearing.
+The harness used to derive `group_id` from the split registry and assign it over
+whatever arrived in the file, which would have hidden a disagreement. It now
+compares and raises instead; a shipped `group_id` is checked, not overwritten.
 
 Rules the loader checks and will refuse a run over:
 
@@ -68,12 +66,10 @@ Rules the loader checks and will refuse a run over:
 
 ### `manifest.json`
 
-These thirteen keys are required. **Thirteen of the fourteen existing runs
-already write all of them**, so this is mostly a description of current practice
-rather than new work. The exception is the probabilistic Brand lookup, which is
-missing `protocol_id` and `config` — `config` is arguably not meaningful for a
-lookup table, but `protocol_id` should be there, since without it the run does
-not say which split protocol it belongs to.
+These thirteen keys are required, and **all fourteen current runs write all of
+them**. When this was first written the probabilistic Brand lookup was missing
+`protocol_id` and `config`; both packages have since been reissued against this
+document and nothing is outstanding.
 
 | Key | What it is |
 |---|---|
@@ -115,7 +111,7 @@ cannot be scored by accident.
 
 These caused more trouble than anything in §1 and need deciding too.
 
-### 3.1 Which class set the macro average runs over — decide this first
+### 3.1 Which class set the macro average runs over
 
 The same predictions give very different macro-F1 depending on the denominator.
 Platform, base arm:
@@ -129,8 +125,11 @@ Platform, base arm:
 **15 points of spread on one run.** Two people can report honestly and disagree
 by that much, which is exactly what a contract is for.
 
-**Proposal: the union.** Every class the model can emit, plus every class that
-appears in the truth. It is the most conservative reading and the only one that
+**Settled: the union.** Every class the model can emit, plus every class that
+appears in the truth. Both packages now declare
+`macro_f1_class_set: model_vocabulary_union_truth` on every run, and their
+figures reconcile with an independent recomputation to 1e-12, label lists
+included. It is the most conservative reading and the only one that
 does not hide a class the model has no chance on. State it in the manifest:
 
 ```json
@@ -180,7 +179,9 @@ Currently it arrives two ways: as a column in `predictions.csv`, or in a
 separate `validation_context.csv` with `record_id, group_id, split, true_label`.
 Both work and the harness reads both.
 
-**Proposal: either is fine, and it must be one of the two.** Since §2 permits
+**Settled: either is fine, and it must be one of the two.** Both are in use —
+one package ships `group_id` as a column in `predictions.csv`, the other in a
+separate `validation_context.csv` — and the harness reads both. Since §2 permits
 extra columns there is no reason to make anyone move a column that already
 works, and a separate context file is equally good — it also gives a second,
 independent copy of `true_label` to check the predictions against, which is how
@@ -198,12 +199,16 @@ If a producer prefers the context file, shipping the provenance key — `dataset
 
 The harness refuses test rows by checking against a registry of protected
 record IDs. For Segment that registry is available, so the check genuinely
-runs. For the Brand and Sub-Segment allocations it is not, so their test
-exclusion currently rests on the producer's word rather than on a check.
+runs. When this was written the Brand and Sub-Segment allocations had no such
+registry, so their test exclusion rested on the producer's word.
 
 Required for any new allocation: **the protected test record IDs and group IDs,
-labels excluded.** IDs only. Without them the guard cannot run and the
-assurance is a claim rather than a measurement.
+labels excluded.** IDs only. Both packages now ship a 12,160-row
+`protected_test_identity_registry.csv` with exactly `record_id, group_id` and no
+label column, byte-identical between the two. Checked here rather than taken on
+trust: zero protected records and **zero protected groups** across all fourteen
+runs. The group-level check is the stronger one, since the splitter is
+group-aware.
 
 ### 3.6 Cost field names
 
@@ -229,14 +234,51 @@ amortised figures were measured on different devices — one model's inference r
 on a GPU and the other's on CPU — so the ratio between them flatters whichever
 got the accelerator.
 
-And neither package benchmarked single-request latency, but they say so
-differently: one sets `inference_latency_ms` to `null` with a scope string
-saying it was not benchmarked, and the other omits the field and documents its
-batch scope instead. Decision 4 asks for the explicit `null`, so the key should
-be present and null rather than absent — an absent key cannot be told apart from
-an oversight.
+Neither package has benchmarked single-request latency, and both now say so the
+same way: `inference_latency_ms: null` with a scope string. That is decision 4
+working as intended — an absent key cannot be told apart from an oversight, a
+null one can. Amortised per-record figures are reported separately under their
+own keys, as they should be, since they are a different quantity.
 
-### 3.7 Line-ending normalisation, stated
+### 3.7 Which hashes are comparable between machines, and which are not
+
+This one cost a round trip, so it is worth writing down. Four files the splitter
+writes carry a wall-clock timestamp, so their SHA-256 can never match across two
+machines, or across two runs on one machine:
+
+| File | Varying field |
+|---|---|
+| `grouping_freeze.json` | `reproduced_utc` |
+| `test_reservation.json` | `reserved_utc` |
+| `summary.json` | `created_utc` |
+| `completion.json` | `completed_utc`, plus the hashes of the three above |
+
+`completion.json` is a seal **internal to one split directory**: it records the
+hashes of that directory's own files, and `--verify` checks them against that
+same directory. It was never meant to be compared between machines, and
+comparing it is what produces a mismatch that looks alarming and means nothing.
+
+The cross-machine anchors are the ones `split_protocol.py` actually checks:
+
+- `completion["protocol_manifest_sha256"]` against the committed bundle's
+  `manifest.json`
+- `protocol_manifest.json`, `eligibility.json` and the four config JSONs, byte
+  for byte against that bundle
+- `expected.splits`, which carries per-partition `records`, `groups`,
+  `record_ids_sha256` and `assignment_sha256`
+
+All of that lives in `src/catalogiq/resources/segment_final_20261009/manifest.json`,
+which **is in the repo** and contains no timestamps and no absolute paths. That
+is the pinned source. `/data/processed/` is gitignored, so there is no pinned
+copy of the generated split directory and asking for one does not help.
+
+Note which code wrote your split. `scripts.split_data` is the team workflow and
+goes through `split_protocol.py`, where the only varying field in
+`grouping_freeze.json` is `reproduced_utc`. The older `scripts.finalize_splits`
+path writes a different freeze that also embeds absolute machine paths, and the
+README says plainly it is not the portable workflow.
+
+### 3.8 Line-ending normalisation, stated
 
 Decision 5 covers the files. The manifest should also say how its own hashes
 were taken, because that is where it bit:
@@ -270,7 +312,7 @@ Short version, so nobody has to relitigate them.
   column as a named GPU's 1,356 training seconds. The current packages both ship
   per-model seconds and amortised per-record latency with scope strings, and the
   comparison works.
-- **LF, and state the normalisation.** See §3.7.
+- **LF, and state the normalisation.** See §3.8.
 
 ---
 
@@ -298,5 +340,5 @@ Short version, so nobody has to relitigate them.
 - [ ] `split_allocation_target` (§3.3)
 - [ ] protected test IDs for any new allocation (§3.5)
 - [ ] cost keys with their scopes, `null` where unmeasured (§3.6)
-- [ ] `source_hash_normalization` (§3.7)
+- [ ] `source_hash_normalization` (§3.8)
 - [ ] LF line endings on everything new
