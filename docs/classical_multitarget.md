@@ -10,28 +10,32 @@ Each target gets its own missing-label mask. A row missing Segment may still be
 usable for another target. Labels are never filled in or inferred during training.
 This is one classifier per target, not a joint multi-output model.
 
-## Shared splits and the current dependency
+## Shared splits and approved target allocations
 
 Only an explicit, verified portable split directory is accepted. The existing
 authoritative verifier checks identities, grouping, frozen membership and hashes.
 The trainer reads `train.csv` and `validation.csv`; `test.csv` is neither opened
 nor hashed. Protected-test evidence is restricted to IDs and group membership.
-The new workflow does not allocate or reshuffle any rows.
+The new workflow does not generate new allocations.
 
 The October 31 handoff supplies approved Brand and Sub-Segment development
 allocations. They preserve frozen groups and test membership but change development
 roles. Use `--allocation-handoff` with the reviewed `handoff_manifest.json` hash
-in `--allocation-manifest-sha256`. The adapter verifies the source completion,
-source bytes, allocation approval pins, labels, eligibility, class vocabulary,
+in `--allocation-manifest-sha256`. The adapter verifies the source's own completion,
+committed portable protocol, exact source CSV bytes, allocation approval pins, labels, eligibility, class vocabulary,
 whole-group isolation and protected membership. It never executes supplied scripts.
 Brand/Sub-Segment training without this handoff is rejected. A dry-run of their
 old V4 profiles remains possible and does not authorize training.
 
-Our local source completion and grouping-freeze bytes differ from the source pins
-in the supplied handoff, so actual training remains blocked. Matching train and
-validation CSV bytes alone does not bypass that guard. Obtain the original source
-sidecars or reconcile the source through review before training; preserve the
-historical directory. See the [October 31 audit](findings/03_modeling/05_classical_contract_20261031.md).
+The team's November 1 contract section 3.7 clarifies that generated completion and
+grouping-freeze files contain timestamps: their raw hashes are local provenance,
+not cross-machine identity. The source must pass the authoritative verifier against
+the committed bundle, including configs, tokenizer and canonical split/group hashes.
+All four source CSVs (train, validation, assignments and protected identities) must
+still match the approved handoff byte for byte. Stable freeze identity fields are
+checked against the bundle. Sender and local sidecar hashes are retained separately;
+local files are checked again after loading. Allocation and handoff approval pins
+remain exact. No source files or historical seals are rewritten.
 
 The existing allocation can support explicitly scoped development experiments on
 the other targets. `split_allocation_target` records that it was designed for
@@ -40,6 +44,7 @@ Segment; this does not claim a new target-balanced allocation or new test approv
 ```bash
 python -m scripts.train_classical --split-dir data/processed/splits --targets Segment Sub-Segment Brand Mnfr Platform TargetAgeGroup --output-dir data/processed/classical_preflight
 python -m scripts.train_classical --split-dir data/processed/splits --targets Segment Mnfr TargetAgeGroup --features compare --train --output-dir data/processed/classical_run
+python -m scripts.train_classical --split-dir data/processed/splits --targets Sub-Segment --features compare --train --allocation-handoff data/processed/classical-splits --allocation-manifest-sha256 bd8fc1c635ef1aa9dafadf8a8ea233d064bf254283fd2f890ce5af4785860359 --output-dir data/processed/subsegment_run
 ```
 
 Always select a new output directory. Without `--train`, no model is fitted.
@@ -91,7 +96,8 @@ or serialization order of keys in the explicit mapping.
 These names and mapping follow the team's October 27 agreement. This document
 also implements the October 31 additions from Maria's
 [shared contract](https://github.com/import-seb/CatalogIQ-Scope/blob/2345648/docs/predictions-contract.md).
-Each manifest declares the exact allocation, union macro-F1 class set and OOV
+The [November 1 clarification](https://github.com/import-seb/CatalogIQ-Scope/blob/a41608e/docs/predictions-contract.md#37-which-hashes-are-comparable-between-machines-and-which-are-not)
+defines portable source identity. Each manifest declares the exact allocation, union macro-F1 class set and OOV
 truth-row policy. Each run also includes an ID-only protected test registry.
 Probabilities remain uncalibrated; Segment's temperature is not applied to other
 targets. No operating threshold or production model is selected here.

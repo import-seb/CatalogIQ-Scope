@@ -9,6 +9,34 @@ from .features import sha256
 from .segment_baseline_data import MISSING_LABELS
 from .segment_transformer import _hash_items
 from .splitting import check_assignments
+from .split_protocol import FORMAT, load_protocol
+
+
+_SOURCE_CSVS = {"train.csv", "validation.csv", "assignments.csv", "protected_final_test.csv"}
+
+
+def _portable_source_identity(source, handoff, protocol_dir):
+    """Check portable anchors; generated timestamps are local provenance only.
+
+    load_target_development also verifies the complete local seal, committed
+    configs/tokenizer, canonical memberships and frozen model-view contract.
+    Exact sender CSV hashes below additionally protect features and target labels.
+    """
+    bundle, protocol = load_protocol(protocol_dir)
+    freeze = _json(source / "grouping_freeze.json")
+    expected = {"format": FORMAT, "protocol_manifest_sha256": sha256(bundle / "manifest.json"),
+        "final_test_record_ids_sha256": protocol["expected"]["splits"]["test"]["record_ids_sha256"],
+        **{key: protocol[key] for key in ("protocol_id", "split_version", "grouping_version", "algorithm_source_sha256_lf")}}
+    if any(freeze.get(key) != value for key, value in expected.items()):
+        raise ValueError("Source grouping freeze differs from the authoritative protocol")
+    if any(handoff["source"].get(key) != protocol[key] for key in ("protocol_id", "grouping_version")):
+        raise ValueError("Handoff names a different source protocol")
+    return {"comparison_policy": "committed_protocol_and_exact_source_csvs",
+        "protocol_manifest_sha256": expected["protocol_manifest_sha256"],
+        "sender_completion_sha256": handoff["source"]["completion_sha256"],
+        "local_completion_sha256": sha256(source / "completion.json"),
+        "local_grouping_freeze_sha256": sha256(source / "grouping_freeze.json"),
+        "generated_sidecars": "local seals verified internally; timestamp-bearing raw hashes are not cross-machine identity"}
 
 
 def _json(path):
@@ -27,8 +55,9 @@ def _sealed_files(root, hashes):
 def load_approved_targets(source, package, targets, *, manifest_sha256, protocol_dir=None):
     """Apply exact approved assignments after checking the source and both seals.
 
-    A different source completion is a hard failure, even when CSV bytes match.
-    Source reconciliation is separate reviewed work, never an implicit fallback.
+    The approved handoff/allocation pins remain exact. Locally reproduced source
+    sidecars use the team's portable protocol identity (contract section 3.7),
+    while every consumed source CSV must still match the sender byte for byte.
     """
     source, package = Path(source).resolve(), Path(package).resolve()
     manifest_path = package / "handoff_manifest.json"
@@ -41,9 +70,10 @@ def load_approved_targets(source, package, targets, *, manifest_sha256, protocol
     if not targets or len(set(targets)) != len(targets) or not set(targets) <= {"Brand", "Sub-Segment"}:
         raise ValueError("An allocation handoff supports distinct Brand/Sub-Segment targets only")
     _sealed_files(package, handoff["artifact_sha256"])
-    if sha256(source / "completion.json") != handoff["source"]["completion_sha256"]:
-        raise ValueError("Different pinned V4 source completion: obtain original sidecars or reconcile through review before training")
+    local_completion = sha256(source / "completion.json")
+    local_source_hashes = {name: sha256(source / name) for name in _SOURCE_CSVS | {"grouping_freeze.json"}}
     views, audit = load_target_development(source, targets, protocol_dir=protocol_dir)
+    source_identity = _portable_source_identity(source, handoff, protocol_dir)
     protected = pd.read_csv(source / "protected_final_test.csv", dtype=str, keep_default_na=False,
                             usecols=["record_id", "group_id", "split"])
     canonical = lambda f: f[["record_id", "group_id", "split"]].sort_values("record_id").reset_index(drop=True)
@@ -51,7 +81,10 @@ def load_approved_targets(source, package, targets, *, manifest_sha256, protocol
         raise ValueError("Protected population differs from handoff")
     for target in targets:
         expected = handoff["targets"][target]
-        _sealed_files(source, expected["source_consumed_artifact_sha256"])
+        source_hashes = expected["source_consumed_artifact_sha256"]
+        if set(source_hashes) != _SOURCE_CSVS | {"grouping_freeze.json"}:
+            raise ValueError("Allocation must pin all four source CSVs and its source grouping freeze")
+        _sealed_files(source, {name: source_hashes[name] for name in _SOURCE_CSVS})
         directory = (package / expected["directory"]).resolve()
         if not directory.is_relative_to(package):
             raise ValueError("Invalid allocation directory")
@@ -104,11 +137,13 @@ def load_approved_targets(source, package, targets, *, manifest_sha256, protocol
         profile.update(allocation_id=expected["directory"], allocation_identity={
             "handoff_manifest_sha256": manifest_sha256,
             "completion_sha256": expected["approved_completion_sha256"],
-            "assignments_sha256": sha256(directory / "assignments.csv")})
-        _sealed_files(source, expected["source_consumed_artifact_sha256"])
+            "assignments_sha256": sha256(directory / "assignments.csv"),
+            "source_identity": {**source_identity, "sender_grouping_freeze_sha256": source_hashes["grouping_freeze.json"]}})
+        _sealed_files(source, {name: source_hashes[name] for name in _SOURCE_CSVS})
         _sealed_files(directory, seal["artifact_sha256"])
         views[target], audit["profiles"][target] = view, profile
     _sealed_files(package, handoff["artifact_sha256"])
-    if sha256(source / "completion.json") != handoff["source"]["completion_sha256"]:
+    _sealed_files(source, local_source_hashes)
+    if sha256(source / "completion.json") != local_completion:
         raise ValueError("Source completion changed during preparation")
     return views, audit

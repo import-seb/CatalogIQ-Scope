@@ -44,11 +44,13 @@ def allocation_fixture(package, source):
     pd.DataFrame({"label": names}).to_csv(directory / "class_coverage.csv", index=False)
     source_hashes = {n: sha256(source / n) for n in ("train.csv", "validation.csv", "assignments.csv", "protected_final_test.csv", "grouping_freeze.json")}
     source_seal = sha256(source / "completion.json")
+    freeze = json.loads((source / "grouping_freeze.json").read_text())
     write_json(directory / "protocol.json", {"preparation": {"target_column": "Brand",
         "completion_sha256": source_seal, "consumed_artifact_sha256": source_hashes}})
     write_json(directory / "completion.json", {"artifact_sha256": {p.name: sha256(p) for p in directory.iterdir()}})
     handoff = {"format": "catalogiq-approved-classical-split-handoff-v1",
-        "source": {"completion_sha256": source_seal, "protected_test_rows": len(protected), "protected_test_groups": protected.group_id.nunique()},
+        "source": {"completion_sha256": source_seal, "protocol_id": freeze["protocol_id"],
+            "grouping_version": freeze["grouping_version"], "protected_test_rows": len(protected), "protected_test_groups": protected.group_id.nunique()},
         "targets": {"Brand": {"directory": directory.name, "approved_completion_sha256": sha256(directory / "completion.json"),
             "source_consumed_artifact_sha256": source_hashes, "label_names": names,
             "development_rows_including_missing": len(original), "labeled_training_rows": len(train),
@@ -262,10 +264,54 @@ class ClassicalPortableTests(unittest.TestCase):
             self.assertFalse(set(views["Brand"].query("split == 'train'").group_id) & set(views["Brand"].query("split == 'validation'").group_id))
             handoff["source"]["completion_sha256"] = "0" * 64
             write_json(package / "handoff_manifest.json", handoff)
-            with self.assertRaisesRegex(ValueError, "Different pinned V4 source"):
+            with self.assertRaisesRegex(ValueError, "different target or source"):
                 load_approved_targets(self.splits, package, ["Brand"], manifest_sha256=sha256(package / "handoff_manifest.json"), protocol_dir=self.protocol)
             with self.assertRaisesRegex(ValueError, "manifest SHA-256"):
                 load_approved_targets(self.splits, package, ["Brand"], manifest_sha256=pin, protocol_dir=self.protocol)
+
+    def test_portable_source_accepts_new_timestamps_but_not_changed_data_or_protocol(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            package, source = root / "handoff", root / "source"
+            # Copy only development and identity artifacts, never the reserved export.
+            shutil.copytree(self.splits, source, ignore=shutil.ignore_patterns("test.csv"))
+            pin, handoff = allocation_fixture(package, self.splits)
+            def reseal(name, value):
+                write_json(source / name, value)
+                seal = json.loads((source / "completion.json").read_text())
+                seal["artifact_sha256"][name] = sha256(source / name)
+                seal["completed_utc"] = "2099-01-01T00:00:00Z"
+                write_json(source / "completion.json", seal)
+            freeze = json.loads((source / "grouping_freeze.json").read_text())
+            freeze["reproduced_utc"] = "2099-01-01T00:00:00Z"
+            reseal("grouping_freeze.json", freeze)
+            real_open = Path.open
+            def guard(path, *args, **kwargs):
+                if path.name in {"test.csv", "training_candidate.csv"}:
+                    raise AssertionError("Read reserved data")
+                return real_open(path, *args, **kwargs)
+            with patch.object(Path, "open", guard):
+                _, audit = load_approved_targets(source, package, ["Brand"], manifest_sha256=pin, protocol_dir=self.protocol)
+            identity = audit["profiles"]["Brand"]["allocation_identity"]["source_identity"]
+            self.assertNotEqual(identity["local_completion_sha256"], identity["sender_completion_sha256"])
+            self.assertNotEqual(identity["local_grouping_freeze_sha256"], identity["sender_grouping_freeze_sha256"])
+            # A locally resealed feature change must still fail the sender CSV pin.
+            train = pd.read_csv(source / "train.csv", dtype=str, keep_default_na=False)
+            train.loc[0, "ProductName"] = "changed product feature"
+            train.to_csv(source / "train.csv", index=False, lineterminator="\n")
+            seal = json.loads((source / "completion.json").read_text())
+            seal["artifact_sha256"]["train.csv"] = sha256(source / "train.csv")
+            write_json(source / "completion.json", seal)
+            with self.assertRaisesRegex(ValueError, "Changed sealed artifact: train.csv"):
+                load_approved_targets(source, package, ["Brand"], manifest_sha256=pin, protocol_dir=self.protocol)
+            shutil.copyfile(self.splits / "train.csv", source / "train.csv")
+            seal["artifact_sha256"]["train.csv"] = sha256(source / "train.csv")
+            write_json(source / "completion.json", seal)
+            freeze["protocol_id"] = "different-protocol"
+            reseal("grouping_freeze.json", freeze)
+            with self.assertRaisesRegex(ValueError, "authoritative protocol"):
+                load_approved_targets(source, package, ["Brand"], manifest_sha256=pin, protocol_dir=self.protocol)
 
     def test_contract_revision_preserves_artifacts_and_exports_ids_only(self):
         with tempfile.TemporaryDirectory() as folder:

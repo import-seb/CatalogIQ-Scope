@@ -1,5 +1,11 @@
 # Classical prediction contract revision, October 31, 2026
 
+Historical record. The source-sidecar blocker below was resolved on November 3
+using the team's November 1 contract section 3.7: generated seals are checked
+locally, while the committed protocol and exact source CSVs establish portable
+identity. The original files remain unchanged. See the November 3 Sub-Segment
+comparison in this directory for the new trained runs.
+
 Maria's contract at `2345648` declares macro-F1 over model vocabulary union
 validation truth, explicit OOV handling, allocation identity, protected IDs/groups
 and cost scopes. The classical producer now exports those fields. A separate
