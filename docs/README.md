@@ -12,6 +12,8 @@
 
 ## Evidence
 
+- [November 6 model-selection decision](findings/03_modeling/20_model_selection_20261106.md): all six target recommendations, checked artifacts, confidence limitations, controlled Sub-Segment CPU benchmark and ticket acceptance status.
+- [Model integration handoff for Max](integration/model_selection_handoff_20261106.md): routing, exact artifact versions, preprocessing, output semantics, review requirements and Maria's evaluation contract.
 - [November 3 Sub-Segment comparison](findings/03_modeling/06_subsegment_comparison_20261103.md): approved allocation, portable source verification, classical category experiment and paired MiniLM comparison.
 - [October 31 classical contract revision](findings/03_modeling/05_classical_contract_20261031.md): historical union-class revision and source-sidecar blocker, resolved by the November 3 portable verification change.
 - [October 29 classical multi-target results](findings/03_modeling/04_multitarget_baseline_20261029.md): eight measured variants, cost, sparse Platform limits and pending Brand/Sub-Segment splits.
