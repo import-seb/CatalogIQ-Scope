@@ -1,7 +1,7 @@
-"""Run Maria's unchanged prediction loader with approved validation-only context.
+"""Pinned Maria loader and reference functions for validation-only checks.
 
-Only the three reviewed loader definitions are extracted. Notebook setup,
-training, discovery, calibration and test-label reads are never executed here.
+Notebook setup, training, discovery and test-label reads never execute here.
+Saved-findings replay uses reference metrics but never calls temperature fitting.
 """
 import ast
 import contextlib
@@ -20,6 +20,43 @@ HARNESS_COMMIT = "05e52e2e0203dee6d58dfc2d0e72d513eed9ad95"
 HARNESS_NOTEBOOK_SHA256 = "8ab3b07a8f15bdcdeb565e4646ec606b4d4f2e4a535e6f991aeea492b60b27fe"
 HARNESS_LOADER_SHA256 = "641afd3af422d3d4de54ed714c51b39665241659668dfcd779c1b1be848a5bc2"
 FUNCTIONS = ("hash_items", "_labels_from", "load_predictions")
+
+REVIEW_HARNESS_COMMIT = "a41608e83dd3f1420ce5cb63a28b022254f879d4"
+REVIEW_NOTEBOOK_BLOB = "5670c9d55777f8f9b313b3f1e7835145fd5a6885"
+REVIEW_REFERENCE = Path(__file__).parent / "resources" / "maria_review_a41608e.py"
+REVIEW_FUNCTION_HASHES = {
+    "queue_metrics": "d03500e93f64fd51bf447084b9efc7b5e22401410d064c8b81f01edde7f395b2",
+    "coverage_risk": "707c663c69424539c088158b5636d6becf0e2fda559d7310e49938e93ce4fbaf",
+    "class_set": "45abdbf95fa993bbf889076a07cf212e8b2d7d5813df25ba153b9c402138bc16",
+    "macro_f1_on": "c66f0b456ac0cbb79ff5e19d72f216ee1f5906b5a31d20a83dedd903c41470b4",
+    "ece_and_reliability": "7defe6cca4052a8b9239006b23dfe8039939bfd34027fe5514c9749b47dcd81e",
+    "multiclass_brier": "afc46750e837276d3d1b494ea157e2267fa708e274a67dd628fdd51ab0b85c21",
+    "temperature_scale": "439a7e3c7074eaff2bc787ac15c8bd825e40ef1af250b59942ffc57f53edfe89",
+}
+
+
+def review_namespace(path=None):
+    """Load only fingerprinted reference definitions, available in wheels too.
+
+    No top-level statements execute. Replay uses saved temperatures; the legacy
+    temperature function remains available only for existing compatibility tests.
+    """
+    path = Path(path) if path is not None else REVIEW_REFERENCE
+    text = path.read_text(encoding="utf8")
+    definitions = {}
+    for node in ast.parse(text).body:
+        if isinstance(node, ast.FunctionDef):
+            if node.name not in REVIEW_FUNCTION_HASHES or node.name in definitions:
+                raise ValueError("Unexpected or duplicate Maria review definition")
+            source = ast.get_source_segment(text, node)
+            if hashlib.sha256(source.encode()).hexdigest() != REVIEW_FUNCTION_HASHES[node.name]:
+                raise ValueError(f"Unreviewed Maria definition: {node.name}")
+            definitions[node.name] = source
+    if set(definitions) != set(REVIEW_FUNCTION_HASHES):
+        raise ValueError("Missing Maria review definitions")
+    namespace = {"np": np, "pd": pd, "f1_score": f1_score}
+    exec(compile("\n\n".join(definitions.values()), str(path), "exec"), namespace)
+    return namespace
 
 
 def loader_definitions(path):

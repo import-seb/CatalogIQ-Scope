@@ -50,6 +50,11 @@ def _confusion_metrics(matrix):
     support = matrix.sum(axis=1)
     predicted_support = matrix.sum(axis=0)
     diagonal = np.diag(matrix)
+    return _metrics_from_counts(support, predicted_support, diagonal)
+
+
+def _metrics_from_counts(support, predicted_support, diagonal):
+    support, predicted_support, diagonal = (np.asarray(v, dtype=float) for v in (support, predicted_support, diagonal))
     precision = np.divide(diagonal, predicted_support, out=np.zeros_like(diagonal),
                           where=predicted_support > 0)
     recall = np.divide(diagonal, support, out=np.zeros_like(diagonal), where=support > 0)
@@ -231,7 +236,7 @@ def annotate_training_neighbors(predictions, train_ids, frozen_groups, near_pair
     return result
 
 
-def _cluster_confusions(predictions, label_names, group_column):
+def _cluster_encodings(predictions, label_names, group_column):
     labels, true, predicted = _predictions(predictions, label_names)
     if group_column not in predictions or predictions[group_column].isna().any():
         raise ValueError("cluster bootstrap requires a nonmissing group column")
@@ -243,6 +248,11 @@ def _cluster_confusions(predictions, label_names, group_column):
     groups = sorted(ordered._group.unique())
     lookup = {group: i for i, group in enumerate(groups)}
     indices = ordered._group.map(lookup).to_numpy(dtype=int)
+    return labels, groups, indices, true, predicted
+
+
+def _cluster_confusions(predictions, label_names, group_column):
+    labels, groups, indices, true, predicted = _cluster_encodings(predictions, label_names, group_column)
     k = len(labels)
     flattened = indices * k * k + true * k + predicted
     matrices = np.bincount(flattened, minlength=len(groups) * k * k).reshape(len(groups), k, k)
@@ -264,15 +274,23 @@ def bootstrap_predictions(predictions, label_names, group_column="group_id",
     grouping correctness, or uncertainty about the production population.
     """
     _bootstrap_configuration(n_bootstrap, confidence)
-    labels, groups, matrices = _cluster_confusions(predictions, label_names, group_column)
-    point = _confusion_metrics(matrices.sum(axis=0))[0]
+    labels, groups, group_index, true, predicted = _cluster_encodings(predictions, label_names, group_column)
+    # Accuracy/F1 need only true support, predicted support and true positives.
+    # A full groups x classes x classes cube takes roughly 2 GiB for Brand.
+    # These three groups x classes arrays give the same draws and metrics.
+    k, g = len(labels), len(groups)
+    support = np.bincount(group_index*k + true, minlength=g*k).reshape(g, k)
+    emitted = np.bincount(group_index*k + predicted, minlength=g*k).reshape(g, k)
+    correct = true == predicted
+    diagonal = np.bincount(group_index[correct]*k + true[correct], minlength=g*k).reshape(g, k)
+    point = _metrics_from_counts(support.sum(axis=0), emitted.sum(axis=0), diagonal.sum(axis=0))[0]
     rows = []
     rng = np.random.default_rng(seed)
     values = np.empty((n_bootstrap, 2))
     if groups:
         for i in range(n_bootstrap):
             selected = rng.integers(0, len(groups), size=len(groups))
-            metric = _confusion_metrics(matrices[selected].sum(axis=0))[0]
+            metric = _metrics_from_counts(support[selected].sum(axis=0), emitted[selected].sum(axis=0), diagonal[selected].sum(axis=0))[0]
             values[i] = metric["accuracy"], metric["macro_f1"]
     alpha = (1 - confidence) / 2
     for index, metric in enumerate(("accuracy", "macro_f1")):

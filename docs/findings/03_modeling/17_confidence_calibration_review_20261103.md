@@ -1,5 +1,15 @@
 # Confidence calibration and human review: development experiment
 
+**Ticket completion, November 6, 2026:** reuse this experiment and its saved
+temperatures; no refitting is needed. The [later uncertainty reassessment](18_accuracy_standard_reassessment_20261103.md)
+supersedes the original maximum-family-size qualification calculation below:
+Mnfr and age have conditional development support for 99%, while automatic
+acceptance remains disabled for every target. The November 6 sections at the end
+add practical thresholds, confidence distributions and acceptance status. See
+[Max's expanded review contract](../../integration/model_selection_handoff_20261106.md#review-policy-existing-behavior-and-decisions-still-required)
+and the [meeting proposal for Ravi](../../integration/review_policy_po_proposal_20261106.md).
+The original experiment and historical results below remain intact.
+
 Date: November 3, 2026. Decision: **keep automatic acceptance disabled for all
 six models**. Several candidates exceed 99% accuracy in the observed accepted
 records, but none passes this experiment's conservative uncertainty requirement.
@@ -405,3 +415,273 @@ the relationship rules, and measure the complete review policy on that new data.
 Until then, people retain approval authority. The practical value is a reusable
 way to decide how much work can safely be automated, with an honest record of
 the remaining mistakes, rather than treating a model's confidence as certainty.
+
+## November 6 completion: reuse, verification and remaining gaps
+
+Reviewed latest main `cebfe9d5df392a6b49487909e4bd9179634adcb4` (PR #31), the
+unchanged [model-selection decisions](20_model_selection_20261106.md), Maria's
+branch `a41608e83dd3f1420ce5cb63a28b022254f879d4`, and Max's PR #23/head
+`618010afaf5a6d9a4ee7b9a23fef7c8c996bb22c`. Maria's current notebook blob is
+`5670c9d55777f8f9b313b3f1e7835145fd5a6885`; her contract blob remains
+`0a155cee291f05cdb832c84a438330a343eb8915`.
+
+Also reviewed Maria's [Segment evaluation report](https://github.com/import-seb/CatalogIQ-Scope/blob/a41608e83dd3f1420ce5cb63a28b022254f879d4/docs/segment-evaluation.md),
+blob `573935a2b16051bd5f3be8c5ee918e8feb550766`. It already measures Max's
+classical Segment calibration/review queue: TF-IDF+category ECE 2.65% to 0.44%
+at T=.80, versus MiniLM 1.37% to .53% at T=1.20. Those are full-11,952-row,
+same-population fit/score diagnostics, not our group-held-apart audit and not
+qualified temperatures for other targets. Her MiniLM .95 queue has 9.06% load
+and 21.37% error miss rate; our audit .95 numbers below use another population
+and saved T, so the percentages must not be treated as a reproduction failure.
+Her matched-load comparison finds margin essentially tied with confidence for
+MiniLM, and her relationship rule remains unwired. We reuse those findings
+instead of assuming that margin is better or inventing a relationship map.
+
+Existing responsibilities are retained: Maria supplies ECE/Brier, fixed-coverage
+and queue definitions; `confidence_calibration`/`confidence_experiment` supply
+group-disjoint calibration, threshold curves, OOV-safe metrics and review
+primitives; `clustered_accuracy` supplies the later working-model bounds; the
+product-rule study supplies the already frozen class/description alternatives.
+No replacement framework, inference adapter or new modeling experiment was built.
+Missing deliverables were the accessible practical-threshold comparison, confidence
+distributions, application severity/precedence/correction contract and PO proposal.
+
+The read-only completion check verified sealed confidence and reassessment
+packages and independently approved target contexts, reconstructed existing
+group roles and measured eligibility gates, and reapplied the saved temperatures.
+It reproduced **36 calibration comparisons and 40 practical-threshold rows**
+(raw and scaled, five selected/provisional targets). It executed only Maria's
+reviewed `ece_and_reliability`, `multiclass_brier`, `queue_metrics`, `coverage_risk`,
+`class_set` and `macro_f1_on` function definitions, with agreement on applicable
+metrics. Notebook setup, model fitting, temperature fitting and discovery cells
+were not executed. The current exports have no OOV truth; Maria's older OOV
+Brier/temperature behavior is therefore not evidence of valid OOV calibration.
+
+All **141 consumed evidence files** were rehashed unchanged; no classifier was
+loaded, no calibration fitted, and no policy, original prediction or split changed.
+Max's supplied classical **Sub-Segment** models remain comparison candidates,
+not the selected route; no Sub-Segment classical calibration results were found.
+That is missing evidence, not poor calibration, and does not erase Maria's
+classical Segment measurements above. Platform remains deferred. The source packages and historical
+verification fields are preserved; the two existing compact CSVs were extended
+for reporting rather than creating duplicate analyses.
+
+## Practical cutoffs: observed workload, escaping errors and uncertainty
+
+All figures below use the existing **temperature-scaled** variant for the five
+selected/provisional models, without choosing a new variant or cutoff from the
+audit. The Brand row is the probabilistic lookup, not Brand MiniLM. Acceptance
+means confidence **at least** the cutoff and passing the already measured
+essential-text/seen-key gates. It is hypothetical eligibility, not authorization.
+Unapproved policies, new class-risk rules and future hierarchy rules are not
+included in these historical workloads. Actual operation still reviews 100%.
+
+The denominator is each target's policy-audit population, not its entire original
+validation population. The 95% intervals below are descriptive two-sided
+percentile intervals from 2,000 whole-group resamples, seed 20261106. They are
+not simultaneous, not new threshold-selection evidence and not prospective
+guarantees. Zero observed errors can produce misleadingly perfect bootstraps.
+
+| Target; audit rows | Cutoff | Review % | Unflagged accuracy % | Escaping errors / unflagged rows | Descriptive 95% accuracy interval % |
+|---|---:|---:|---:|---:|---|
+| Segment; 4,131 | .80 | 3.87 | 98.439 | 62 / 3,971 | 97.961–98.859 |
+| Segment | .90 | 6.32 | 99.018 | 38 / 3,870 | 98.615–99.352 |
+| Segment | .95 | 9.32 | 99.439 | 21 / 3,746 | 99.138–99.676 |
+| Segment | .99 | 30.14 | 99.896 | 3 / 2,886 | 99.759–100.000 |
+| Mnfr; 4,076 | .80 | 0.00 | 99.975 | 1 / 4,076 | 99.924–100.000 |
+| Mnfr | .90 | 0.00 | 99.975 | 1 / 4,076 | 99.924–100.000 |
+| Mnfr | .95 | 0.05 | 99.975 | 1 / 4,074 | 99.924–100.000 |
+| Mnfr | .99 | 0.05 | 99.975 | 1 / 4,074 | 99.924–100.000 |
+| TargetAgeGroup; 4,010 | .80 | 0.07 | 99.925 | 3 / 4,007 | 99.828–100.000 |
+| TargetAgeGroup | .90 | 0.17 | 99.925 | 3 / 4,003 | 99.828–100.000 |
+| TargetAgeGroup | .95 | 0.30 | 99.925 | 3 / 3,998 | 99.827–100.000 |
+| TargetAgeGroup | .99 | 1.10 | 99.950 | 2 / 3,966 | 99.872–100.000 |
+| Brand lookup; 4,345 | .80 | 19.98 | 98.878 | 39 / 3,477 | 98.403–99.271 |
+| Brand lookup | .90 | 21.75 | 99.059 | 32 / 3,400 | 98.612–99.419 |
+| Brand lookup | .95 | 24.03 | 99.334 | 22 / 3,301 | 98.941–99.649 |
+| Brand lookup | .99 | 38.85 | 99.699 | 8 / 2,657 | 99.480–99.886 |
+| Sub-Segment; 3,957 | .80 | 16.10 | 94.066 | 197 / 3,320 | 93.128–94.950 |
+| Sub-Segment | .90 | 26.91 | 96.715 | 95 / 2,892 | 95.943–97.416 |
+| Sub-Segment | .95 | 38.51 | 97.945 | 50 / 2,433 | 97.310–98.515 |
+| Sub-Segment | .99 | 79.15 | 99.636 | 3 / 825 | 99.162–100.000 |
+
+The [existing shortlist CSV](confidence_review_20261103/threshold_shortlist.csv)
+now includes .80 alongside all former cutoffs, raw/scaled and selection/audit
+rows. For the 20 displayed rows it also records the revised conditional beta
+lower bound, minority support/errors, wrong per 100 incoming, flag precision
+and miss rate. Blank diagnostic fields on other rows mean not recomputed here.
+Maria's zero-denominator queue displays are represented as null rather than
+claiming measured precision when no products were flagged.
+
+The revised conditional beta lower bounds at .99 are only **98.626% for Brand
+lookup and 97.725% for Sub-Segment**, despite the bootstrap intervals above.
+Sparse escaping errors and unequal family sizes make the method assumptions
+matter. Use the predeclared primary method and its limitations rather than
+choosing whichever interval happens to clear 99%.
+
+Higher cutoffs can sacrifice many correct suggestions: Mnfr's .99 cutoff reviews
+two correct audit predictions and still misses its one error. On Segment, .95
+flags 385 rows, 24.94% of which are errors, but 17.95% of all errors escape;
+.99 flags 1,245 rows, only 9.16% errors, and 2.56% of all errors escape. Higher
+review volume therefore does not automatically mean more efficient review.
+
+## Confidence distributions and minority-class tradeoffs
+
+The [extended calibration table](confidence_review_20261103/calibration_comparison.csv)
+retains all ECE/Brier/NLL results and adds correct/incorrect counts and 10th,
+50th and 90th confidence percentiles by model, variant and role. Audit medians:
+
+| Selected/provisional model | Correct / incorrect rows | Median confidence when correct, raw to scaled % | Median confidence when wrong, raw to scaled % |
+|---|---:|---:|---:|
+| Segment | 4,014 / 117 | 99.889 to 99.604 | 87.499 to 82.597 |
+| Mnfr | 4,075 / 1 | 99.998 to 99.990 | 99.743 to 99.350 |
+| TargetAgeGroup | 4,005 / 5 | 99.990 to 99.820 | 99.354 to 97.085 |
+| Brand lookup | 4,160 / 185 | 97.329 to 99.667 | 62.604 to 88.820 |
+| Sub-Segment | 3,492 / 465 | 97.760 to 97.800 | 76.125 to 76.304 |
+
+There is substantial overlap: high-confidence errors survive. Mnfr's single
+wrong score is a case description, not a stable error distribution. Lookup's
+wrong-score median rises after calibration because many fallback records share
+one prior; missing/unseen keys must still be reviewed. Average calibration
+quality cannot establish per-class correctness. Existing reliability and
+risk-coverage charts above remain the scientific figures for this task.
+
+For the additional shortlist diagnostics, "minority" means a represented truth
+class with fewer than 50 rows **in that target's audit**, an analysis definition
+only. Truth is unavailable at prediction time; do not implement it as a runtime
+gate. At .95, Sub-Segment leaves 164/490 minority truth rows unflagged with
+13 errors (92.07% accuracy), versus 37 errors among 2,269 common-class rows
+(98.37%). At .99, **zero of those 490 minority rows pass**. High aggregate
+accuracy has been bought by giving them no unreviewed coverage.
+
+Age's .99 cutoff passes only 25/41 Infant audit truth rows and still makes one
+error among them (96%); its common-class accepted accuracy is 99.975%.
+Lookup's .99 cutoff passes 1,117/1,235 minority truth rows with zero errors, but
+several individual represented brands receive no coverage; this is not a
+guarantee for every rare brand. Segment/Mnfr have no audit classes below that
+50-row definition, yet Other Self Care and J&J are still minority classes
+relative to the majority and must remain visible in per-class reporting.
+
+Maria's fixed-coverage tool was also exercised, without introducing operational
+cutoffs: keeping the most confident half of Segment retains only two observed
+classes; keeping 90% of Mnfr retains only one. Its macro-F1 output is deliberately
+unavailable when the full-coverage class mix disappears. These rankings can split
+equal-confidence ties and omit lookup gates; they are diagnostics, not a
+replacement for the cutoff-plus-gate table above.
+
+## Interpreting the 99% objective and closing the ticket
+
+- **Per-target overall validation accuracy:** Mnfr 99.966% and age 99.751%
+  already exceed 99%; Segment 96.946%, lookup 95.689% and Sub-Segment 88.583%
+  do not. These use full original labeled validation populations, unlike the
+  smaller audit rows in the threshold table.
+- **Unflagged accuracy:** some audit cutoff rows exceed 99%, including
+  Sub-Segment .99 at only 20.85% coverage. This is a conditional subset score,
+  not overall accuracy or permission to deploy the cutoff.
+- **Statistical support:** the existing independently selected Mnfr/age recipes
+  pass the later working-model lower bounds. Segment/lookup/Sub-Segment recipes
+  do not. The newly displayed Segment .99 beta diagnostic also exceeds 99%, but
+  promoting that result after inspecting this audit would be new selection on
+  reused data. No new winner/threshold is selected here. Group-size/risk
+  dependence, minority coverage and historical reuse still limit every claim.
+- **All-target product correctness:** unmeasured. Different target allocations
+  cannot be averaged or their accuracies multiplied to claim a fully correct
+  product rate. Platform has no selected model.
+- **Accuracy after human correction:** unmeasured. Reviewing every product is
+  an operating safeguard, not evidence that people correct every mistake.
+  A separately audited corrected-export sample is required.
+
+Propose **at least 99% correctness per target among predictions used without
+human review**, with frozen policy, group-aware one-sided uncertainty,
+review coverage, escaping errors, minority coverage and critical-error counts
+reported together. This is a qualification objective, not a current claim.
+Also measure whole-product correctness and audited corrected-export accuracy
+as distinct business outcomes. The PO proposal defines the recommended launch
+policy, alternatives, assumptions and five prioritized decisions.
+
+| Acceptance criterion | Completion status | Evidence / follow-up |
+|---|---|---|
+| Evaluate thresholds and calibration | Satisfied for all five available selected/provisional targets | Existing held-apart calibration and charts; verified practical cutoff table, confidence distributions and minority diagnostics. Platform explicitly deferred. |
+| Assess 99% goal and uncertainty | Satisfied as a development assessment | Original and revised group-aware analyses reconciled; numerical pass distinguished from prospective approval, whole-product and corrected-export accuracy. |
+| Document mandatory human-review conditions | Satisfied as a proposal | Severity, reason codes, approved-map limits and no-threshold defaults in Max's handoff; no fabricated hierarchy. |
+| Provide review rules for application integration | Satisfied as a specification | Versioned envelope, OR/precedence rules, CSV lifecycle, unavailable outputs and human corrections documented; dashboard wiring remains Max's work. |
+| PO decision proposal | Satisfied | Meeting-ready recommendation, three quantified alternatives and five finding/proposal/tradeoff questions. |
+| Enable production policy / certify 99% | Pending follow-up, not an acceptance criterion for this assessment ticket | Ravi/team approval, fresh representative validation and operational measurement; no production cutoff enabled. |
+
+The assessment/specification ticket can close on review of these deliverables.
+Policy approval, fresh-data qualification and dashboard implementation remain
+explicit follow-ups; no external ticket status was changed.
+
+## Reproduction files and maintained entry point
+
+The one-off cache projection has been integrated into the existing workflow.
+Only the reporting orchestration and the required reviewed reference functions
+were promoted. There is no second evaluator and no notebook-cache dependency.
+
+| Required repository code | Responsibility |
+|---|---|
+| `scripts/evaluate_confidence_review.py` and `src/catalogiq/cli.py` | Existing entry point; `--summarize-saved` selects replay instead of fitting calibration. |
+| `src/catalogiq/confidence_experiment.py` | `summarize_saved` validates sources, reapplies saved temperatures and projects the compact findings into a fresh directory. |
+| Existing `confidence_calibration.py`, `clustered_accuracy.py`, `prediction_contract.py` and imported preparation/identity helpers | Reuse the original calculations, group bootstrap, bounds, feature gates and protected-ID checks. No algorithms were copied into a new implementation. |
+| `src/catalogiq/maria_harness_compatibility.py` and packaged `resources/maria_review_a41608e.py` | Fingerprinted Maria metric/queue/coverage definitions, without notebook setup, training/discovery cells or notebook outputs. |
+
+The reference resource also replaces the old calibration-only test fixture:
+its three existing definitions are byte-identical at the function level. The
+historical temperature-fitting reference is retained for existing compatibility
+tests but never called during saved replay. Existing tests now use that shared
+resource instead of maintaining a duplicate. Package metadata includes the
+resource, so the replay works from an installed wheel as well as a checkout.
+
+The following **private inputs stay in their current locations**; do not move
+them into source control or download/deserialize model binaries for this replay:
+
+- `data/processed/predictions_contract_v2_20261031/`: root completion and each
+  of the six explicitly named runs' manifest, predictions, context, mapping and
+  ID-only registry; lookup `model.json` supplies existing key metadata for gates.
+  Brand MiniLM remains present only to reproduce the original comparison rows.
+- `data/processed/confidence_review_v3_20261103/`: root completion and calibration
+  table; per run, `temperature.json`, `policy.json`, `experiment_assignments.csv`,
+  `calibration_metrics.csv` and `thresholds.csv`.
+- `data/processed/split_integration_reproduced_20261010/`: existing completion,
+  protocol, assignments, train/validation development data and protected identity
+  metadata. The approved Brand v1/Sub-Segment v1 r2 allocations and original
+  `split_finalization_20261009/frozen/protected_final_test.csv` identity registry
+  remain necessary for the existing independent population checks.
+
+The replay's `verification.json` records the exact consumed file list and raw
+hashes. It needs neither checkpoints/`.joblib` files, the full Maria notebook,
+plotting caches, original charts nor the simulation trial archive. Protected
+features/labels and `test.csv` remain inaccessible. Matplotlib is unnecessary for
+saved replay; it is required only to regenerate the original scientific charts.
+
+With the existing environment and private inputs, run from the repository root:
+
+```powershell
+$env:PYTHONPATH = 'src'
+.venv-gpu/Scripts/python.exe scripts/evaluate_confidence_review.py --summarize-saved data/processed/confidence_review_v3_20261103 --output-root data/processed/confidence_summary_reproduction_20261106 --bootstrap-samples 2000 --summary-seed 20261106
+```
+
+Choose a new output directory for each repetition. The command refuses existing
+outputs and overlap with source directories, preserves sealed sources and writes
+`threshold_shortlist.csv`, `calibration_comparison.csv`, `fixed_coverage.csv`,
+`verification.json` and `completion.json`. The two compact tables reproduce the
+published documentation tables **byte for byte**: 264 shortlist rows, 36
+calibration rows, 40 verified raw/scaled practical cutoff comparisons and 20
+selected-variant group-aware diagnostics. Fixed-coverage output retains Maria's
+class-mix warnings as unavailable macro-F1 values.
+
+The original experiment commands earlier in this report still reproduce the
+full calibration experiment in a fresh directory when needed. Saved replay does
+not refit anything. Historical cache-script fingerprints remain provenance under
+`completion_20261106` in [verification.json](confidence_review_20261103/verification.json);
+the maintained replay and its new provenance are recorded separately. No
+temporary notebook, cache log or duplicate executable is required.
+
+Verification of the maintained path: **673 tests passed**, including saved-replay
+integrity/refusal checks, existing calibration/lookup compatibility and the full
+repository suite. A wheel build and isolated wheel import confirmed the reference
+resource is packaged. Real replay reverified **83 necessary input files** and
+reproduced both published compact tables byte for byte. The prior 141-file check
+also sealed ancillary historical results; those extra charts/simulation outputs
+are not needed for this replay. Detailed new provenance is under
+`maintained_reproduction_20261106` in the existing verification record.

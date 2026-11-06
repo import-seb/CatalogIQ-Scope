@@ -14,6 +14,7 @@ from catalogiq.brand_probabilistic_lookup import (
     export_probabilistic_lookup, fit_frequency_lookup, predict_frequency_lookup,
 )
 from catalogiq.features import sha256
+from catalogiq.maria_harness_compatibility import REVIEW_REFERENCE
 from catalogiq.prediction_contract import CORE_FIELDS, POLICY_FIELDS, REGISTRY_NAME
 from catalogiq.minilm_prediction_export import ExportInputs, write_json
 from catalogiq.segment_transformer import ModelConfig, _hash_items
@@ -22,7 +23,7 @@ from catalogiq.target_minilm_experiment import brand_key, classification_metrics
 
 FIXTURES = Path(__file__).parent / "fixtures"
 LOADER = FIXTURES / "maria_harness_loader_05e52e2.py"
-CALIBRATION = FIXTURES / "maria_harness_calibration_05e52e2.py"
+CALIBRATION = REVIEW_REFERENCE
 MODULE = "catalogiq.brand_probabilistic_lookup"
 LABELS = ("Rare", "A", "UnItemised brand", "B")
 
