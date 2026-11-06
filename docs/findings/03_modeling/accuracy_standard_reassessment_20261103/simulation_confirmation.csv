@@ -1,0 +1,13 @@
+case,size_pattern,error_process,true_error_rate,true_accuracy,size_independent_risk,method,trials,bootstrap_repetitions,coverage_failure_rate,coverage_failure_mc_lower,coverage_failure_mc_upper,false_support_99_rate,support_99_mc_lower,support_99_mc_upper
+singletons_row_independent_0.01010,singletons,row_independent,0.0101,0.9899,True,wilson_size_adjusted,1000,19999,0.029,0.019505937324384624,0.041384719116401895,0.029,0.019505937324384624,0.041384719116401895
+singletons_row_independent_0.01010,singletons,row_independent,0.0101,0.9899,True,group_bootstrap,1000,19999,0.099,0.0811911289469688,0.11920848268620646,0.099,0.0811911289469688,0.11920848268620646
+singletons_row_independent_0.01010,singletons,row_independent,0.0101,0.9899,True,beta_effective_sample,1000,19999,0.029,0.019505937324384624,0.041384719116401895,0.029,0.019505937324384624,0.041384719116401895
+equal_two_row_independent_0.00025,equal_two,row_independent,0.00025,0.99975,True,wilson_size_adjusted,1000,19999,0.0,0.0,0.003682083896865671,,0.9963179161031344,1.0
+equal_two_row_independent_0.00025,equal_two,row_independent,0.00025,0.99975,True,group_bootstrap,1000,19999,0.376,0.34588107034591425,0.4068513760241379,,0.9963179161031344,1.0
+equal_two_row_independent_0.00025,equal_two,row_independent,0.00025,0.99975,True,beta_effective_sample,1000,19999,0.0,0.0,0.003682083896865671,,0.9963179161031344,1.0
+unequal_beta_binomial_rho_0.2_0.01010,unequal,beta_binomial_rho_0.2,0.0101,0.9899,True,wilson_size_adjusted,1000,19999,0.003,0.0006190999316495713,0.008742023238478308,0.003,0.0006190999316495713,0.008742023238478308
+unequal_beta_binomial_rho_0.2_0.01010,unequal,beta_binomial_rho_0.2,0.0101,0.9899,True,group_bootstrap,1000,19999,0.085,0.06845727877099017,0.10403198577837723,0.075,0.05944612821126318,0.0931084469614991
+unequal_beta_binomial_rho_0.2_0.01010,unequal,beta_binomial_rho_0.2,0.0101,0.9899,True,beta_effective_sample,1000,19999,0.003,0.0006190999316495713,0.008742023238478308,0.001,2.5317487491294045e-05,0.005558924279826698
+long_tail_whole_family_0.01010,long_tail,whole_family,0.0101,0.9899,True,wilson_size_adjusted,1000,19999,0.0,0.0,0.003682083896865671,0.0,0.0,0.003682083896865671
+long_tail_whole_family_0.01010,long_tail,whole_family,0.0101,0.9899,True,group_bootstrap,1000,19999,0.253,0.22631524866453992,0.2811472625832941,0.248,0.22150812983746698,0.2759842205130937
+long_tail_whole_family_0.01010,long_tail,whole_family,0.0101,0.9899,True,beta_effective_sample,1000,19999,0.0,0.0,0.003682083896865671,0.0,0.0,0.003682083896865671

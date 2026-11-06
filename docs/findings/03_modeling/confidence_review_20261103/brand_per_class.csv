@@ -1,0 +1,144 @@
+class,truth_rows,accepted_truth_rows,truth_class_coverage,accepted_predictions,incorrect_accepted_predictions,missed_true_class_errors,accepted_precision,minority_under_50_rows
+21st Century,2,0,0,0,0,0,,True
+Advil,20,20,1,20,0,0,1,True
+Airborne,4,0,0,0,0,0,,True
+Aleve,23,0,0,0,0,0,,True
+Alka Seltzer,7,0,0,0,0,0,,True
+Allegra,6,0,0,0,0,0,,True
+Amazing Nutrition,11,0,0,0,0,0,,True
+Amazon Basic Care,12,0,0,0,0,0,,True
+Ancient Nutrition,5,0,0,0,0,0,,True
+Andrew Lessman,9,3,0.333333333333,3,0,0,1,True
+Ark Labs,6,0,0,0,0,0,,True
+Astepro,0,0,,0,0,0,,True
+Bayer,1,0,0,0,0,0,,True
+Benadryl,8,0,0,0,0,0,,True
+Bengay,0,0,,0,0,0,,True
+Best Naturals,16,16,1,16,0,0,1,True
+Biofreeze,7,0,0,0,0,0,,True
+Biotrue,0,0,,0,0,0,,True
+Bluebonnet,6,6,1,6,0,0,1,True
+Boiron,8,0,0,0,0,0,,True
+Bonafide,0,0,,0,0,0,,True
+Botanic Choice,2,0,0,0,0,0,,True
+Bronson,11,0,0,0,0,0,,True
+BulkSupplements,25,25,1,25,0,0,1,True
+CVS Health,31,28,0.903225806452,30,2,0,0.933333333333,True
+Carlson,17,17,1,17,0,0,1,True
+Carlyle,19,19,1,19,0,0,1,True
+Centrum,10,10,1,10,0,0,1,True
+Claritin,5,0,0,0,0,0,,True
+Codeage,5,3,0.6,3,0,0,1,True
+Country Life,3,2,0.666666666667,2,0,0,1,True
+Culturelle,8,0,0,0,0,0,,True
+Designs for health,6,6,1,6,0,0,1,True
+Dimetapp,4,0,0,0,0,0,,True
+Doctor's Best,15,14,0.933333333333,14,0,0,1,True
+Dr. Mercola,9,0,0,0,0,0,,True
+Emergen-C,5,5,1,5,0,0,1,True
+Equate,30,30,1,30,0,0,1,True
+Estroven,0,0,,0,0,0,,True
+Excedrin,6,0,0,0,0,0,,True
+Flonase,17,0,0,0,0,0,,True
+Force Factor,2,0,0,0,0,0,,True
+GNC,6,6,1,6,0,0,1,True
+Gaia Herbs,1,0,0,0,0,0,,True
+Garden of Life,14,14,1,14,0,0,1,True
+Generic,25,25,1,25,0,0,1,True
+Genexa,6,0,0,0,0,0,,True
+HALLS,27,27,1,27,0,0,1,True
+HAWAIIPHARM,7,0,0,0,0,0,,True
+HUM,1,0,0,0,0,0,,True
+Health & Her,0,0,,0,0,0,,True
+Herb Pharm,14,1,0.0714285714286,1,0,0,1,True
+Hers,0,0,,0,0,0,,True
+Horbäach,9,9,1,9,0,0,1,True
+Hyland's,19,0,0,0,0,0,,True
+IDEAL PERFORMANCE,7,0,0,0,0,0,,True
+Icy Hot,1,0,0,0,0,0,,True
+Imodium,0,0,,0,0,0,,True
+Irwin Naturals,8,0,0,0,0,0,,True
+Jarrow Formulas,7,7,1,7,0,0,1,True
+KAL,7,0,0,0,0,0,,True
+Kirkland Signature,7,6,0.857142857143,6,0,0,1,True
+Lactaid,2,0,0,0,0,0,,True
+Life Extension,10,10,1,10,0,0,1,True
+Love Wellness,1,0,0,0,0,0,,True
+MaryRuth Organics,11,10,0.909090909091,10,0,0,1,True
+Mason Natural,7,0,0,0,0,0,,True
+MegaFood,9,0,0,0,0,0,,True
+Meno,0,0,,0,0,0,,True
+Metagenics,11,0,0,0,0,0,,True
+Metamucil,13,0,0,0,0,0,,True
+Micro Ingredients,10,0,0,0,0,0,,True
+MiraLax,0,0,,0,0,0,,True
+Mommy's Bliss,0,0,,0,0,0,,True
+Motrin,0,0,,0,0,0,,True
+Mucinex,8,8,1,8,0,0,1,True
+NOW,60,60,1,60,0,0,1,False
+Nasonex,1,0,0,0,0,0,,True
+Natrol,26,26,1,26,0,0,1,True
+NaturaNectar,0,0,,0,0,0,,True
+Natural Factors,20,18,0.9,18,0,0,1,True
+Nature Made,54,54,1,54,0,0,1,False
+Nature's Answer,8,0,0,0,0,0,,True
+Nature's Bounty,76,76,1,76,0,0,1,False
+Nature's Nutrition,14,0,0,0,0,0,,True
+Nature's Plus,4,4,1,4,0,0,1,True
+Nature's Sunshine,4,0,0,0,0,0,,True
+Nature's Truth,6,6,1,6,0,0,1,True
+Nature's Way,24,24,1,24,0,0,1,True
+Natures Craft,20,20,1,20,0,0,1,True
+NeilMed,6,0,0,0,0,0,,True
+New Chapter,10,10,1,10,0,0,1,True
+Nexium,0,0,,0,0,0,,True
+Nordic Naturals,4,4,1,4,0,0,1,True
+NusaPure,3,0,0,0,0,0,,True
+Nutricost,12,12,1,12,0,0,1,True
+Olly,35,35,1,35,0,0,1,True
+One A Day,19,19,1,19,0,0,1,True
+Other Brands,161,101,0.627329192547,80,10,31,0.875,False
+Pedialyte,2,0,0,0,0,0,,True
+Pepcid,0,0,,0,0,0,,True
+Pepto Bismol,13,0,0,0,0,0,,True
+Pipping Rock,17,17,1,17,0,0,1,True
+Pure Encapsulations,10,10,1,10,0,0,1,True
+Pure Organic Ingredients,8,0,0,0,0,0,,True
+Puritan's Pride,21,21,1,21,0,0,1,True
+Qunol,0,0,,0,0,0,,True
+Rae Wellness,2,0,0,0,0,0,,True
+ReNew Life,43,0,0,0,0,0,,True
+Refresh,0,0,,0,0,0,,True
+Ricola,11,3,0.272727272727,3,0,0,1,True
+Robitussin,8,0,0,0,0,0,,True
+Rolaids,0,0,,0,0,0,,True
+SOLARAY,35,35,1,35,0,0,1,True
+SmartyPants,3,0,0,0,0,0,,True
+Solgar,12,12,1,12,0,0,1,True
+Source Naturals,14,14,1,14,0,0,1,True
+Spring Valley,10,10,1,10,0,0,1,True
+Standard Process Inc.,7,0,0,0,0,0,,True
+Starwest Botanicals,5,5,1,5,0,0,1,True
+Sudafed,1,0,0,0,0,0,,True
+Sunwarrior,3,0,0,0,0,0,,True
+Swanson,95,95,1,95,0,0,1,False
+TUMS,13,13,1,13,0,0,1,True
+Theraflu,0,0,,0,0,0,,True
+Thorne Research,8,0,0,0,0,0,,True
+Tylenol,28,28,1,28,0,0,1,True
+UnItemised brand,2664,2457,0.922297297297,2475,30,12,0.987878787879,False
+Vicks,36,36,1,37,2,1,0.945945945946,True
+Visine,2,0,0,0,0,0,,True
+Vitafusion,7,6,0.857142857143,6,0,0,1,True
+Vital Proteins,0,0,,0,0,0,,True
+Vitamatic,5,0,0,0,0,0,,True
+Vitauthority,0,0,,0,0,0,,True
+Voltaren,1,0,0,0,0,0,,True
+Walgreens,29,29,1,29,0,0,1,True
+Wile,1,0,0,0,0,0,,True
+Womaness,0,0,,0,0,0,,True
+Xyzal,0,0,,0,0,0,,True
+Zarbee's,7,4,0.571428571429,4,0,0,1,True
+Zicam,4,0,0,0,0,0,,True
+Zyrtec,15,0,0,0,0,0,,True
+up & up,9,9,1,9,0,0,1,True

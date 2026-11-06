@@ -7,6 +7,81 @@ from pathlib import Path
 from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 
+def product_review_rules_main(argv=None) -> int:
+    """Explore Segment/Brand lookup product gates with fixed confidence floors."""
+    from .product_rule_experiment import AUDIT_RUN, DISCOVERY_RUN, audit_product_rules, discover_product_rules
+    from .paths import ROOT_PATH
+    parser = argparse.ArgumentParser(description=product_review_rules_main.__doc__)
+    parser.add_argument("phase", choices=("discover", "audit"))
+    parser.add_argument("--output-root", type=Path)
+    parser.add_argument("--discovery-run", type=Path, default=ROOT_PATH/DISCOVERY_RUN)
+    parser.add_argument("--plot-cache", type=Path)
+    args = parser.parse_args(argv)
+    try:
+        if args.phase == "discover":
+            result = discover_product_rules(ROOT_PATH, args.output_root or ROOT_PATH/DISCOVERY_RUN,
+                                            plot_cache=args.plot_cache)
+        else:
+            result = audit_product_rules(ROOT_PATH, args.discovery_run, args.output_root or ROOT_PATH/AUDIT_RUN,
+                                         plot_cache=args.plot_cache)
+    except (ValueError, OSError, RuntimeError, KeyError, ImportError) as error:
+        parser.exit(1, f"Error: {error}\n")
+    print(f"Saved {args.phase} results to {result}")
+    return 0
+
+
+def accuracy_standard_main(argv=None) -> int:
+    """Validate clustered intervals in simulations, then replay frozen audit policies."""
+    from .accuracy_reassessment import (
+        AUDIT_RUN, OLD_RUN, VALIDATION_RUN, evaluate_frozen_audit, run_method_validation,
+    )
+    from .paths import ROOT_PATH
+    parser = argparse.ArgumentParser(description=accuracy_standard_main.__doc__)
+    parser.add_argument("phase", choices=("simulate", "audit"))
+    parser.add_argument("--output-root", type=Path)
+    parser.add_argument("--method-validation", type=Path, default=ROOT_PATH/VALIDATION_RUN)
+    parser.add_argument("--previous-run", type=Path, default=ROOT_PATH/OLD_RUN)
+    parser.add_argument("--trials", type=int, default=2000)
+    parser.add_argument("--simulation-bootstrap", type=int, default=1999)
+    parser.add_argument("--audit-bootstrap", type=int, default=49999)
+    args = parser.parse_args(argv)
+    try:
+        if args.phase == "simulate":
+            result = run_method_validation(args.output_root or ROOT_PATH/VALIDATION_RUN,
+                trials=args.trials, bootstrap_repetitions=args.simulation_bootstrap)
+        else:
+            result = evaluate_frozen_audit(ROOT_PATH, args.previous_run, args.method_validation,
+                args.output_root or ROOT_PATH/AUDIT_RUN, bootstrap_repetitions=args.audit_bootstrap)
+    except (ValueError, OSError, RuntimeError, KeyError) as error:
+        parser.exit(1, f"Error: {error}\n")
+    print(f"Saved {args.phase} results to {result}")
+    return 0
+
+
+def confidence_review_main(argv=None) -> int:
+    """Evaluate existing validation probabilities without training or test scoring."""
+    from .confidence_experiment import DEFAULT_OUTPUT, DEFAULT_SOURCE, run_experiment
+    from .paths import ROOT_PATH
+    parser = argparse.ArgumentParser(description=confidence_review_main.__doc__)
+    parser.add_argument("--source-root", type=Path, default=ROOT_PATH / DEFAULT_SOURCE)
+    parser.add_argument("--output-root", type=Path, default=ROOT_PATH / DEFAULT_OUTPUT)
+    parser.add_argument("--bootstrap-samples", type=int, default=2000)
+    parser.add_argument("--plot-cache", type=Path, help="Optional isolated Matplotlib dependency directory")
+    parser.add_argument("--candidate-run", type=Path, help="Explicit future candidate; no automatic discovery")
+    parser.add_argument("--candidate-manifest-sha256", help="Required seal for an explicit future candidate")
+    args = parser.parse_args(argv)
+    if bool(args.candidate_run) != bool(args.candidate_manifest_sha256):
+        parser.error("--candidate-run and --candidate-manifest-sha256 must be supplied together")
+    candidates = [(args.candidate_run, args.candidate_manifest_sha256)] if args.candidate_run else []
+    try:
+        result = run_experiment(ROOT_PATH, args.source_root, args.output_root,
+            bootstrap_samples=args.bootstrap_samples, plot_cache=args.plot_cache, candidates=candidates)
+    except (ValueError, OSError, RuntimeError, KeyError, ImportError) as error:
+        parser.exit(1, f"Error: {error}\n")
+    print(f"Saved {result['runs']} development-only policy evaluations to {result['output_root']}")
+    return 0
+
+
 def segment_baseline_main(argv=None) -> int:
     """Prepare or train a word TF-IDF Segment baseline on explicit shared assignments."""
     parser = argparse.ArgumentParser(description=segment_baseline_main.__doc__)

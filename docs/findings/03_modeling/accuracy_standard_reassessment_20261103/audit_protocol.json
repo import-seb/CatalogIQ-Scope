@@ -1,0 +1,13 @@
+{
+  "format": "catalogiq-frozen-policy-reassessment-v1",
+  "primary_method": "beta_effective_sample",
+  "alpha": 0.05,
+  "goal": 0.99,
+  "simulations_completion_sha256": "b15c62b55d498a2782606204f0a1706db6e37d4ddc49bfd2ab195d9f23a179cb",
+  "bootstrap_repetitions": 49999,
+  "bootstrap_seed": 20261104,
+  "thresholds_temperatures_and_gates": "Exactly as sealed in the previous experiment",
+  "reselection_recalibration_or_category_slices": false,
+  "simultaneous_sensitivity": "Also report primary bound at alpha=.05/6; primary requested comparison remains one-sided 95% per model",
+  "production_enabled": false
+}

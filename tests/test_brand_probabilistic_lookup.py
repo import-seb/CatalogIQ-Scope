@@ -14,6 +14,7 @@ from catalogiq.brand_probabilistic_lookup import (
     export_probabilistic_lookup, fit_frequency_lookup, predict_frequency_lookup,
 )
 from catalogiq.features import sha256
+from catalogiq.prediction_contract import CORE_FIELDS, POLICY_FIELDS, REGISTRY_NAME
 from catalogiq.minilm_prediction_export import ExportInputs, write_json
 from catalogiq.segment_transformer import ModelConfig, _hash_items
 from catalogiq.target_minilm_experiment import brand_key, classification_metrics
@@ -137,7 +138,8 @@ class ProbabilisticBrandTests(unittest.TestCase):
         protected = pd.DataFrame({"record_id": ["protected"], "group_id": ["gp"]})
         inputs = ExportInputs("Brand", source, {}, replace(ModelConfig(), sequence_length=256), LABELS, frame,
             np.arange(len(self.training)), np.arange(len(self.training), len(frame)),
-            frame[["record_id", "group_id", "split"]], protected, snapshots, "test-brand-minilm", {"allocation": "approved fixture"}, None)
+            frame[["record_id", "group_id", "split"]], protected, snapshots, "test-brand-minilm",
+            {"allocation": "approved fixture", "protocol_id": "fixture-frozen-v4"}, None)
         predictions, _, _, _ = evaluate_frequency_lookup(self.model, self.validation, old, metrics)
         predictions.to_csv(mini / "predictions.csv", index=False, lineterminator="\n")
         write_json(mini / "manifest.json", {"target": "Brand", "model_identity": inputs.model_identity,
@@ -155,6 +157,11 @@ class ProbabilisticBrandTests(unittest.TestCase):
                 result = export_probabilistic_lookup(inputs, output, mini, LOADER, calibration_source=CALIBRATION)
             manifest = json.loads((output / "manifest.json").read_text())
             self.assertEqual(result["status"], "completed_and_verified")
+            self.assertTrue(set(CORE_FIELDS).issubset(manifest))
+            self.assertTrue(set(POLICY_FIELDS).issubset(manifest))
+            self.assertEqual(manifest["protocol_id"], inputs.split_identity["protocol_id"])
+            self.assertEqual(manifest["config"]["smoothing"], SMOOTHING)
+            self.assertEqual(pd.read_csv(output / REGISTRY_NAME).columns.tolist(), ["record_id", "group_id"])
             self.assertEqual(result["changed_prediction_records"], 1)
             self.assertFalse(result["calibration"]["export_probabilities_temperature_scaled"])
             self.assertEqual(result["calibration"]["rows_retained"], 6)

@@ -1,0 +1,241 @@
+{
+  "format": "catalogiq-accuracy-method-validation-v1",
+  "seed": 20261103,
+  "alpha": 0.05,
+  "goal": 0.99,
+  "trials_per_case": 2000,
+  "bootstrap_repetitions_per_trial": 1999,
+  "scenarios": [
+    {
+      "case": "singletons_row_independent_0.01010",
+      "size_pattern": "singletons",
+      "error_process": "row_independent",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": true
+    },
+    {
+      "case": "singletons_row_independent_0.01000",
+      "size_pattern": "singletons",
+      "error_process": "row_independent",
+      "true_error_rate": 0.01,
+      "true_accuracy": 0.99,
+      "size_independent_risk": true
+    },
+    {
+      "case": "singletons_row_independent_0.00990",
+      "size_pattern": "singletons",
+      "error_process": "row_independent",
+      "true_error_rate": 0.0099,
+      "true_accuracy": 0.9901,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_row_independent_0.01010",
+      "size_pattern": "equal_two",
+      "error_process": "row_independent",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_row_independent_0.01000",
+      "size_pattern": "equal_two",
+      "error_process": "row_independent",
+      "true_error_rate": 0.01,
+      "true_accuracy": 0.99,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_row_independent_0.00990",
+      "size_pattern": "equal_two",
+      "error_process": "row_independent",
+      "true_error_rate": 0.0099,
+      "true_accuracy": 0.9901,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_row_independent_0.00025",
+      "size_pattern": "equal_two",
+      "error_process": "row_independent",
+      "true_error_rate": 0.00025,
+      "true_accuracy": 0.99975,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_whole_family_0.01010",
+      "size_pattern": "equal_two",
+      "error_process": "whole_family",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_whole_family_0.01000",
+      "size_pattern": "equal_two",
+      "error_process": "whole_family",
+      "true_error_rate": 0.01,
+      "true_accuracy": 0.99,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_whole_family_0.00990",
+      "size_pattern": "equal_two",
+      "error_process": "whole_family",
+      "true_error_rate": 0.0099,
+      "true_accuracy": 0.9901,
+      "size_independent_risk": true
+    },
+    {
+      "case": "equal_two_whole_family_0.00500",
+      "size_pattern": "equal_two",
+      "error_process": "whole_family",
+      "true_error_rate": 0.005,
+      "true_accuracy": 0.995,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_row_independent_0.01010",
+      "size_pattern": "unequal",
+      "error_process": "row_independent",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_row_independent_0.00990",
+      "size_pattern": "unequal",
+      "error_process": "row_independent",
+      "true_error_rate": 0.0099,
+      "true_accuracy": 0.9901,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.01010",
+      "size_pattern": "unequal",
+      "error_process": "beta_binomial_rho_0.2",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.01000",
+      "size_pattern": "unequal",
+      "error_process": "beta_binomial_rho_0.2",
+      "true_error_rate": 0.01,
+      "true_accuracy": 0.99,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.00990",
+      "size_pattern": "unequal",
+      "error_process": "beta_binomial_rho_0.2",
+      "true_error_rate": 0.0099,
+      "true_accuracy": 0.9901,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.00500",
+      "size_pattern": "unequal",
+      "error_process": "beta_binomial_rho_0.2",
+      "true_error_rate": 0.005,
+      "true_accuracy": 0.995,
+      "size_independent_risk": true
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.00025",
+      "size_pattern": "unequal",
+      "error_process": "beta_binomial_rho_0.2",
+      "true_error_rate": 0.00025,
+      "true_accuracy": 0.99975,
+      "size_independent_risk": true
+    },
+    {
+      "case": "long_tail_whole_family_0.01010",
+      "size_pattern": "long_tail",
+      "error_process": "whole_family",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": true
+    },
+    {
+      "case": "long_tail_whole_family_0.01000",
+      "size_pattern": "long_tail",
+      "error_process": "whole_family",
+      "true_error_rate": 0.01,
+      "true_accuracy": 0.99,
+      "size_independent_risk": true
+    },
+    {
+      "case": "long_tail_whole_family_0.00990",
+      "size_pattern": "long_tail",
+      "error_process": "whole_family",
+      "true_error_rate": 0.0099,
+      "true_accuracy": 0.9901,
+      "size_independent_risk": true
+    },
+    {
+      "case": "long_tail_whole_family_0.00025",
+      "size_pattern": "long_tail",
+      "error_process": "whole_family",
+      "true_error_rate": 0.00025,
+      "true_accuracy": 0.99975,
+      "size_independent_risk": true
+    },
+    {
+      "case": "long_tail_large_only_0.01100",
+      "size_pattern": "long_tail",
+      "error_process": "large_only",
+      "true_error_rate": 0.011,
+      "true_accuracy": 0.989,
+      "size_independent_risk": false
+    },
+    {
+      "case": "long_tail_large_only_0.01010",
+      "size_pattern": "long_tail",
+      "error_process": "large_only",
+      "true_error_rate": 0.0101,
+      "true_accuracy": 0.9899,
+      "size_independent_risk": false
+    },
+    {
+      "case": "long_tail_large_only_0.01000",
+      "size_pattern": "long_tail",
+      "error_process": "large_only",
+      "true_error_rate": 0.01,
+      "true_accuracy": 0.99,
+      "size_independent_risk": false
+    },
+    {
+      "case": "long_tail_large_only_0.00900",
+      "size_pattern": "long_tail",
+      "error_process": "large_only",
+      "true_error_rate": 0.009,
+      "true_accuracy": 0.991,
+      "size_independent_risk": false
+    }
+  ],
+  "sources": {
+    "wilson_survey_extension": "https://www150.statcan.gc.ca/n1/pub/12-001-x/2017002/article/54872/02-eng.htm",
+    "franco_et_al_2018": "https://www.math.umd.edu/~slud/s770/SurveyConfidenceIntervals/JSSAM-2017-065-FINAL.pdf",
+    "korn_graubard_1998": "https://www150.statcan.gc.ca/n1/pub/12-001-x/1998002/article/4356-eng.pdf",
+    "dean_pagano_2015": "https://academic.oup.com/jssam/article-abstract/3/4/484/950501",
+    "nchs_standards": "https://www.cdc.gov/nchs/media/pdfs/2024/09/sr02_175.pdf"
+  },
+  "code_sha256": {
+    "clustered_accuracy.py": "b8e0ed49bdefb022ac44bf6c68dece54a0fe53b1c115b20413f731958dfc1022",
+    "accuracy_simulations.py": "82824bee0ea121d348d50f0e2f555e23545fa65440e7874df55157980287fa68",
+    "accuracy_reassessment.py": "645e9eb8e1533ae79677eec1c6bd5c924897b38b93f90735bf60beab767aacb5"
+  },
+  "catalog_data_read": false,
+  "audit_results_used_for_method_choice": false,
+  "method_a": "One-sided Wilson with unequal-size rho=1 design effect and published df adjustment",
+  "method_b": "One-sided percentile group-ratio bootstrap, fifth percentile",
+  "alternative": "Korn-Graubard-type effective-sample beta interval with the same size-only working design effect",
+  "primary_reporting_method_fixed_before_simulations": "beta_effective_sample",
+  "primary_reason": "Published comparisons favor conservative beta/Clopper-Pearson-type intervals for extreme proportions and clustering; bootstrap is a cross-check, not a chooser",
+  "working_model": "Independent families; no systematic association of family size with expected error probability; arbitrary within-family correlation up to one",
+  "veto": "Simulation undercoverage must be reported and limits claims; do not switch to a method because it passes a real model",
+  "simulation_intervals": "Exact binomial 95% Monte Carlo uncertainty on independent trial rates; diagnostic comparisons, not multiplicity-adjusted tests",
+  "per_model_not_simultaneous": true
+}

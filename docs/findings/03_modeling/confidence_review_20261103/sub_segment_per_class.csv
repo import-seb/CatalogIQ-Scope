@@ -1,0 +1,50 @@
+class,truth_rows,accepted_truth_rows,truth_class_coverage,accepted_predictions,incorrect_accepted_predictions,missed_true_class_errors,accepted_precision,minority_under_50_rows
+Acid Relief,55,12,0.218181818182,13,1,0,0.923076923077,False
+All Other Digestive Health,121,65,0.537190082645,67,3,1,0.955223880597,False
+Allergy INS,34,0,0,0,0,0,,True
+Anti-Diarrheal,12,0,0,0,0,0,,True
+Anti-Gas,27,1,0.037037037037,0,0,1,,True
+Anti-Nausea,2,0,0,0,0,0,,True
+Cold & Heat Wraps,167,107,0.640718562874,109,2,0,0.981651376147,False
+Cold/Flu,83,0,0,0,0,0,,False
+Constipation Remedies,96,80,0.833333333333,82,2,0,0.975609756098,False
+Cough,28,2,0.0714285714286,0,0,2,,True
+Creams & Gels (Rubs),0,0,,0,0,0,,True
+Creams/Gels & Medicated Patches,42,1,0.0238095238095,0,0,1,,True
+Daily oral contracception,0,0,,0,0,0,,True
+Dermatologicals,0,0,,0,0,0,,True
+Devices/Refills,0,0,,0,0,0,,True
+Digestive enzymes,23,0,0,0,0,0,,True
+Ear Care,148,146,0.986486486486,146,0,0,1,False
+External Upper Respiratory,7,0,0,0,0,0,,True
+Eye Care,46,31,0.673913043478,31,0,0,1,True
+Hemorrhoid Remedies,9,0,0,0,0,0,,True
+Herbal & Natural (H&N),519,339,0.653179190751,337,2,4,0.994065281899,False
+Internal Pain,81,21,0.259259259259,21,0,0,1,False
+Lactose Intolerance,3,0,0,0,0,0,,True
+Menopausal Support,4,0,0,0,0,0,,True
+Minerals,353,237,0.671388101983,239,4,2,0.983263598326,False
+Motion Sickness,23,0,0,0,0,0,,True
+Multivitamins,188,62,0.329787234043,61,0,1,1,False
+Nasal Sprays,35,0,0,0,0,0,,True
+Obesity treatments,32,0,0,0,0,0,,True
+Oral Antihistamine,57,0,0,0,0,0,,False
+Other Allergy,50,0,0,0,0,0,,False
+Other External Analgesics,37,1,0.027027027027,0,0,1,,True
+Other Lifestyle CHC,4,0,0,0,0,0,,True
+Other Self Care,6,1,0.166666666667,0,0,1,,True
+Pregnancy Vitamins,19,0,0,0,0,0,,True
+Probiotics,57,0,0,0,0,0,,False
+Prostate Remedies,12,0,0,0,0,0,,True
+Remaining Internal Pain,1,0,0,0,0,0,,True
+Single Vitamins,266,170,0.639097744361,173,3,0,0.982658959538,False
+Sinus excl Sprays,16,0,0,0,0,0,,True
+Sleep Aids,60,27,0.45,27,0,0,1,False
+Sore Throat / Cough Drops,66,39,0.590909090909,41,2,0,0.951219512195,False
+Speciality Pain,97,37,0.381443298969,37,0,0,1,False
+Stimulants,2,1,0.5,0,0,1,,True
+Supplements,1003,423,0.421734795613,419,3,7,0.992840095465,False
+Systemic Cardiovasculars,30,19,0.633333333333,19,0,0,1,True
+Temperature Packs,24,0,0,0,0,0,,True
+Topical Itch,4,0,0,0,0,0,,True
+Urinary products,8,0,0,0,0,0,,True

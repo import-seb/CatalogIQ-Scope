@@ -1,0 +1,9 @@
+predicted_class,discovery_accepted_rows,discovery_accepted_groups,discovery_errors,discovery_accuracy,eligible_for_screen,per_class_99_percent_guarantee
+Allergy,109,54,4,0.963302752293578,True,False
+CCFS,179,113,6,0.9664804469273743,True,False
+Digestive Health,327,186,8,0.9755351681957186,True,False
+External Analgesics,290,186,2,0.993103448275862,True,False
+Internal Analgesics,199,131,9,0.9547738693467337,True,False
+Lifestyle CHC,224,118,1,0.9955357142857143,True,False
+Other Self Care,66,22,1,0.9848484848484849,False,False
+"Vitamins, Minerals & Supplements",2352,1410,8,0.9965986394557823,True,False

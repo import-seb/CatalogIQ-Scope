@@ -1,0 +1,248 @@
+{
+  "primary_reporting_method": "beta_effective_sample",
+  "method_preference_based_on": "Published rare-proportion guidance; frozen before simulations and new audit calculation",
+  "general_99_percent_certification_validated": false,
+  "all_tested_primary_coverage_checks_without_demonstrated_undercoverage": false,
+  "common_family_risk_working_model_demonstrated_undercoverage": false,
+  "primary_undercoverage_cases": [
+    "long_tail_large_only_0.01100",
+    "long_tail_large_only_0.01010",
+    "long_tail_large_only_0.01000",
+    "long_tail_large_only_0.00900"
+  ],
+  "all_method_undercoverage_flags": [
+    {
+      "case": "singletons_row_independent_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.082,
+      "coverage_failure_mc_lower": 0.07034520016699762,
+      "coverage_failure_mc_upper": 0.09489669671628181
+    },
+    {
+      "case": "singletons_row_independent_0.00990",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.074,
+      "coverage_failure_mc_lower": 0.06290868484123781,
+      "coverage_failure_mc_upper": 0.08635857234057762
+    },
+    {
+      "case": "equal_two_row_independent_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.073,
+      "coverage_failure_mc_lower": 0.06198175871883227,
+      "coverage_failure_mc_upper": 0.0852886914740207
+    },
+    {
+      "case": "equal_two_row_independent_0.00990",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0665,
+      "coverage_failure_mc_lower": 0.05597247989981572,
+      "coverage_failure_mc_upper": 0.078318872562347
+    },
+    {
+      "case": "equal_two_row_independent_0.00025",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.3665,
+      "coverage_failure_mc_lower": 0.3453411370648547,
+      "coverage_failure_mc_upper": 0.3880510013569705
+    },
+    {
+      "case": "equal_two_whole_family_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0805,
+      "coverage_failure_mc_lower": 0.06894812021973874,
+      "coverage_failure_mc_upper": 0.0932985087409656
+    },
+    {
+      "case": "equal_two_whole_family_0.01000",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.063,
+      "coverage_failure_mc_lower": 0.05274888585871713,
+      "coverage_failure_mc_upper": 0.07455384258951644
+    },
+    {
+      "case": "equal_two_whole_family_0.00990",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0655,
+      "coverage_failure_mc_lower": 0.05505053790353323,
+      "coverage_failure_mc_upper": 0.07724405539806713
+    },
+    {
+      "case": "equal_two_whole_family_0.00500",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0635,
+      "coverage_failure_mc_lower": 0.053208842231459184,
+      "coverage_failure_mc_upper": 0.07509225526514264
+    },
+    {
+      "case": "unequal_row_independent_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.068,
+      "coverage_failure_mc_lower": 0.05735671775546186,
+      "coverage_failure_mc_upper": 0.07992978675450117
+    },
+    {
+      "case": "unequal_row_independent_0.00990",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0745,
+      "coverage_failure_mc_lower": 0.06337237783566636,
+      "coverage_failure_mc_upper": 0.08689328491216987
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0825,
+      "coverage_failure_mc_lower": 0.0708111603684484,
+      "coverage_failure_mc_upper": 0.09542916131269873
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.01000",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0865,
+      "coverage_failure_mc_lower": 0.0745434906314059,
+      "coverage_failure_mc_upper": 0.09968426603990928
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.00990",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0715,
+      "coverage_failure_mc_lower": 0.06059254115154538,
+      "coverage_failure_mc_upper": 0.08368270926923457
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.00500",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.0895,
+      "coverage_failure_mc_lower": 0.07734794970888674,
+      "coverage_failure_mc_upper": 0.10287042296058387
+    },
+    {
+      "case": "unequal_beta_binomial_rho_0.2_0.00025",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.48,
+      "coverage_failure_mc_lower": 0.4578974274590679,
+      "coverage_failure_mc_upper": 0.5021612880243965
+    },
+    {
+      "case": "long_tail_whole_family_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.248,
+      "coverage_failure_mc_lower": 0.22920409041614687,
+      "coverage_failure_mc_upper": 0.26753743182839934
+    },
+    {
+      "case": "long_tail_whole_family_0.01000",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.2295,
+      "coverage_failure_mc_lower": 0.2112278190387579,
+      "coverage_failure_mc_upper": 0.2485685042824389
+    },
+    {
+      "case": "long_tail_whole_family_0.00990",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.245,
+      "coverage_failure_mc_lower": 0.22628576148441118,
+      "coverage_failure_mc_upper": 0.2644646406111706
+    },
+    {
+      "case": "long_tail_whole_family_0.00025",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.617,
+      "coverage_failure_mc_lower": 0.5952863544920243,
+      "coverage_failure_mc_upper": 0.6383700196787462
+    },
+    {
+      "case": "long_tail_large_only_0.01100",
+      "method": "wilson_size_adjusted",
+      "coverage_failure_rate": 0.2645,
+      "coverage_failure_mc_lower": 0.24527639051286323,
+      "coverage_failure_mc_upper": 0.2844163341281283
+    },
+    {
+      "case": "long_tail_large_only_0.01100",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.2645,
+      "coverage_failure_mc_lower": 0.24527639051286323,
+      "coverage_failure_mc_upper": 0.2844163341281283
+    },
+    {
+      "case": "long_tail_large_only_0.01100",
+      "method": "beta_effective_sample",
+      "coverage_failure_rate": 0.2645,
+      "coverage_failure_mc_lower": 0.24527639051286323,
+      "coverage_failure_mc_upper": 0.2844163341281283
+    },
+    {
+      "case": "long_tail_large_only_0.01010",
+      "method": "wilson_size_adjusted",
+      "coverage_failure_rate": 0.297,
+      "coverage_failure_mc_lower": 0.2770338267418906,
+      "coverage_failure_mc_upper": 0.3175629542723191
+    },
+    {
+      "case": "long_tail_large_only_0.01010",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.297,
+      "coverage_failure_mc_lower": 0.2770338267418906,
+      "coverage_failure_mc_upper": 0.3175629542723191
+    },
+    {
+      "case": "long_tail_large_only_0.01010",
+      "method": "beta_effective_sample",
+      "coverage_failure_rate": 0.297,
+      "coverage_failure_mc_lower": 0.2770338267418906,
+      "coverage_failure_mc_upper": 0.3175629542723191
+    },
+    {
+      "case": "long_tail_large_only_0.01000",
+      "method": "wilson_size_adjusted",
+      "coverage_failure_rate": 0.298,
+      "coverage_failure_mc_lower": 0.27801296482088184,
+      "coverage_failure_mc_upper": 0.3185808671507691
+    },
+    {
+      "case": "long_tail_large_only_0.01000",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.298,
+      "coverage_failure_mc_lower": 0.27801296482088184,
+      "coverage_failure_mc_upper": 0.3185808671507691
+    },
+    {
+      "case": "long_tail_large_only_0.01000",
+      "method": "beta_effective_sample",
+      "coverage_failure_rate": 0.298,
+      "coverage_failure_mc_lower": 0.27801296482088184,
+      "coverage_failure_mc_upper": 0.3185808671507691
+    },
+    {
+      "case": "long_tail_large_only_0.00900",
+      "method": "wilson_size_adjusted",
+      "coverage_failure_rate": 0.3455,
+      "coverage_failure_mc_lower": 0.3246485306674322,
+      "coverage_failure_mc_upper": 0.3668053843936645
+    },
+    {
+      "case": "long_tail_large_only_0.00900",
+      "method": "group_bootstrap",
+      "coverage_failure_rate": 0.3455,
+      "coverage_failure_mc_lower": 0.3246485306674322,
+      "coverage_failure_mc_upper": 0.3668053843936645
+    },
+    {
+      "case": "long_tail_large_only_0.00900",
+      "method": "beta_effective_sample",
+      "coverage_failure_rate": 0.3455,
+      "coverage_failure_mc_lower": 0.3246485306674322,
+      "coverage_failure_mc_upper": 0.3668053843936645
+    }
+  ],
+  "production_enabled": false,
+  "interpretation": "Report conditional development bounds. If stress cases fail, no unconditional 99% certification is justified, even for a real model whose numerical bound clears .99.",
+  "sources": {
+    "wilson_survey_extension": "https://www150.statcan.gc.ca/n1/pub/12-001-x/2017002/article/54872/02-eng.htm",
+    "franco_et_al_2018": "https://www.math.umd.edu/~slud/s770/SurveyConfidenceIntervals/JSSAM-2017-065-FINAL.pdf",
+    "korn_graubard_1998": "https://www150.statcan.gc.ca/n1/pub/12-001-x/1998002/article/4356-eng.pdf",
+    "dean_pagano_2015": "https://academic.oup.com/jssam/article-abstract/3/4/484/950501",
+    "nchs_standards": "https://www.cdc.gov/nchs/media/pdfs/2024/09/sr02_175.pdf"
+  }
+}

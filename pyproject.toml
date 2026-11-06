@@ -18,6 +18,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+calibration = [
+    "matplotlib>=3.8,<4",
+]
 splitting = [
     "numpy==2.3.3",
     "pandas==2.3.2",

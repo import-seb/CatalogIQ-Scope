@@ -1,0 +1,303 @@
+policy,class,training_rows,uncommon_true_class,truth_rows,accepted_truth_rows,truth_class_coverage,accepted_predictions,incorrect_accepted_predictions,accepted_precision,missed_true_class_errors,per_class_99_percent_confirmed,model
+fixed_threshold_baseline,Allergy,1925,False,170,150,0.8823529411764706,150,6,0.96,6,False,segment
+fixed_threshold_baseline,CCFS,3009,False,236,205,0.8686440677966102,199,2,0.9899497487437185,8,False,segment
+fixed_threshold_baseline,Digestive Health,4982,False,395,342,0.8658227848101265,349,9,0.9742120343839542,2,False,segment
+fixed_threshold_baseline,External Analgesics,4009,False,269,238,0.8847583643122676,237,0,1.0,1,False,segment
+fixed_threshold_baseline,Internal Analgesics,3392,False,233,192,0.8240343347639485,198,6,0.9696969696969697,0,False,segment
+fixed_threshold_baseline,Lifestyle CHC,3206,False,239,223,0.9330543933054394,221,1,0.995475113122172,3,False,segment
+fixed_threshold_baseline,Other Self Care,805,True,53,44,0.8301886792452831,43,1,0.9767441860465116,2,False,segment
+fixed_threshold_baseline,"Vitamins, Minerals & Supplements",34448,False,2536,2409,0.9499211356466877,2406,6,0.9975062344139651,9,False,segment
+selected_experimental_rule,Allergy,1925,False,170,3,0.01764705882352941,0,0,,3,False,segment
+selected_experimental_rule,CCFS,3009,False,236,0,0.0,0,0,,0,False,segment
+selected_experimental_rule,Digestive Health,4982,False,395,1,0.002531645569620253,0,0,,1,False,segment
+selected_experimental_rule,External Analgesics,4009,False,269,237,0.8810408921933085,237,0,1.0,0,False,segment
+selected_experimental_rule,Internal Analgesics,3392,False,233,0,0.0,0,0,,0,False,segment
+selected_experimental_rule,Lifestyle CHC,3206,False,239,221,0.9246861924686193,221,1,0.995475113122172,1,False,segment
+selected_experimental_rule,Other Self Care,805,True,53,1,0.018867924528301886,0,0,,1,False,segment
+selected_experimental_rule,"Vitamins, Minerals & Supplements",34448,False,2536,2401,0.9467665615141956,2406,6,0.9975062344139651,1,False,segment
+fixed_threshold_baseline,21st Century,114,True,2,2,1.0,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Advil,204,True,20,20,1.0,20,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Airborne,116,True,4,4,1.0,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Aleve,110,True,23,23,1.0,23,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Alka Seltzer,112,True,7,6,0.8571428571428571,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Allegra,64,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Amazing Nutrition,166,True,11,11,1.0,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Amazon Basic Care,100,True,12,12,1.0,12,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Ancient Nutrition,71,True,5,5,1.0,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Andrew Lessman,88,True,9,9,1.0,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Ark Labs,86,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Astepro,2,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Bayer,81,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Benadryl,104,True,8,8,1.0,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Bengay,25,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Best Naturals,213,True,16,16,1.0,16,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Biofreeze,70,True,7,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Biotrue,18,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Bluebonnet,170,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Boiron,126,True,8,8,1.0,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Bonafide,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Botanic Choice,59,True,2,2,1.0,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Bronson,91,True,11,11,1.0,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,BulkSupplements,320,True,25,25,1.0,25,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,CVS Health,444,True,31,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Carlson,186,True,17,17,1.0,17,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Carlyle,293,True,19,19,1.0,19,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Centrum,207,True,10,10,1.0,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Claritin,98,True,5,5,1.0,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Codeage,134,True,5,5,1.0,6,1,0.8333333333333334,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Country Life,119,True,3,3,1.0,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Culturelle,84,True,8,8,1.0,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Designs for health,122,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Dimetapp,13,True,4,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Doctor's Best,154,True,15,14,0.9333333333333333,14,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Dr. Mercola,82,True,9,9,1.0,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Emergen-C,114,True,5,5,1.0,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Equate,376,True,30,30,1.0,30,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Estroven,6,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Excedrin,58,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Flonase,49,True,17,17,1.0,17,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Force Factor,91,True,2,2,1.0,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,GNC,206,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Gaia Herbs,110,True,1,1,1.0,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Garden of Life,295,True,14,14,1.0,14,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Generic,362,True,25,25,1.0,25,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Genexa,32,True,6,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,HALLS,144,True,27,27,1.0,27,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,HAWAIIPHARM,84,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,HUM,22,True,1,1,1.0,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Health & Her,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Herb Pharm,117,True,14,14,1.0,14,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Hers,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Horbäach,177,True,9,9,1.0,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Hyland's,135,True,19,19,1.0,20,1,0.95,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,IDEAL PERFORMANCE,119,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Icy Hot,95,True,1,1,1.0,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Imodium,35,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Irwin Naturals,69,True,8,8,1.0,9,1,0.8888888888888888,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Jarrow Formulas,169,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,KAL,92,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Kirkland Signature,149,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Lactaid,47,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Life Extension,252,True,10,10,1.0,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Love Wellness,15,True,1,1,1.0,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,MaryRuth Organics,147,True,11,11,1.0,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Mason Natural,102,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,MegaFood,119,True,9,9,1.0,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Meno,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Metagenics,68,True,11,11,1.0,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Metamucil,105,True,13,13,1.0,13,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Micro Ingredients,69,True,10,10,1.0,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,MiraLax,38,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Mommy's Bliss,53,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Motrin,71,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Mucinex,225,True,8,7,0.875,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,NOW,912,True,60,60,1.0,60,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nasonex,9,True,1,1,1.0,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Natrol,253,True,26,26,1.0,26,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,NaturaNectar,5,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Natural Factors,126,True,20,20,1.0,20,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature Made,708,True,54,54,1.0,54,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Answer,96,True,8,8,1.0,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Bounty,624,True,76,75,0.9868421052631579,75,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Nutrition,142,True,14,14,1.0,14,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Plus,212,True,4,4,1.0,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Sunshine,63,True,4,4,1.0,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Truth,194,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nature's Way,387,True,24,24,1.0,24,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Natures Craft,141,True,20,20,1.0,20,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,NeilMed,101,True,6,6,1.0,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,New Chapter,158,True,10,10,1.0,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nexium,39,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nordic Naturals,200,True,4,4,1.0,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,NusaPure,73,True,3,3,1.0,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Nutricost,326,True,12,12,1.0,12,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Olly,238,True,35,35,1.0,35,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,One A Day,165,True,19,19,1.0,19,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Other Brands,2259,False,161,21,0.13043478260869565,2,0,1.0,19,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Pedialyte,29,True,2,2,1.0,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Pepcid,70,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Pepto Bismol,64,True,13,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Pipping Rock,174,True,17,17,1.0,17,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Pure Encapsulations,193,True,10,10,1.0,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Pure Organic Ingredients,138,True,8,8,1.0,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Puritan's Pride,277,True,21,21,1.0,21,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Qunol,60,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Rae Wellness,23,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,ReNew Life,100,True,43,43,1.0,43,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Refresh,96,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Ricola,112,True,11,11,1.0,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Robitussin,78,True,8,6,0.75,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Rolaids,15,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,SOLARAY,355,True,35,35,1.0,35,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,SmartyPants,82,True,3,3,1.0,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Solgar,301,True,12,12,1.0,12,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Source Naturals,234,True,14,14,1.0,14,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Spring Valley,191,True,10,10,1.0,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Standard Process Inc.,85,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Starwest Botanicals,104,True,5,5,1.0,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Sudafed,38,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Sunwarrior,23,True,3,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Swanson,607,True,95,95,1.0,95,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,TUMS,156,True,13,13,1.0,13,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Theraflu,37,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Thorne Research,88,True,8,8,1.0,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Tylenol,250,True,28,26,0.9285714285714286,26,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,UnItemised brand,36866,False,2664,1844,0.6921921921921922,1860,19,0.9897849462365591,3,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Vicks,347,True,36,30,0.8333333333333334,30,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Visine,45,True,2,1,0.5,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Vitafusion,152,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Vital Proteins,91,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Vitamatic,111,True,5,5,1.0,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Vitauthority,10,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Voltaren,5,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Walgreens,526,True,29,29,1.0,29,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Wile,4,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Womaness,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Xyzal,25,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Zarbee's,107,True,7,7,1.0,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Zicam,69,True,4,4,1.0,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,Zyrtec,78,True,15,15,1.0,15,0,1.0,0,False,brand_lookup_probabilistic_v1
+fixed_threshold_baseline,up & up,173,True,9,9,1.0,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,21st Century,114,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Advil,204,True,20,8,0.4,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Airborne,116,True,4,1,0.25,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Aleve,110,True,23,9,0.391304347826087,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Alka Seltzer,112,True,7,1,0.14285714285714285,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Allegra,64,True,6,3,0.5,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Amazing Nutrition,166,True,11,5,0.45454545454545453,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Amazon Basic Care,100,True,12,3,0.25,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Ancient Nutrition,71,True,5,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Andrew Lessman,88,True,9,2,0.2222222222222222,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Ark Labs,86,True,6,2,0.3333333333333333,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Astepro,2,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Bayer,81,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Benadryl,104,True,8,1,0.125,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Bengay,25,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Best Naturals,213,True,16,7,0.4375,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Biofreeze,70,True,7,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Biotrue,18,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Bluebonnet,170,True,6,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Boiron,126,True,8,3,0.375,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Bonafide,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Botanic Choice,59,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Bronson,91,True,11,5,0.45454545454545453,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,BulkSupplements,320,True,25,15,0.6,15,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,CVS Health,444,True,31,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Carlson,186,True,17,5,0.29411764705882354,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Carlyle,293,True,19,5,0.2631578947368421,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Centrum,207,True,10,5,0.5,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Claritin,98,True,5,5,1.0,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Codeage,134,True,5,2,0.4,3,1,0.6666666666666667,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Country Life,119,True,3,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Culturelle,84,True,8,6,0.75,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Designs for health,122,True,6,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Dimetapp,13,True,4,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Doctor's Best,154,True,15,3,0.2,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Dr. Mercola,82,True,9,3,0.3333333333333333,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Emergen-C,114,True,5,3,0.6,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Equate,376,True,30,10,0.3333333333333333,10,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Estroven,6,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Excedrin,58,True,6,3,0.5,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Flonase,49,True,17,3,0.17647058823529413,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Force Factor,91,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,GNC,206,True,6,1,0.16666666666666666,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Gaia Herbs,110,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Garden of Life,295,True,14,6,0.42857142857142855,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Generic,362,True,25,7,0.28,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Genexa,32,True,6,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,HALLS,144,True,27,9,0.3333333333333333,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,HAWAIIPHARM,84,True,7,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,HUM,22,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Health & Her,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Herb Pharm,117,True,14,1,0.07142857142857142,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Hers,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Horbäach,177,True,9,2,0.2222222222222222,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Hyland's,135,True,19,6,0.3157894736842105,7,1,0.8571428571428572,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,IDEAL PERFORMANCE,119,True,7,1,0.14285714285714285,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Icy Hot,95,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Imodium,35,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Irwin Naturals,69,True,8,3,0.375,4,1,0.75,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Jarrow Formulas,169,True,7,2,0.2857142857142857,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,KAL,92,True,7,2,0.2857142857142857,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Kirkland Signature,149,True,7,4,0.5714285714285714,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Lactaid,47,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Life Extension,252,True,10,2,0.2,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Love Wellness,15,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,MaryRuth Organics,147,True,11,3,0.2727272727272727,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Mason Natural,102,True,7,5,0.7142857142857143,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,MegaFood,119,True,9,3,0.3333333333333333,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Meno,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Metagenics,68,True,11,3,0.2727272727272727,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Metamucil,105,True,13,5,0.38461538461538464,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Micro Ingredients,69,True,10,1,0.1,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,MiraLax,38,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Mommy's Bliss,53,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Motrin,71,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Mucinex,225,True,8,2,0.25,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,NOW,912,True,60,24,0.4,24,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nasonex,9,True,1,1,1.0,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Natrol,253,True,26,11,0.4230769230769231,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,NaturaNectar,5,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Natural Factors,126,True,20,6,0.3,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature Made,708,True,54,24,0.4444444444444444,24,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Answer,96,True,8,3,0.375,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Bounty,624,True,76,26,0.34210526315789475,26,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Nutrition,142,True,14,7,0.5,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Plus,212,True,4,1,0.25,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Sunshine,63,True,4,1,0.25,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Truth,194,True,6,3,0.5,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nature's Way,387,True,24,5,0.20833333333333334,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Natures Craft,141,True,20,5,0.25,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,NeilMed,101,True,6,1,0.16666666666666666,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,New Chapter,158,True,10,5,0.5,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nexium,39,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nordic Naturals,200,True,4,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,NusaPure,73,True,3,1,0.3333333333333333,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Nutricost,326,True,12,6,0.5,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Olly,238,True,35,12,0.34285714285714286,12,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,One A Day,165,True,19,8,0.42105263157894735,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Other Brands,2259,False,161,1,0.006211180124223602,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Pedialyte,29,True,2,1,0.5,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Pepcid,70,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Pepto Bismol,64,True,13,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Pipping Rock,174,True,17,7,0.4117647058823529,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Pure Encapsulations,193,True,10,4,0.4,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Pure Organic Ingredients,138,True,8,5,0.625,5,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Puritan's Pride,277,True,21,6,0.2857142857142857,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Qunol,60,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Rae Wellness,23,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,ReNew Life,100,True,43,6,0.13953488372093023,6,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Refresh,96,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Ricola,112,True,11,1,0.09090909090909091,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Robitussin,78,True,8,1,0.125,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Rolaids,15,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,SOLARAY,355,True,35,11,0.3142857142857143,11,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,SmartyPants,82,True,3,2,0.6666666666666666,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Solgar,301,True,12,3,0.25,3,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Source Naturals,234,True,14,7,0.5,7,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Spring Valley,191,True,10,1,0.1,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Standard Process Inc.,85,True,7,4,0.5714285714285714,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Starwest Botanicals,104,True,5,2,0.4,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Sudafed,38,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Sunwarrior,23,True,3,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Swanson,607,True,95,17,0.17894736842105263,17,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,TUMS,156,True,13,4,0.3076923076923077,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Theraflu,37,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Thorne Research,88,True,8,1,0.125,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Tylenol,250,True,28,8,0.2857142857142857,8,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,UnItemised brand,36866,False,2664,576,0.21621621621621623,573,0,1.0,3,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Vicks,347,True,36,9,0.25,9,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Visine,45,True,2,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Vitafusion,152,True,7,2,0.2857142857142857,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Vital Proteins,91,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Vitamatic,111,True,5,2,0.4,2,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Vitauthority,10,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Voltaren,5,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Walgreens,526,True,29,22,0.7586206896551724,22,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Wile,4,True,1,0,0.0,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Womaness,1,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Xyzal,25,True,0,0,,0,0,,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Zarbee's,107,True,7,4,0.5714285714285714,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Zicam,69,True,4,1,0.25,1,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,Zyrtec,78,True,15,4,0.26666666666666666,4,0,1.0,0,False,brand_lookup_probabilistic_v1
+selected_experimental_rule,up & up,173,True,9,1,0.1111111111111111,1,0,1.0,0,False,brand_lookup_probabilistic_v1

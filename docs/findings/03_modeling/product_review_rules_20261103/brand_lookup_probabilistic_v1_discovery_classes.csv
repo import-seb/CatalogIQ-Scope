@@ -1,0 +1,144 @@
+predicted_class,discovery_accepted_rows,discovery_accepted_groups,discovery_errors,discovery_accuracy,eligible_for_screen,per_class_99_percent_guarantee
+21st Century,12,5,0,1.0,False,False
+Advil,10,3,0,1.0,False,False
+Airborne,16,2,0,1.0,False,False
+Aleve,1,1,0,1.0,False,False
+Alka Seltzer,0,0,0,,False,False
+Allegra,2,1,0,1.0,False,False
+Amazing Nutrition,20,12,0,1.0,False,False
+Amazon Basic Care,5,1,0,1.0,False,False
+Ancient Nutrition,2,1,0,1.0,False,False
+Andrew Lessman,8,3,0,1.0,False,False
+Ark Labs,10,7,0,1.0,False,False
+Astepro,0,0,0,,False,False
+Bayer,10,3,0,1.0,False,False
+Benadryl,15,1,0,1.0,False,False
+Bengay,5,1,0,1.0,False,False
+Best Naturals,12,8,0,1.0,False,False
+Biofreeze,0,0,0,,False,False
+Biotrue,0,0,0,,False,False
+Bluebonnet,23,10,0,1.0,False,False
+Boiron,11,8,0,1.0,False,False
+Bonafide,0,0,0,,False,False
+Botanic Choice,7,6,0,1.0,False,False
+Bronson,5,2,0,1.0,False,False
+BulkSupplements,30,16,0,1.0,False,False
+CVS Health,0,0,0,,False,False
+Carlson,9,5,0,1.0,False,False
+Carlyle,31,21,0,1.0,False,False
+Centrum,16,6,0,1.0,False,False
+Claritin,7,2,0,1.0,False,False
+Codeage,19,1,0,1.0,False,False
+Country Life,20,13,0,1.0,False,False
+Culturelle,9,3,0,1.0,False,False
+Designs for health,7,5,0,1.0,False,False
+Dimetapp,0,0,0,,False,False
+Doctor's Best,7,4,0,1.0,False,False
+Dr. Mercola,5,5,0,1.0,False,False
+Emergen-C,16,5,0,1.0,False,False
+Equate,17,11,0,1.0,False,False
+Estroven,0,0,0,,False,False
+Excedrin,0,0,0,,False,False
+Flonase,0,0,0,,False,False
+Force Factor,4,4,0,1.0,False,False
+GNC,5,2,0,1.0,False,False
+Gaia Herbs,4,2,0,1.0,False,False
+Garden of Life,33,13,0,1.0,False,False
+Generic,23,16,0,1.0,False,False
+Genexa,0,0,0,,False,False
+HALLS,0,0,0,,False,False
+HAWAIIPHARM,3,2,0,1.0,False,False
+HUM,2,2,0,1.0,False,False
+Health & Her,0,0,0,,False,False
+Herb Pharm,7,5,0,1.0,False,False
+Hers,0,0,0,,False,False
+Horbäach,15,11,1,0.9333333333333333,False,False
+Hyland's,7,5,0,1.0,False,False
+IDEAL PERFORMANCE,13,3,0,1.0,False,False
+Icy Hot,15,7,0,1.0,False,False
+Imodium,9,1,0,1.0,False,False
+Irwin Naturals,9,2,2,0.7777777777777778,False,False
+Jarrow Formulas,20,1,0,1.0,False,False
+KAL,4,3,0,1.0,False,False
+Kirkland Signature,11,5,0,1.0,False,False
+Lactaid,0,0,0,,False,False
+Life Extension,15,6,0,1.0,False,False
+Love Wellness,1,1,0,1.0,False,False
+MaryRuth Organics,11,7,0,1.0,False,False
+Mason Natural,7,3,0,1.0,False,False
+MegaFood,8,5,0,1.0,False,False
+Meno,0,0,0,,False,False
+Metagenics,0,0,0,,False,False
+Metamucil,7,3,0,1.0,False,False
+Micro Ingredients,3,2,0,1.0,False,False
+MiraLax,0,0,0,,False,False
+Mommy's Bliss,1,1,0,1.0,False,False
+Motrin,0,0,0,,False,False
+Mucinex,14,5,0,1.0,False,False
+NOW,71,43,0,1.0,True,False
+Nasonex,1,1,0,1.0,False,False
+Natrol,6,4,0,1.0,False,False
+NaturaNectar,0,0,0,,False,False
+Natural Factors,5,5,0,1.0,False,False
+Nature Made,41,9,0,1.0,False,False
+Nature's Answer,5,3,0,1.0,False,False
+Nature's Bounty,30,7,0,1.0,False,False
+Nature's Nutrition,13,4,0,1.0,False,False
+Nature's Plus,41,5,0,1.0,False,False
+Nature's Sunshine,5,3,0,1.0,False,False
+Nature's Truth,26,12,0,1.0,False,False
+Nature's Way,27,16,0,1.0,False,False
+Natures Craft,7,7,0,1.0,False,False
+NeilMed,2,2,0,1.0,False,False
+New Chapter,16,9,1,0.9375,False,False
+Nexium,0,0,0,,False,False
+Nordic Naturals,18,4,0,1.0,False,False
+NusaPure,10,10,0,1.0,False,False
+Nutricost,21,15,0,1.0,False,False
+Olly,6,1,0,1.0,False,False
+One A Day,8,3,0,1.0,False,False
+Other Brands,0,0,0,,False,False
+Pedialyte,5,2,1,0.8,False,False
+Pepcid,16,1,0,1.0,False,False
+Pepto Bismol,0,0,0,,False,False
+Pipping Rock,9,7,0,1.0,False,False
+Pure Encapsulations,11,8,0,1.0,False,False
+Pure Organic Ingredients,12,10,0,1.0,False,False
+Puritan's Pride,13,8,0,1.0,False,False
+Qunol,8,1,0,1.0,False,False
+Rae Wellness,0,0,0,,False,False
+ReNew Life,0,0,0,,False,False
+Refresh,0,0,0,,False,False
+Ricola,5,1,0,1.0,False,False
+Robitussin,9,3,0,1.0,False,False
+Rolaids,0,0,0,,False,False
+SOLARAY,25,10,0,1.0,False,False
+SmartyPants,4,3,0,1.0,False,False
+Solgar,26,14,0,1.0,False,False
+Source Naturals,8,5,0,1.0,False,False
+Spring Valley,20,4,0,1.0,False,False
+Standard Process Inc.,5,5,0,1.0,False,False
+Starwest Botanicals,6,6,0,1.0,False,False
+Sudafed,7,1,0,1.0,False,False
+Sunwarrior,0,0,0,,False,False
+Swanson,11,2,0,1.0,False,False
+TUMS,13,3,0,1.0,False,False
+Theraflu,2,2,0,1.0,False,False
+Thorne Research,1,1,0,1.0,False,False
+Tylenol,17,7,1,0.9411764705882353,False,False
+UnItemised brand,1909,1173,23,0.9879518072289156,True,False
+Vicks,5,4,0,1.0,False,False
+Visine,3,3,0,1.0,False,False
+Vitafusion,14,9,0,1.0,False,False
+Vital Proteins,0,0,0,,False,False
+Vitamatic,6,4,0,1.0,False,False
+Vitauthority,0,0,0,,False,False
+Voltaren,0,0,0,,False,False
+Walgreens,48,27,1,0.9791666666666666,True,False
+Wile,0,0,0,,False,False
+Womaness,0,0,0,,False,False
+Xyzal,0,0,0,,False,False
+Zarbee's,15,2,0,1.0,False,False
+Zicam,6,3,0,1.0,False,False
+Zyrtec,0,0,0,,False,False
+up & up,10,6,0,1.0,False,False

@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from catalogiq.features import sha256
+from catalogiq.prediction_contract import CORE_FIELDS, POLICY_FIELDS, REGISTRY_NAME
 from catalogiq.maria_harness_compatibility import load_with_maria_harness, loader_definitions
 from catalogiq.minilm_prediction_export import (
     ALLOCATIONS, TARGETS, ExportInputs, compare_original, export_target,
@@ -96,6 +97,13 @@ class PredictionExportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Protected-test"):
             self.validate(protected_groups=["ga"])
 
+    def test_oov_truth_is_retained_in_export_validation(self):
+        frame = self.predictions.copy()
+        frame.loc[0, "true_label"] = "Unseen true class"
+        context = self.validation.assign(true_label=frame.true_label)
+        self.assertEqual(self.validate(frame, context)["rows"], 2)
+        self.assertEqual(frame.record_id.tolist(), ["z", "a"])
+
     def test_nonfinite_unnormalized_and_misaligned_probabilities_are_rejected(self):
         for column, value in (("probability_0", np.nan), ("probability_0", -.1),
             ("probability_0", 1.1), ("probability_0", .7), ("confidence", .7), ("confidence", np.inf)):
@@ -161,6 +169,10 @@ class PredictionExportTests(unittest.TestCase):
                 manifest = json.loads((directory / "manifest.json").read_text())
                 self.assertEqual(manifest["target"], target)
                 self.assertEqual(manifest["input_fields"], list(INPUT_FIELDS))
+                self.assertTrue(set(CORE_FIELDS).issubset(manifest))
+                self.assertTrue(set(POLICY_FIELDS).issubset(manifest))
+                self.assertEqual(manifest["macro_f1_class_set"], "model_vocabulary_union_truth")
+                self.assertEqual(pd.read_csv(directory / REGISTRY_NAME).columns.tolist(), ["record_id", "group_id"])
                 self.assertEqual(manifest["label_names"], list(self.labels))
                 self.assertEqual(manifest["validation_record_ids_sha256"], _hash_items(["a", "z"]))
                 self.assertEqual(manifest["original_training_validation_record_ids_sha256"], _hash_items(["z", "a"]))

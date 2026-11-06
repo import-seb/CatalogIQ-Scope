@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 from .features import sha256
+from .prediction_contract import class_policy, contract_metadata, write_identity_registry, REGISTRY_NAME
 from .maria_harness_compatibility import load_with_maria_harness
 from .segment_category_ablation import load_category_development, load_tokenizer, tokenize_category_corpus
 from .segment_transformer import ModelConfig, _hash_items, _initialize_torch, _make_classifier, _state_sha256
@@ -304,8 +305,9 @@ def validate_predictions(predictions, validation, labels, protected_ids, protect
     expected = validation.set_index("record_id").loc[ids]
     if predictions.true_label.tolist() != expected.true_label.tolist():
         raise ValueError("Prediction truth differs from approved target labels")
-    if not predictions.true_label.isin(labels).all() or not predictions.predicted_label.isin(labels).all():
-        raise ValueError("Prediction labels differ from ordered vocabulary")
+    # Unknown true classes remain in the validation population as errors.
+    # Only model outputs are constrained by the saved probability vocabulary.
+    class_policy(predictions, labels)
     probabilities = predictions[expected_columns[4:]].to_numpy(dtype=float)
     confidence = predictions.confidence.to_numpy(dtype=float)
     if (not np.isfinite(probabilities).all() or (probabilities < 0).any() or (probabilities > 1).any()
@@ -378,11 +380,14 @@ def export_target(inputs, output_root, harness_notebook, *, device=None):
         "inference": runtime, "checks": checks, "comparison_to_original": reference,
         "probabilities_calibrated": False, "model_training_performed": False, "test_csv_read_or_hashed": False}
     manifest.update(handoff_cost_metadata(inputs, runtime, len(predictions)))
+    manifest = contract_metadata(manifest, predictions, inputs.labels)
     output_root.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix=f".{slug(inputs.target)}-", dir=output_root))
     try:
         predictions.to_csv(stage / "predictions.csv", index=False, lineterminator="\n")
         validation.to_csv(stage / "validation_context.csv", index=False, lineterminator="\n")
+        manifest["protected_test_registry"] = write_identity_registry(
+            stage / REGISTRY_NAME, inputs.protected, manifest["protocol_id"])
         write_json(stage / "label_mapping.json", manifest["label_mapping"])
         write_json(stage / "manifest.json", manifest)
         restored = pd.read_csv(stage / "predictions.csv", dtype={"record_id": str}, keep_default_na=False)

@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 
 from .features import sha256
+from .prediction_contract import contract_metadata, write_identity_registry, REGISTRY_NAME
 from .maria_harness_compatibility import HARNESS_NOTEBOOK_SHA256, load_with_maria_harness
 from .minilm_prediction_export import prepare_export, read_json, write_json, validate_predictions, verify_snapshots
 from .segment_transformer import _hash_items
@@ -274,10 +275,13 @@ def export_probabilistic_lookup(inputs, output_directory, minilm_directory, harn
         "test_csv_read_or_hashed": False, "checks": checks, "minilm_alignment": {"rows": len(mini), "exact_order_and_truth": True,
             "predictions_sha256": source_hashes[minilm_directory / "predictions.csv"]},
         "source_input_sha256": {str(p): digest for p, digest in source_hashes.items()}}
+    manifest = contract_metadata(manifest, predictions, inputs.labels, lookup_model=model)
     output_directory.parent.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix=".brand-probabilistic-", dir=output_directory.parent))
     try:
         predictions.to_csv(stage / "predictions.csv", index=False, lineterminator="\n")
+        manifest["protected_test_registry"] = write_identity_registry(
+            stage / REGISTRY_NAME, inputs.protected, manifest["protocol_id"])
         context.to_csv(stage / "validation_context.csv", index=False, lineterminator="\n")
         differences.to_csv(stage / "prediction_differences.csv", index=False, lineterminator="\n")
         write_json(stage / "model.json", model)

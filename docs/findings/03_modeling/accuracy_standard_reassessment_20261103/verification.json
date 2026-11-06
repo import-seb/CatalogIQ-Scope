@@ -1,0 +1,54 @@
+{
+  "old_run_sealed_files_verified_unchanged": 84,
+  "new_output_sealed_files_verified": 12,
+  "audit_consumed_evidence_files_verified_unchanged": 144,
+  "original_consumed_sources_preserved": 53,
+  "legacy_calibration_mathematics_unchanged": true,
+  "legacy_cli_extended_for_new_command": true,
+  "new_statistical_code_matches_frozen_simulation_protocol": true,
+  "main_independent_simulation_trials": 52000,
+  "confirmation_independent_simulation_trials": 4000,
+  "main_simulation_bootstrap_repetitions": 1999,
+  "confirmation_bootstrap_repetitions": 19999,
+  "audit_bootstrap_repetitions": 49999,
+  "tests_passed": 88,
+  "new_tests": 17,
+  "test_exit_code": 0,
+  "new_test_file_sha256": "9c78f65e2f0e3bc1505b9dc272c7c24b092baad1ba6c81fb5ceeccea05d4f307",
+  "code_sha256": {
+    "clustered_accuracy.py": "b8e0ed49bdefb022ac44bf6c68dece54a0fe53b1c115b20413f731958dfc1022",
+    "accuracy_simulations.py": "82824bee0ea121d348d50f0e2f555e23545fa65440e7874df55157980287fa68",
+    "accuracy_reassessment.py": "645e9eb8e1533ae79677eec1c6bd5c924897b38b93f90735bf60beab767aacb5",
+    "accuracy_simulation_stability.py": "3c5b42505f6aef73aa81a1da45fa8f578f88c95463b82ce36ce6d8cbf32247fc",
+    "cli.py": "44afcdfba56774b106953c2a65260d67a11a503ca475450af0a7731dd6f93be2"
+  },
+  "reviewed_primary_sources": {
+    "wilson_survey_extension": "https://www150.statcan.gc.ca/n1/pub/12-001-x/2017002/article/54872/02-eng.htm",
+    "franco_et_al_2018": "https://www.math.umd.edu/~slud/s770/SurveyConfidenceIntervals/JSSAM-2017-065-FINAL.pdf",
+    "korn_graubard_1998": "https://www150.statcan.gc.ca/n1/pub/12-001-x/1998002/article/4356-eng.pdf",
+    "dean_pagano_2015": "https://academic.oup.com/jssam/article-abstract/3/4/484/950501",
+    "nchs_standards": "https://www.cdc.gov/nchs/media/pdfs/2024/09/sr02_175.pdf"
+  },
+  "classifier_training": false,
+  "threshold_reselection": false,
+  "recalibration_fitting": false,
+  "category_slice_analysis": false,
+  "protected_test_evaluated": false,
+  "automatic_classification_enabled": false,
+  "source_run_completion_sha256": "06fe175c3a2f2cd8f43fd27866f0d39617bbb40f6c3b3cc105a61f01bc92fefa",
+  "new_run_completion_sha256": {
+    "accuracy_method_validation_v1_20261103": "b15c62b55d498a2782606204f0a1706db6e37d4ddc49bfd2ab195d9f23a179cb",
+    "accuracy_reassessment_v1_20261103": "ba3025ae2ab984e9c4c25e89de17c70f7be91c1db8a0ddbfe888374258b02e2f",
+    "accuracy_bootstrap_stability_v1_20261103": "57a2673ba6fd01c56854dbaf3792f59f0a2f16543cef7b4d1af25618568797b2"
+  },
+  "copied_artifacts_sha256": {
+    "comparison.csv": "c9921128fb6ee66e455bbbfbea69583da496b7e79259e9c97cc8dd3a0a3d8525",
+    "bootstrap_stability.csv": "a743ace4667948f6cd2061184afc53d5407c6f50732001c57855b9bf6ee4f1ae",
+    "simulation_comparison.csv": "2768d1212b31e83dae4554502c4e1855ce4b90a88605c1946893dab884f5d493",
+    "method_protocol.json": "c658355e39c9ee08df8f5f297c09596aacfa6737883dfa07bb112c1f98644f4f",
+    "method_decision.json": "d79b9b58dc2fd500af5f33afc46bd7890a05a5ac37a64dea7694d686d672d10c",
+    "simulation_confirmation.csv": "ecfc62286e19f94d291950a39ccdf820b206f8889030ca741c00d276755bd16f",
+    "confirmation_protocol.json": "3022713537ea29fd1b2cc3e3c778d58fc84f425d0c164b4ac646dfa1e268fb76",
+    "audit_protocol.json": "4c7acba1ffcefd98cae9a36797c2b56ebd9475d63f68eb5a584ee99f0369188a"
+  }
+}
