@@ -8,6 +8,7 @@
 # Saved tokenizer configuration contains CRLF; its original bytes are frozen.
 /src/catalogiq/resources/segment_final_20261009/tokenizer/* -text -eol whitespace=cr-at-eol
 /tests/fixtures/portable_split_protocol/** text eol=lf
+/src/catalogiq/resources/maria_review_a41608e.py text eol=lf
 
 # New classical modules use LF. Previously fingerprinted sources stay unchanged.
 /src/catalogiq/classical_*.py text eol=lf
