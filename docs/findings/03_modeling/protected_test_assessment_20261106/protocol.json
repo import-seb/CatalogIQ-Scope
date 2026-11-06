@@ -1,0 +1,903 @@
+{
+  "format": "catalogiq-protected-test-assessment-v1",
+  "status": "frozen",
+  "created_utc": "2026-11-06T19:20:10.697766+00:00",
+  "purpose": "Final held-out model assessment against supplied labels; reviewer-assisted product, no automatic production publication",
+  "test": {
+    "path": "data/processed/split_integration_reproduced_20261010/test.csv",
+    "expected_sha256_from_existing_seal": "0664b82be6b23b0752ab310b01394868be4de6c73cc1d76559efd10e1fa824c4",
+    "identity_registry": "data/processed/split_integration_reproduced_20261010/protected_final_test.csv",
+    "assignments": "data/processed/split_integration_reproduced_20261010/assignments.csv",
+    "records": 12160,
+    "groups": 11979,
+    "identity": {
+      "records": 12160,
+      "groups": 11979,
+      "record_ids_sha256": "443b96d4028166b9eb0a254aa42c767f35a86f7448c7d009ad1abe73420547bf",
+      "assignment_sha256": "69e046b4813bcd15336dd20165cfc7af3715bf4c2571103df0a1e83458cd6d62"
+    }
+  },
+  "models": [
+    {
+      "run": "segment",
+      "target": "Segment",
+      "selection_status": "selected",
+      "model_identity": "segment_category_ablation_256_20261010/with_category",
+      "label_mapping": {
+        "probability_0": "Allergy",
+        "probability_1": "CCFS",
+        "probability_2": "Digestive Health",
+        "probability_3": "External Analgesics",
+        "probability_4": "Internal Analgesics",
+        "probability_5": "Lifestyle CHC",
+        "probability_6": "Other Self Care",
+        "probability_7": "Vitamins, Minerals & Supplements"
+      },
+      "input_fields": [
+        "ProductCategory",
+        "ProductName",
+        "ProductBrand",
+        "ProductDescription",
+        "ProductContents"
+      ],
+      "training_allocation": "segment-final-20261009",
+      "temperature": 1.176651150252567,
+      "diagnostic_candidate": {
+        "variant": "temperature",
+        "threshold": 0.93
+      },
+      "kind": "minilm",
+      "checkpoint": "data/processed/segment_category_ablation_256_20261010/with_category/checkpoint.pt",
+      "state_sha256": "08d6f4d337dc35f858515ebd5be54200d41c5ca77e2f862fff5ad549aad842bd",
+      "config": {
+        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+        "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+        "sequence_length": 256,
+        "epochs": 3,
+        "learning_rate": 3e-05,
+        "batch_size": 32,
+        "evaluation_batch_size": 64,
+        "weight_decay": 0.01,
+        "warmup_fraction": 0.1,
+        "seed": 42,
+        "device": "cuda",
+        "threads": 4,
+        "precision": "fp32",
+        "dropout": 0.1,
+        "field_character_limits": [
+          1024,
+          512,
+          4000,
+          2000
+        ],
+        "local_files_only": true,
+        "log_every_steps": 50
+      },
+      "model_directory": "data/processed/segment_category_ablation_256_20261010/with_category"
+    },
+    {
+      "run": "mnfr",
+      "target": "Mnfr",
+      "selection_status": "selected",
+      "model_identity": "minilm-mnfr-category256-c3458037a670c8f0",
+      "label_mapping": {
+        "probability_0": "All others",
+        "probability_1": "J&J"
+      },
+      "input_fields": [
+        "ProductCategory",
+        "ProductName",
+        "ProductBrand",
+        "ProductDescription",
+        "ProductContents"
+      ],
+      "training_allocation": "segment-final-20261009",
+      "temperature": 1.1854264513643078,
+      "diagnostic_candidate": {
+        "variant": "temperature",
+        "threshold": 0.5
+      },
+      "kind": "minilm",
+      "checkpoint": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff/checkpoint.pt",
+      "state_sha256": "237063f3097fd7de26db0e5b13e4d8c29128a5f7283347e2cc6ad5f6f61dafaf",
+      "config": {
+        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+        "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+        "sequence_length": 256,
+        "epochs": 3,
+        "learning_rate": 3e-05,
+        "batch_size": 32,
+        "evaluation_batch_size": 64,
+        "weight_decay": 0.01,
+        "warmup_fraction": 0.1,
+        "seed": 42,
+        "device": "auto",
+        "threads": 4,
+        "precision": "fp32",
+        "dropout": 0.1,
+        "field_character_limits": [
+          1024,
+          512,
+          4000,
+          2000
+        ],
+        "local_files_only": true,
+        "log_every_steps": 50
+      },
+      "model_directory": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff"
+    },
+    {
+      "run": "targetagegroup",
+      "target": "TargetAgeGroup",
+      "selection_status": "selected",
+      "model_identity": "minilm-targetagegroup-category256-48256ce8adfceee1",
+      "label_mapping": {
+        "probability_0": "Adult",
+        "probability_1": "Children",
+        "probability_2": "Infant"
+      },
+      "input_fields": [
+        "ProductCategory",
+        "ProductName",
+        "ProductBrand",
+        "ProductDescription",
+        "ProductContents"
+      ],
+      "training_allocation": "segment-final-20261009",
+      "temperature": 1.4149839640779933,
+      "diagnostic_candidate": {
+        "variant": "temperature",
+        "threshold": 0.5
+      },
+      "kind": "minilm",
+      "checkpoint": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup/checkpoint.pt",
+      "state_sha256": "9bd44d1a19924e0ae4a18abe5cece7634aeb463a90dbb7f0bc0e72b2e0fb5218",
+      "config": {
+        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+        "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+        "sequence_length": 256,
+        "epochs": 3,
+        "learning_rate": 3e-05,
+        "batch_size": 32,
+        "evaluation_batch_size": 64,
+        "weight_decay": 0.01,
+        "warmup_fraction": 0.1,
+        "seed": 42,
+        "device": "auto",
+        "threads": 4,
+        "precision": "fp32",
+        "dropout": 0.1,
+        "field_character_limits": [
+          1024,
+          512,
+          4000,
+          2000
+        ],
+        "local_files_only": true,
+        "log_every_steps": 50
+      },
+      "model_directory": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup"
+    },
+    {
+      "run": "brand_lookup_probabilistic_v1",
+      "target": "Brand",
+      "selection_status": "selected",
+      "model_identity": "brand-productbrand-empirical-prior-v1-8cbdb95a5638dbed",
+      "label_mapping": {
+        "probability_0": "21st Century",
+        "probability_1": "Advil",
+        "probability_2": "Airborne",
+        "probability_3": "Aleve",
+        "probability_4": "Alka Seltzer",
+        "probability_5": "Allegra",
+        "probability_6": "Amazing Nutrition",
+        "probability_7": "Amazon Basic Care",
+        "probability_8": "Ancient Nutrition",
+        "probability_9": "Andrew Lessman",
+        "probability_10": "Ark Labs",
+        "probability_11": "Astepro",
+        "probability_12": "Bayer",
+        "probability_13": "Benadryl",
+        "probability_14": "Bengay",
+        "probability_15": "Best Naturals",
+        "probability_16": "Biofreeze",
+        "probability_17": "Biotrue",
+        "probability_18": "Bluebonnet",
+        "probability_19": "Boiron",
+        "probability_20": "Bonafide",
+        "probability_21": "Botanic Choice",
+        "probability_22": "Bronson",
+        "probability_23": "BulkSupplements",
+        "probability_24": "CVS Health",
+        "probability_25": "Carlson",
+        "probability_26": "Carlyle",
+        "probability_27": "Centrum",
+        "probability_28": "Claritin",
+        "probability_29": "Codeage",
+        "probability_30": "Country Life",
+        "probability_31": "Culturelle",
+        "probability_32": "Designs for health",
+        "probability_33": "Dimetapp",
+        "probability_34": "Doctor's Best",
+        "probability_35": "Dr. Mercola",
+        "probability_36": "Emergen-C",
+        "probability_37": "Equate",
+        "probability_38": "Estroven",
+        "probability_39": "Excedrin",
+        "probability_40": "Flonase",
+        "probability_41": "Force Factor",
+        "probability_42": "GNC",
+        "probability_43": "Gaia Herbs",
+        "probability_44": "Garden of Life",
+        "probability_45": "Generic",
+        "probability_46": "Genexa",
+        "probability_47": "HALLS",
+        "probability_48": "HAWAIIPHARM",
+        "probability_49": "HUM",
+        "probability_50": "Health & Her",
+        "probability_51": "Herb Pharm",
+        "probability_52": "Hers",
+        "probability_53": "Horb\u00e4ach",
+        "probability_54": "Hyland's",
+        "probability_55": "IDEAL PERFORMANCE",
+        "probability_56": "Icy Hot",
+        "probability_57": "Imodium",
+        "probability_58": "Irwin Naturals",
+        "probability_59": "Jarrow Formulas",
+        "probability_60": "KAL",
+        "probability_61": "Kirkland Signature",
+        "probability_62": "Lactaid",
+        "probability_63": "Life Extension",
+        "probability_64": "Love Wellness",
+        "probability_65": "MaryRuth Organics",
+        "probability_66": "Mason Natural",
+        "probability_67": "MegaFood",
+        "probability_68": "Meno",
+        "probability_69": "Metagenics",
+        "probability_70": "Metamucil",
+        "probability_71": "Micro Ingredients",
+        "probability_72": "MiraLax",
+        "probability_73": "Mommy's Bliss",
+        "probability_74": "Motrin",
+        "probability_75": "Mucinex",
+        "probability_76": "NOW",
+        "probability_77": "Nasonex",
+        "probability_78": "Natrol",
+        "probability_79": "NaturaNectar",
+        "probability_80": "Natural Factors",
+        "probability_81": "Nature Made",
+        "probability_82": "Nature's Answer",
+        "probability_83": "Nature's Bounty",
+        "probability_84": "Nature's Nutrition",
+        "probability_85": "Nature's Plus",
+        "probability_86": "Nature's Sunshine",
+        "probability_87": "Nature's Truth",
+        "probability_88": "Nature's Way",
+        "probability_89": "Natures Craft",
+        "probability_90": "NeilMed",
+        "probability_91": "New Chapter",
+        "probability_92": "Nexium",
+        "probability_93": "Nordic Naturals",
+        "probability_94": "NusaPure",
+        "probability_95": "Nutricost",
+        "probability_96": "Olly",
+        "probability_97": "One A Day",
+        "probability_98": "Other Brands",
+        "probability_99": "Pedialyte",
+        "probability_100": "Pepcid",
+        "probability_101": "Pepto Bismol",
+        "probability_102": "Pipping Rock",
+        "probability_103": "Pure Encapsulations",
+        "probability_104": "Pure Organic Ingredients",
+        "probability_105": "Puritan's Pride",
+        "probability_106": "Qunol",
+        "probability_107": "Rae Wellness",
+        "probability_108": "ReNew Life",
+        "probability_109": "Refresh",
+        "probability_110": "Ricola",
+        "probability_111": "Robitussin",
+        "probability_112": "Rolaids",
+        "probability_113": "SOLARAY",
+        "probability_114": "SmartyPants",
+        "probability_115": "Solgar",
+        "probability_116": "Source Naturals",
+        "probability_117": "Spring Valley",
+        "probability_118": "Standard Process Inc.",
+        "probability_119": "Starwest Botanicals",
+        "probability_120": "Sudafed",
+        "probability_121": "Sunwarrior",
+        "probability_122": "Swanson",
+        "probability_123": "TUMS",
+        "probability_124": "Theraflu",
+        "probability_125": "Thorne Research",
+        "probability_126": "Tylenol",
+        "probability_127": "UnItemised brand",
+        "probability_128": "Vicks",
+        "probability_129": "Visine",
+        "probability_130": "Vitafusion",
+        "probability_131": "Vital Proteins",
+        "probability_132": "Vitamatic",
+        "probability_133": "Vitauthority",
+        "probability_134": "Voltaren",
+        "probability_135": "Walgreens",
+        "probability_136": "Wile",
+        "probability_137": "Womaness",
+        "probability_138": "Xyzal",
+        "probability_139": "Zarbee's",
+        "probability_140": "Zicam",
+        "probability_141": "Zyrtec",
+        "probability_142": "up & up"
+      },
+      "input_fields": [
+        "ProductBrand"
+      ],
+      "training_allocation": "brand_development_allocation_v1_20261029",
+      "temperature": 0.7530340250800807,
+      "diagnostic_candidate": {
+        "variant": "temperature",
+        "threshold": 0.955
+      },
+      "kind": "lookup",
+      "model": "data/processed/predictions_contract_v2_20261031/brand_lookup_probabilistic_v1/model.json"
+    },
+    {
+      "run": "sub_segment",
+      "target": "Sub-Segment",
+      "selection_status": "provisional",
+      "model_identity": "minilm-sub_segment-category256-8a1e8f3e742eb3a7",
+      "label_mapping": {
+        "probability_0": "Acid Relief",
+        "probability_1": "All Other Digestive Health",
+        "probability_2": "Allergy INS",
+        "probability_3": "Anti-Diarrheal",
+        "probability_4": "Anti-Gas",
+        "probability_5": "Anti-Nausea",
+        "probability_6": "Cold & Heat Wraps",
+        "probability_7": "Cold/Flu",
+        "probability_8": "Constipation Remedies",
+        "probability_9": "Cough",
+        "probability_10": "Creams & Gels (Rubs)",
+        "probability_11": "Creams/Gels & Medicated Patches",
+        "probability_12": "Daily oral contracception",
+        "probability_13": "Dermatologicals",
+        "probability_14": "Devices/Refills",
+        "probability_15": "Digestive enzymes",
+        "probability_16": "Ear Care",
+        "probability_17": "External Upper Respiratory",
+        "probability_18": "Eye Care",
+        "probability_19": "Hemorrhoid Remedies",
+        "probability_20": "Herbal & Natural (H&N)",
+        "probability_21": "Internal Pain",
+        "probability_22": "Lactose Intolerance",
+        "probability_23": "Menopausal Support",
+        "probability_24": "Minerals",
+        "probability_25": "Motion Sickness",
+        "probability_26": "Multivitamins",
+        "probability_27": "Nasal Sprays",
+        "probability_28": "Obesity treatments",
+        "probability_29": "Oral Antihistamine",
+        "probability_30": "Other Allergy",
+        "probability_31": "Other External Analgesics",
+        "probability_32": "Other Lifestyle CHC",
+        "probability_33": "Other Self Care",
+        "probability_34": "Pregnancy Vitamins",
+        "probability_35": "Probiotics",
+        "probability_36": "Prostate Remedies",
+        "probability_37": "Remaining Internal Pain",
+        "probability_38": "Single Vitamins",
+        "probability_39": "Sinus excl Sprays",
+        "probability_40": "Sleep Aids",
+        "probability_41": "Sore Throat / Cough Drops",
+        "probability_42": "Speciality Pain",
+        "probability_43": "Stimulants",
+        "probability_44": "Supplements",
+        "probability_45": "Systemic Cardiovasculars",
+        "probability_46": "Temperature Packs",
+        "probability_47": "Topical Itch",
+        "probability_48": "Urinary products"
+      },
+      "input_fields": [
+        "ProductCategory",
+        "ProductName",
+        "ProductBrand",
+        "ProductDescription",
+        "ProductContents"
+      ],
+      "training_allocation": "sub_segment_development_allocation_v1_20261029_r2",
+      "temperature": 0.9970838247644359,
+      "diagnostic_candidate": {
+        "variant": "temperature",
+        "threshold": 0.977
+      },
+      "kind": "minilm",
+      "checkpoint": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment/checkpoint.pt",
+      "state_sha256": "0d7bae71749d266d138c42f07bad15236ac0a0d6a8892bdbec0275f0b5fdf7ad",
+      "config": {
+        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+        "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+        "sequence_length": 256,
+        "epochs": 3,
+        "learning_rate": 3e-05,
+        "batch_size": 32,
+        "evaluation_batch_size": 64,
+        "weight_decay": 0.01,
+        "warmup_fraction": 0.1,
+        "seed": 42,
+        "device": "auto",
+        "threads": 4,
+        "precision": "fp32",
+        "dropout": 0.1,
+        "field_character_limits": [
+          1024,
+          512,
+          4000,
+          2000
+        ],
+        "local_files_only": true,
+        "log_every_steps": 50
+      },
+      "model_directory": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/segment/manifest.json",
+      "sha256": "a825d1ab6e80fc072329e5199cb071318666f51261b935dd69e7041e35fca27b",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/segment/temperature.json",
+      "sha256": "e126b7f2cb51a7a7e7938cd38b2d8a1ef4d09f0cd98f08a0062520df92bc1f0f",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/segment/policy.json",
+      "sha256": "e4ef424c00bc5e4d22818e5720bbae28bc7621ffed87fd364ffbf7327a4296bf",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/segment_category_ablation_256_20261010/with_category/checkpoint.pt",
+      "sha256": "7e417d8204dbaeef4cea4e54690594560e3fbd3b8288f4be850ff60f4de32e27",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/segment_category_ablation_256_20261010/with_category/model_config.json",
+      "sha256": "937985bf91f18fceebc3827924064347d5e8c8e7df41007f08d24928e6492ff9",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/segment_category_ablation_256_20261010/with_category/encoder_config.json",
+      "sha256": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/segment_category_ablation_256_20261010/with_category/tokenizer/tokenizer.json",
+      "sha256": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/segment_category_ablation_256_20261010/with_category/tokenizer/tokenizer_config.json",
+      "sha256": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/mnfr/manifest.json",
+      "sha256": "dbee9be3ad54df18a982e3fa4c47d64603b9199e740c8857ec81299a0548dff2",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/mnfr/temperature.json",
+      "sha256": "87849c8f5b93ef81b27da248e0ebf846d9e08f6b1079d98c13c1f3fabf2c6960",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/mnfr/policy.json",
+      "sha256": "6475d3e10f7da10f8cd1459ec25dc20144ed7773c864409debd260a52aaede13",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff/checkpoint.pt",
+      "sha256": "13af52155597c62e6c29ce83f229fd57fa20bee8e4184b8b654b79713deff797",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff/model_config.json",
+      "sha256": "db7f1b23f6539ccbfe6c694644eb53416c7c2ba712e6ce82b58b6adbf32d7999",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff/encoder_config.json",
+      "sha256": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff/tokenizer/tokenizer.json",
+      "sha256": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/mnfr_minilm_selection_v1_20261029/maria_handoff/tokenizer/tokenizer_config.json",
+      "sha256": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/targetagegroup/manifest.json",
+      "sha256": "682a003f4abf070c8065e50a53f65eac2d98f243d733812473e03fec00b54722",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/targetagegroup/temperature.json",
+      "sha256": "1db74c82d0e2b83c74f6413c57216a3db600831d2be16e6a00096e47487ba721",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/targetagegroup/policy.json",
+      "sha256": "2d625e01f6b816a53bfddf142608872b8701b21d40826bf3f5b39f943804803c",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup/checkpoint.pt",
+      "sha256": "9d864499526a921709272982c055f70305ff98cf5c135ee1125fc33f6b6efda0",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup/model_config.json",
+      "sha256": "db7f1b23f6539ccbfe6c694644eb53416c7c2ba712e6ce82b58b6adbf32d7999",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup/encoder_config.json",
+      "sha256": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup/tokenizer/tokenizer.json",
+      "sha256": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/targetagegroup/tokenizer/tokenizer_config.json",
+      "sha256": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/brand_lookup_probabilistic_v1/manifest.json",
+      "sha256": "9483408504d67b887a13ca2eecce38189d00bb6122ae2750c83fa088301d726f",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/brand_lookup_probabilistic_v1/temperature.json",
+      "sha256": "f11b5854959a5d86ed75690aa5f6ba43e246a264174f7361d369855e0a7d9dd5",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/brand_lookup_probabilistic_v1/policy.json",
+      "sha256": "7e1bca069fe118b8d3cc221ad2cb40b2e78dc2fe0f080968651e3f14d96dc6c3",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/brand_lookup_probabilistic_v1/model.json",
+      "sha256": "19d0b22672d8e1e4033c4b9a511eee101bf9653da951f1d8c0cd574b909f2fe8",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/sub_segment/manifest.json",
+      "sha256": "2dc2e9891b89525a0659d8a097bba44d398fead06f65b23d9aa0842af677454a",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/sub_segment/temperature.json",
+      "sha256": "373873d768287d9cd21b1d466b1d27f8739f4a20dbc4bd7ff7c2a25d05699c75",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/sub_segment/policy.json",
+      "sha256": "c6dc1db70c53efd6b4789847accab30494c9858f259cd48fb73d270a3e839989",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment/checkpoint.pt",
+      "sha256": "02f4fbb0f6ee55c80eb9068f0c8be9cc2a56982edd6bfdd8a2436918aa10997f",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment/model_config.json",
+      "sha256": "db7f1b23f6539ccbfe6c694644eb53416c7c2ba712e6ce82b58b6adbf32d7999",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment/encoder_config.json",
+      "sha256": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment/tokenizer/tokenizer.json",
+      "sha256": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/minilm_remaining_targets_v1_20261029/handoff/sub_segment/tokenizer/tokenizer_config.json",
+      "sha256": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "src/catalogiq/resources/segment_final_20261009/manifest.json",
+      "sha256": "d11acef2eaca75e717ed5bfb0f1d2bea2fa7398fb187216a6fa58a518471c1ff",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_integration_reproduced_20261010/completion.json",
+      "sha256": "53f3ab943e66eefc701b3f2c598a5fcd379084a6f9f851c6f7e7e6251d9e9a81",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_integration_reproduced_20261010/protocol_manifest.json",
+      "sha256": "d11acef2eaca75e717ed5bfb0f1d2bea2fa7398fb187216a6fa58a518471c1ff",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_integration_reproduced_20261010/assignments.csv",
+      "sha256": "dae5b6139c3dc1eb215c477ba02f0d82fa805e05f7ae9bb13b45280dbdbdb3f3",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_integration_reproduced_20261010/protected_final_test.csv",
+      "sha256": "753be3e8fa66044fa2cd622faf4dfac0fd0f3ec3f7f623bd63854c0206670ce0",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_finalization_20261009/frozen/protected_final_test.csv",
+      "sha256": "634e2458f1b3cfce2b85f40f7098d134ddcd8c3616ad656336fca1083fa046e3",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_integration_reproduced_20261010/validation.csv",
+      "sha256": "f8f65051fd5c1af40d7fe07b189e6f1d2ec3239c6151dcc2d635c5546f211fab",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/brand_development_allocation_v1_20261029/completion.json",
+      "sha256": "94c64e5bd80219595f3c8764acd67a5d64496a63164276807d42b14d56624c6e",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/brand_development_allocation_v1_20261029/assignments.csv",
+      "sha256": "e4b908aca2287c500eb373f05bc7b46349de19ab2b5df2d2fc8db021f2062dc7",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/brand_development_allocation_v1_20261029/protected_final_test.csv",
+      "sha256": "753be3e8fa66044fa2cd622faf4dfac0fd0f3ec3f7f623bd63854c0206670ce0",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/brand_development_allocation_v1_20261029/development_assignments.csv",
+      "sha256": "b8877a8823c114e1727e11984c72c75da686d9f317d7289d8c6e182edad37323",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/brand_development_allocation_v1_20261029/protocol.json",
+      "sha256": "901d1900097917213e910ced8afa0d27ddcae4d6bc5467f0eaeb3b1709439b18",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/sub_segment_development_allocation_v1_20261029_r2/completion.json",
+      "sha256": "26f52bd5360af96d0271c998f13c846dfeaa325bf0fb90b4c85011df5cabdc6a",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/sub_segment_development_allocation_v1_20261029_r2/assignments.csv",
+      "sha256": "f3091892007c142c60e37d460367070928482b754b9431da940705b2aec126b2",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/sub_segment_development_allocation_v1_20261029_r2/protected_final_test.csv",
+      "sha256": "753be3e8fa66044fa2cd622faf4dfac0fd0f3ec3f7f623bd63854c0206670ce0",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/sub_segment_development_allocation_v1_20261029_r2/development_assignments.csv",
+      "sha256": "050bf358b7de10fb3cdd481003efb76080cf483706e4d157b4650ee81f0bdbe9",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/sub_segment_development_allocation_v1_20261029_r2/protocol.json",
+      "sha256": "69138c8d311f83bde97ee79c52e6bda0670ce2d333334a95f84d5fe701ccd618",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/split_integration_reproduced_20261010/train.csv",
+      "sha256": "3d7e91e1b6b8ab23cd4f38daa878e0082020330fb901041763338b41e3ae616b",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/predictions_contract_v2_20261031/completion.json",
+      "sha256": "a5d83e0a9b4f0f992daf0af918ff1ff631c5663dfefc94f2c0ee935110c7b854",
+      "normalization": "raw_bytes"
+    },
+    {
+      "path": "data/processed/confidence_review_v3_20261103/completion.json",
+      "sha256": "06fe175c3a2f2cd8f43fd27866f0d39617bbb40f6c3b3cc105a61f01bc92fefa",
+      "normalization": "raw_bytes"
+    }
+  ],
+  "code": [
+    {
+      "path": "src/catalogiq/protected_test_assessment.py",
+      "sha256": "6faa1af707704e9b846585157995a1d801b9964b556fe2e7a3a79eb1eb17f3a1",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/confidence_calibration.py",
+      "sha256": "2359a1cbcc8648c6451924604a712a756b17ed4ea032c9912fbff126406712ab",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/clustered_accuracy.py",
+      "sha256": "b8e0ed49bdefb022ac44bf6c68dece54a0fe53b1c115b20413f731958dfc1022",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/prediction_contract.py",
+      "sha256": "072274e586cb12c2dd17646abd65420dd14e35035b326cd2baa47a5323b711bb",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/split_protocol.py",
+      "sha256": "965da85597ee0228f0bc1f99254a35cf6c322be46ee4a031b0d85dcff994d6e9",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/segment_validation_analysis.py",
+      "sha256": "6d16564cce234b5a8dca9df607e24a6627303fded1d38e4b235ae7ae1f8749e7",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/segment_transformer.py",
+      "sha256": "e974f53121fad3eba81b16683a9157cbe447ff7dc25bf1738755f42a3b3adfc1",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/segment_category_ablation.py",
+      "sha256": "66ce18f3b31b6d7d7775405a6b00c1f1124ba56a0d93f78664d8fa2554811461",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/brand_probabilistic_lookup.py",
+      "sha256": "337592cb402a777af3b5262b4ed5faf89373fbaddc38e84c58963ad10f0d3c5d",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/target_minilm_experiment.py",
+      "sha256": "68d04a4cc34d3f87daf4c114b23533d19cacffaf5ae401ab5d00796d2f338851",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/minilm_prediction_export.py",
+      "sha256": "258093f010955f44c1ef7a3277c3a4b19a8132653e0ca0a5d56db4f9fa46c34b",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/features.py",
+      "sha256": "24e87ca9437430fae1cc7dd4ee6a1bf4df8cdf42100384ccc6559d8d05915ce9",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/structural.py",
+      "sha256": "e407a567fc862d07c75b53a9bfd900166e3afbe954ae15d039c65b6312af4f55",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/accuracy_reassessment.py",
+      "sha256": "645e9eb8e1533ae79677eec1c6bd5c924897b38b93f90735bf60beab767aacb5",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/cli.py",
+      "sha256": "83862a2b8809414503f90ddf868df87fe506e6f5c577183357bdfc0542c7cf6b",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/paths.py",
+      "sha256": "b9f5e2e11b94c60f1dfd90420e2c2e5176e62685eee1413947296b2fd9024de0",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "src/catalogiq/__init__.py",
+      "sha256": "10e10383147d3b1316fc1752c14e5bc212155ecb439a3d5f5fd5ad45ceb98ea8",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "scripts/assess_protected_test.py",
+      "sha256": "25bd2f4df648e92449faa24dfc16ab9ed5a128b084a2e6672c2077a3390587ba",
+      "normalization": "crlf_to_lf"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "ab19fc8e7bc18c7a8b0063abf7373d92117b3c1bdd91a154f058687708ec650e",
+      "normalization": "crlf_to_lf"
+    }
+  ],
+  "runtime": {
+    "device": "cpu",
+    "precision": "fp32",
+    "threads": 2,
+    "batch_size": 64,
+    "seed": 42,
+    "python": "3.13.7",
+    "libraries": {
+      "numpy": "2.3.3",
+      "pandas": "2.3.2",
+      "scipy": "1.16.2",
+      "scikit-learn": "1.7.2",
+      "tokenizers": "0.22.2",
+      "torch": "2.11.0+cu128",
+      "transformers": "5.3.0",
+      "threadpoolctl": "3.6.0"
+    }
+  },
+  "metrics": {
+    "primary": "macro_f1_model_vocabulary_union_truth",
+    "zero_division": 0,
+    "secondary": [
+      "accuracy",
+      "macro_precision",
+      "macro_recall",
+      "weighted_precision",
+      "weighted_recall",
+      "weighted_f1",
+      "per_class_support",
+      "confusion_matrix"
+    ],
+    "population": "All protected records; score each target's nonmissing supplied labels; no confidence/class/outlier row exclusions",
+    "missing_truth": [
+      "",
+      "nan",
+      "none",
+      "null"
+    ],
+    "oov_truth": "Retained as errors and included in union denominator",
+    "intervals": {
+      "method": "whole_frozen_group_percentile_bootstrap",
+      "samples": 2000,
+      "seed": 20261106,
+      "confidence": 0.95,
+      "scope": "Descriptive two-sided per-target accuracy and union macro-F1; not simultaneous production guarantees"
+    },
+    "calibration": "Raw and fixed saved-temperature ECE/Brier/NLL; no fitting; OOV/zero true probability gives infinite NLL flag",
+    "thresholds": [
+      0.8,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "threshold_role": "Descriptive review prioritization only, never retune or enable approval",
+    "relationship_rates": {
+      "status": "unmeasured_no_approved_machine_readable_registry",
+      "valid_pair_rate": null
+    },
+    "platform": {
+      "status": "deferred",
+      "model": null,
+      "metrics": null,
+      "prediction_coverage": 0
+    },
+    "human_corrected_accuracy": null,
+    "numerical_99_percent_release_requirement": null
+  },
+  "representation_check": "Before reporting, audit exact 256-token input equality against train/validation without changing groups or dropping test rows; report any crossings as a limitation",
+  "controls": {
+    "test_opened_or_hashed_during_freeze": false,
+    "execution_authorized_by_freeze": false,
+    "new_models_or_threshold_selection": false,
+    "production_approval": false,
+    "attempt_policy": "One planned assessment. Create a durable receipt before test access; preserve failed attempts. Technical retries use identical pins and disclose prior exposure."
+  },
+  "limitations": [
+    "Supplied labels have not been certified as independent ground truth",
+    "Frozen grouping used four fields/128 tokens; selected neural inputs use five fields/256 tokens",
+    "Known grouping misses, taxonomy ambiguity and historical development reuse remain",
+    "No approved complete relationship map; relationship-validity requirements remain unresolved",
+    "No final corrected-export, reviewer-time or live retailer quality claim follows from model test metrics"
+  ]
+}

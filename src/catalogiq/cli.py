@@ -7,6 +7,45 @@ from pathlib import Path
 from .paths import DATA_PATH, TARGET_PATH, TRAIN_PATH
 
 
+def protected_test_main(argv=None) -> int:
+    """Freeze or preflight a protected-test assessment; never score by default."""
+    from .paths import ROOT_PATH
+    from .protected_test_assessment import assess, freeze_protocol, preflight
+    parser = argparse.ArgumentParser(description=protected_test_main.__doc__)
+    parser.add_argument("phase", choices=("freeze", "preflight", "assess"))
+    parser.add_argument("--protocol", type=Path, required=True)
+    parser.add_argument("--protocol-sha256", help="Exact independently reviewed frozen protocol file hash")
+    parser.add_argument("--output-root", type=Path)
+    parser.add_argument("--execute", action="store_true", help="Only with separately authorized assess phase")
+    parser.add_argument("--authorization-reference", help="Record the actual instruction/approval authorizing test access")
+    args = parser.parse_args(argv)
+    if args.phase != "assess" and (args.execute or args.authorization_reference):
+        parser.error("Execution authorization applies only to assess")
+    if args.phase != "freeze" and not args.protocol_sha256:
+        parser.error("A reviewed --protocol-sha256 is required")
+    if args.phase == "assess" and (not args.execute or not args.authorization_reference or not args.output_root):
+        parser.error("assess requires --execute, --authorization-reference and a fresh --output-root")
+    if args.phase == "freeze" and args.output_root:
+        parser.error("freeze writes only --protocol; use preflight for a readiness report")
+    try:
+        if args.phase == "freeze":
+            result = freeze_protocol(ROOT_PATH, args.protocol)
+        elif args.phase == "preflight":
+            _, _, result = preflight(ROOT_PATH, args.protocol, args.protocol_sha256)
+            if args.output_root:
+                args.output_root.mkdir(parents=True, exist_ok=False)
+                from .prediction_contract import write_json
+                write_json(args.output_root/"summary.json", result)
+        else:
+            result = assess(ROOT_PATH, args.protocol, args.protocol_sha256, args.output_root,
+                            authorized=args.execute, authorization_id=args.authorization_reference)
+    except (ValueError, OSError, RuntimeError, KeyError, ImportError) as error:
+        parser.exit(1, f"Error: {error}\n")
+    # Assessment per-record labels/predictions stay in the private output only.
+    print(json.dumps(result if args.phase != "assess" else {"status": "completed", "output_root": str(args.output_root)}, indent=2))
+    return 0
+
+
 def product_review_rules_main(argv=None) -> int:
     """Explore Segment/Brand lookup product gates with fixed confidence floors."""
     from .product_rule_experiment import AUDIT_RUN, DISCOVERY_RUN, audit_product_rules, discover_product_rules
@@ -60,11 +99,15 @@ def accuracy_standard_main(argv=None) -> int:
 
 def confidence_review_main(argv=None) -> int:
     """Evaluate existing validation probabilities without training or test scoring."""
-    from .confidence_experiment import DEFAULT_OUTPUT, DEFAULT_SOURCE, run_experiment
+    from .confidence_experiment import DEFAULT_OUTPUT, DEFAULT_SOURCE, run_experiment, summarize_saved
     from .paths import ROOT_PATH
     parser = argparse.ArgumentParser(description=confidence_review_main.__doc__)
     parser.add_argument("--source-root", type=Path, default=ROOT_PATH / DEFAULT_SOURCE)
-    parser.add_argument("--output-root", type=Path, default=ROOT_PATH / DEFAULT_OUTPUT)
+    parser.add_argument("--output-root", type=Path, help="New output directory; required with --summarize-saved")
+    parser.add_argument("--summarize-saved", type=Path,
+                        help="Replay this sealed confidence run without fitting calibration or requiring notebook caches")
+    parser.add_argument("--summary-seed", type=int, default=20261106,
+                        help="Group-bootstrap seed for saved-summary replay (default: 20261106)")
     parser.add_argument("--bootstrap-samples", type=int, default=2000)
     parser.add_argument("--plot-cache", type=Path, help="Optional isolated Matplotlib dependency directory")
     parser.add_argument("--candidate-run", type=Path, help="Explicit future candidate; no automatic discovery")
@@ -72,10 +115,16 @@ def confidence_review_main(argv=None) -> int:
     args = parser.parse_args(argv)
     if bool(args.candidate_run) != bool(args.candidate_manifest_sha256):
         parser.error("--candidate-run and --candidate-manifest-sha256 must be supplied together")
+    if args.summarize_saved and (not args.output_root or args.candidate_run or args.plot_cache):
+        parser.error("--summarize-saved requires --output-root and cannot use candidate or plotting options")
     candidates = [(args.candidate_run, args.candidate_manifest_sha256)] if args.candidate_run else []
     try:
-        result = run_experiment(ROOT_PATH, args.source_root, args.output_root,
-            bootstrap_samples=args.bootstrap_samples, plot_cache=args.plot_cache, candidates=candidates)
+        if args.summarize_saved:
+            result = summarize_saved(ROOT_PATH, args.source_root, args.summarize_saved, args.output_root,
+                bootstrap_samples=args.bootstrap_samples, seed=args.summary_seed)
+        else:
+            result = run_experiment(ROOT_PATH, args.source_root, args.output_root or ROOT_PATH/DEFAULT_OUTPUT,
+                bootstrap_samples=args.bootstrap_samples, plot_cache=args.plot_cache, candidates=candidates)
     except (ValueError, OSError, RuntimeError, KeyError, ImportError) as error:
         parser.exit(1, f"Error: {error}\n")
     print(f"Saved {result['runs']} development-only policy evaluations to {result['output_root']}")

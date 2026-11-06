@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from importlib.metadata import version
+import hashlib
 import json
 from pathlib import Path
 import platform
@@ -14,13 +15,13 @@ import pandas as pd
 
 from .confidence_calibration import (
     GROUP_SALT, ROLES, accepted_summary, bootstrap_accuracy, calibration_metrics,
-    essential_information_reasons, fit_temperature, partition_context, per_class_table,
+    essential_information_reasons, fit_temperature, group_role, partition_context, per_class_table,
     temperature_scale, threshold_grid, threshold_table,
 )
 from .features import sha256
 from .prediction_contract import (
     CONTRACT_BLOB, Evidence, IDENTITY, REGISTRY_NAME, RUNS, frozen_identity_context,
-    read_json, validate_manifest, write_json,
+    _safe_member, read_json, validate_manifest, write_json,
 )
 
 
@@ -28,6 +29,10 @@ DEFAULT_SOURCE = "data/processed/predictions_contract_v2_20261031"
 DEFAULT_OUTPUT = "data/processed/confidence_review_v3_20261103"
 TARGET_ACCURACY = .99
 ALPHA = .05
+
+SUMMARY_THRESHOLDS = (.5, .8, .9, .93, .95, .955, .97, .977, .99, .995, .999)
+PRACTICAL_THRESHOLDS = (.8, .9, .95, .99)
+SUMMARY_SELECTED_RUNS = ("segment", "mnfr", "targetagegroup", "brand_lookup_probabilistic_v1", "sub_segment")
 
 
 def csv_output(frame, path):
@@ -372,3 +377,220 @@ def run_experiment(root, source_root, output_root, *, bootstrap_samples=2000, pl
         shutil.rmtree(staging)
         raise
     return {"runs": len(results), "output_root": str(output_root), "results": results}
+
+
+def _summarize_saved_run(name, frame, labels, columns, eligible, cohorts, assignments,
+                         temperature, policy, existing, saved_cal, reference, *,
+                         bootstrap_samples, seed):
+    """Project saved results, reusing the original metrics, gates and intervals."""
+    if (assignments.record_id.tolist() != frame.record_id.tolist()
+            or assignments.group_id.tolist() != frame.group_id.tolist()
+            or assignments.split.tolist() != frame.split.tolist()
+            or assignments.experiment_role.tolist() != frame.group_id.map(group_role).tolist()
+            or assignments.eligible_measured_gates.eq("True").tolist() != eligible.tolist()
+            or assignments.cohort.tolist() != cohorts.tolist()):
+        raise ValueError("Saved assignments, eligibility or cohorts changed")
+    if policy["enabled"] or policy["operational_threshold"] is not None:
+        raise ValueError("Replay requires the original disabled research policies")
+    # This validates the three group-disjoint roles without fitting anything.
+    partition_context(frame[[*IDENTITY, "true_label"]])
+    audit = assignments.experiment_role.eq("policy_audit").to_numpy()
+    truth = frame.true_label.to_numpy()[audit]
+    predicted = frame.predicted_label.to_numpy()[audit]
+    groups = frame.group_id.to_numpy()[audit]
+    correct = truth == predicted
+    probabilities = frame[columns].to_numpy(float)
+    variants = {"raw": temperature_scale(probabilities, 1.),
+                "temperature": temperature_scale(probabilities, temperature)}
+    selected_variant = policy["selected_candidate"]["variant"]
+    if selected_variant not in variants:
+        raise ValueError("Unknown saved score variant")
+    select = np.isclose(existing.threshold.to_numpy()[:, None],
+                        np.asarray(SUMMARY_THRESHOLDS)[None, :], atol=1e-12, rtol=0).any(axis=1)
+    shortlist = existing.loc[select].copy()
+    shortlist["run"] = name
+    distributions, practical = [], []
+
+    def check_close(actual, saved, message):
+        if actual is None or pd.isna(actual):
+            matches = saved is None or pd.isna(saved)
+        else:
+            matches = np.isclose(actual, saved, atol=1e-10, rtol=0)
+        if not matches:
+            raise ValueError(message)
+
+    calibration_checks = threshold_checks = 0
+    for variant, matrix in variants.items():
+        for role in ROLES:
+            role_mask = assignments.experiment_role.eq(role).to_numpy()
+            part = matrix[role_mask]
+            outcome = frame.true_label.to_numpy()[role_mask] == frame.predicted_label.to_numpy()[role_mask]
+            metrics, _ = calibration_metrics(part, frame.true_label.to_numpy()[role_mask], labels)
+            saved = saved_cal.loc[saved_cal.variant.eq(variant) & saved_cal.subset.eq(role)]
+            if len(saved) != 1:
+                raise ValueError("Saved calibration role/variant must be unique and complete")
+            for key in ("accuracy", "ece_10_bins", "brier_multiclass_sum", "nll"):
+                check_close(metrics[key], saved.iloc[0][key], f"Saved calibration mismatch: {key}")
+            # The current exports contain no OOV truth; do not endorse the
+            # historical reference's OOV treatment by comparing it on OOV data.
+            if metrics["oov_truth_rows"]:
+                raise ValueError("Maria reference comparison requires an explicit OOV policy")
+            _, ece = reference["ece_and_reliability"](part.max(axis=1), outcome)
+            brier = reference["multiclass_brier"](list(part), frame.true_label.to_numpy()[role_mask], labels)
+            check_close(metrics["ece_10_bins"], ece, "Maria ECE mismatch")
+            check_close(metrics["brier_multiclass_sum"], brier, "Maria Brier mismatch")
+            calibration_checks += 1
+            distribution = {"run": name, "variant": variant, "subset": role}
+            for tag, keep in (("correct", outcome), ("incorrect", ~outcome)):
+                values = part.max(axis=1)[keep]
+                distribution[tag + "_rows"] = len(values)
+                for q in (.1, .5, .9):
+                    distribution[f"{tag}_confidence_q{int(q*100)}"] = float(np.quantile(values, q)) if len(values) else None
+            distributions.append(distribution)
+        if name not in SUMMARY_SELECTED_RUNS:
+            continue
+        confidence = matrix[audit].max(axis=1)
+        table = threshold_table(confidence, correct, groups, eligible[audit], thresholds=PRACTICAL_THRESHOLDS)
+        for row in table.to_dict("records"):
+            saved = existing.loc[existing.subset.eq("policy_audit") & existing.variant.eq(variant)
+                                 & np.isclose(existing.threshold, row["threshold"], atol=1e-12, rtol=0)]
+            if len(saved) != 1:
+                raise ValueError("Saved audit threshold must be unique and complete")
+            for key in ("accepted_rows", "review_rows", "accepted_errors", "accepted_accuracy"):
+                check_close(row[key], saved.iloc[0][key], f"Saved threshold mismatch: {key}")
+            threshold_checks += 1
+            accepted = eligible[audit] & (confidence >= row["threshold"])
+            queue = reference["queue_metrics"](~accepted, correct)
+            if queue["wrong_caught"] + row["accepted_errors"] != queue["wrong_total"]:
+                raise ValueError("Maria queue errors do not reconcile")
+            if variant == selected_variant:
+                from .clustered_accuracy import aggregate_groups, analytic_bounds
+                ci = bootstrap_accuracy(accepted, correct, groups, seed=seed, samples=bootstrap_samples)
+                family = aggregate_groups(accepted, correct, groups)
+                bound = analytic_bounds(family.accepted_rows, family.errors)
+                support = pd.Series(truth).value_counts()
+                minority = np.isin(truth, support[support < 50].index)
+                practical.append({**row, "run": name, "variant": variant, "subset": "policy_audit",
+                    "bootstrap_95_lower": ci["lower"], "bootstrap_95_upper": ci["upper"],
+                    "beta_one_sided_95_lower": bound["beta_effective_sample"],
+                    "wrong_per_100_incoming": 100*row["accepted_errors"]/len(truth),
+                    "queue_flag_precision_percent": queue["flag_precision_%"] if row["review_rows"] else None,
+                    "queue_miss_rate_percent": queue["miss_rate_%"] if queue["wrong_total"] else None,
+                    "minority_audit_truth_rows": int(minority.sum()),
+                    "minority_accepted_truth_rows": int((minority & accepted).sum()),
+                    "minority_accepted_errors": int((minority & accepted & ~correct).sum()),
+                    "minority_accepted_accuracy": float(correct[minority & accepted].mean()) if (minority & accepted).any() else None})
+    audit_frame = frame.loc[audit].copy()
+    audit_frame["top1_prob"] = variants[selected_variant][audit].max(axis=1)
+    audit_frame["correct"] = correct
+    coverage = reference["coverage_risk"](audit_frame, labels)
+    if (coverage.iloc[0].answered != len(truth)
+            or coverage.iloc[0]["accuracy_on_answered_%"] != round(correct.mean()*100, 2)):
+        raise ValueError("Maria full-coverage result mismatch")
+    coverage["run"], coverage["variant"], coverage["subset"] = name, selected_variant, "policy_audit"
+    return shortlist, distributions, practical, coverage, calibration_checks, threshold_checks
+
+
+def summarize_saved(root, source_root, previous, output_root, *, bootstrap_samples=2000, seed=20261106):
+    """Reproduce compact findings from sealed predictions and saved temperatures.
+
+    No classifier loading, calibrator fitting, threshold selection, notebook
+    cache, plots or modification of the original result packages is required.
+    """
+    from .accuracy_reassessment import cleanup_staging, fresh_staging, seal_output
+    from .maria_harness_compatibility import (
+        REVIEW_FUNCTION_HASHES, REVIEW_HARNESS_COMMIT, REVIEW_NOTEBOOK_BLOB,
+        REVIEW_REFERENCE, review_namespace,
+    )
+    root, source_root, previous, output_root = (Path(p).resolve() for p in (root, source_root, previous, output_root))
+    if output_root.exists():
+        raise FileExistsError(f"Refusing existing summary directory: {output_root}")
+    if any(output_root.is_relative_to(p) or p.is_relative_to(output_root)
+           for p in (source_root, previous, root / "data/processed/split_integration_reproduced_20261010",
+                     root / "data/processed/brand_development_allocation_v1_20261029",
+                     root / "data/processed/sub_segment_development_allocation_v1_20261029_r2")):
+        raise ValueError("Summary outputs must be separate from prediction, split and result sources")
+    if bootstrap_samples < 100 or type(seed) is not int or seed < 0:
+        raise ValueError("At least 100 bootstrap samples and a nonnegative integer seed required")
+    evidence = Evidence()
+    previous_seal = evidence.json(previous / "completion.json")
+
+    def saved_member(name):
+        path = evidence.capture(_safe_member(previous, name))
+        if evidence.hashes[path] != previous_seal["files_sha256"].get(name):
+            raise ValueError(f"Saved report seal mismatch: {name}")
+        return path
+
+    protocol, protected, contexts, identities, _ = frozen_identity_context(root, evidence)
+    features = load_development_features(root, evidence, protected)
+    handoff = evidence.json(source_root / "completion.json")
+    evidence.capture(REVIEW_REFERENCE)
+    reference = review_namespace()
+    shortlists, distributions, practical, coverages = [], [], [], []
+    calibration_checks = threshold_checks = 0
+    # Keep the original projection order; use explicit owned runs, not discovery.
+    names = (*SUMMARY_SELECTED_RUNS, "brand")
+    for name in names:
+        _, frame, labels, columns, _ = load_run(source_root/name, evidence, contexts,
+            identities, protected, protocol, handoff_seal=handoff)
+        eligible, _, cohorts = model_gates(source_root/name, frame, features, evidence)
+        assignments = evidence.csv(saved_member(f"{name}/experiment_assignments.csv"),
+            [*IDENTITY, "experiment_role", "eligible_measured_gates", "cohort"])
+        temperature = evidence.json(saved_member(f"{name}/temperature.json"))["temperature"]
+        policy = evidence.json(saved_member(f"{name}/policy.json"))
+        existing = pd.read_csv(saved_member(f"{name}/thresholds.csv"))
+        saved_cal = pd.read_csv(saved_member(f"{name}/calibration_metrics.csv"))
+        result = _summarize_saved_run(name, frame, labels, columns, eligible, cohorts,
+            assignments, temperature, policy, existing, saved_cal, reference,
+            bootstrap_samples=bootstrap_samples, seed=seed)
+        shortlist, distribution, detail, coverage, checked_cal, checked_thresholds = result
+        shortlists.append(shortlist)
+        distributions.extend(distribution)
+        practical.extend(detail)
+        coverages.append(coverage)
+        calibration_checks += checked_cal
+        threshold_checks += checked_thresholds
+    compact = pd.concat(shortlists, ignore_index=True)
+    details = pd.DataFrame(practical)
+    key = ["run", "variant", "subset", "threshold"]
+    extras = [k for k in details if k not in compact or k in key]
+    compact = compact.merge(details[extras], on=key, how="left", validate="one_to_one")
+    calibration = pd.read_csv(saved_member("calibration_comparison.csv"))
+    calibration = calibration.merge(pd.DataFrame(distributions), on=["run", "variant", "subset"], validate="one_to_one")
+    evidence.reverify()
+    destination, staging = fresh_staging(output_root)
+    try:
+        csv_output(compact, staging/"threshold_shortlist.csv")
+        csv_output(calibration, staging/"calibration_comparison.csv")
+        csv_output(pd.concat(coverages, ignore_index=True), staging/"fixed_coverage.csv")
+        evidence.reverify()
+        write_json(staging/"verification.json", {
+            "format": "catalogiq-saved-confidence-summary-v1",
+            "source_root": str(source_root.relative_to(root)) if source_root.is_relative_to(root) else str(source_root),
+            "previous_run": str(previous.relative_to(root)) if previous.is_relative_to(root) else str(previous),
+            "bootstrap_samples": bootstrap_samples, "bootstrap_seed": seed,
+            "source_hash_normalization": "raw_bytes",
+            "source_sha256": {p.relative_to(root).as_posix() if p.is_relative_to(root) else str(p): h for p, h in evidence.hashes.items()},
+            "source_files_reverified_unchanged": len(evidence.hashes),
+            "code_sha256_lf": {p.name: hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+                for p in (Path(__file__), Path(__file__).with_name("confidence_calibration.py"),
+                          Path(__file__).with_name("clustered_accuracy.py"), Path(__file__).with_name("maria_harness_compatibility.py"))},
+            "maria_harness_commit": REVIEW_HARNESS_COMMIT, "maria_notebook_git_blob": REVIEW_NOTEBOOK_BLOB,
+            "maria_definition_sha256": REVIEW_FUNCTION_HASHES,
+            "maria_temperature_fit_called": False,
+            "saved_calibration_comparisons_reproduced": calibration_checks,
+            "saved_threshold_comparisons_reproduced": threshold_checks,
+            "practical_selected_variant_audit_rows": len(details),
+            "shortlist_rows": len(compact), "calibration_rows": len(calibration),
+            "classifiers_loaded_or_trained": False, "calibrators_fitted": False,
+            "thresholds_selected": False, "original_sources_modified": False,
+            "protected_test_features_or_labels_read": False,
+            "all_policies_disabled": True,
+        })
+        seal_output(staging)
+        staging.rename(destination)
+    except BaseException:
+        cleanup_staging(staging, destination)
+        raise
+    return {"runs": len(names), "output_root": str(destination),
+            "calibration_checks": calibration_checks, "threshold_checks": threshold_checks}

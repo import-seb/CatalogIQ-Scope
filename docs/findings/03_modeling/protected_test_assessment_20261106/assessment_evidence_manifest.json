@@ -1,0 +1,18 @@
+{
+  "format": "catalogiq-protected-test-evidence-v1",
+  "protocol_sha256": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+  "hashing": "Raw SHA-256 of LF files; preserve Git attributes. The manifest does not hash itself.",
+  "files_sha256": {
+    "docs/findings/03_modeling/21_protected_test_assessment_protocol_20261106.md": "41a3a2ca07106acf6b536cfc62979e7e946dec4164a24994fad952f62e6a7422",
+    "docs/findings/03_modeling/22_protected_test_assessment_20261106.md": "365c5341f26b265d2b21e29e490eb776d2b86163a48f1de097e54d0cb352aeaf",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/assessment_artifact_checksums.json": "7c6d783776d0183956b3bf2b56ff38845844c7fc7dc165573b685c15086f1494",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/assessment_verification.json": "127821710e26d19eb28acddbabd4ce151b07ebf16890aca0d707e5abc441892d",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/calibration_comparison.csv": "715aa14dcb06111c74a5c726060b56decc1ef44055cb0bf4a1f6ad703620048d",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/execution_environment.json": "46e034152413d4ee73d3bdca619631bfc54d019e2a2568c6fc978613fb559152",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/metric_intervals.csv": "2deb32c118fc84f88e8b2dbcc42b19a5e5efe46cd93d517925f96c148ee38423",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/preparation_verification.json": "48a8668d48a86c25ff8a48eead9d8948741b71e37d5acc2aedad6804d2b4010b",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/protocol.json": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/results_summary.json": "17555400428aa0b99767d1a0b84fbaad265f68803d27a2395937cd273ca83702",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/threshold_diagnostics.csv": "b9648f663c3855bed024a5e32a6423b96f64c188ffdc62b720a91a79362f1ed9"
+  }
+}
