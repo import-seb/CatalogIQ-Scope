@@ -22,6 +22,8 @@ def reseal(directory):
 
 
 def fixture(directory):
+    # Preserve the Windows-generated fixture bytes used by the Mnfr regression
+    # identity on every platform; production hashes must remain byte-sensitive.
     # Several rows in one group still count as one independent example group.
     data = [
         ("a", "g1", "train", "Common"), ("b", "g1", "train", "Common"),
@@ -37,12 +39,12 @@ def fixture(directory):
     frame["Segment"] = ""  # Other targets must not depend on Segment eligibility.
     frame["ProductName"] = "FORBIDDEN_FEATURE"
     for role in ("train", "validation"):
-        frame.loc[frame.split.eq(role)].to_csv(directory / f"{role}.csv", index=False)
+        frame.loc[frame.split.eq(role)].to_csv(directory / f"{role}.csv", index=False, lineterminator="\r\n")
     protected = pd.DataFrame({"record_id": ["z"], "group_id": ["gz"], "split": ["test"],
                               "Brand": ["SECRET_TEST_LABEL"], "ProductName": ["SECRET_TEST_FEATURE"]})
-    protected.to_csv(directory / "protected_final_test.csv", index=False)
+    protected.to_csv(directory / "protected_final_test.csv", index=False, lineterminator="\r\n")
     pd.concat([frame[["record_id", "group_id", "split"]], protected[["record_id", "group_id", "split"]]],
-              ignore_index=True).to_csv(directory / "assignments.csv", index=False)
+              ignore_index=True).to_csv(directory / "assignments.csv", index=False, lineterminator="\r\n")
     (directory / "grouping_freeze.json").write_text(json.dumps({
         "format": "catalogiq-portable-split-v1", "grouping_version": "rule-final-v4",
         "protocol_id": "synthetic-v4"}), encoding="utf8")

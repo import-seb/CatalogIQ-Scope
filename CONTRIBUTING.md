@@ -29,12 +29,14 @@ training fold. Label-dependent preprocessing can otherwise leak evaluation data.
 ## Local checks
 
 ```bash
-python -m pip install -e ".[notebooks]"
+python -m pip install -e ".[notebooks,splitting,tests]"
 python -m unittest discover -s tests -v
 ```
 
 CI runs synthetic tests and a package build without private
 CSVs. It does not execute the research notebooks or validate model quality.
+The `tests` extra includes PyTorch for the tiny offline neural fixtures. CI
+installs its CPU wheels; no GPU or pretrained model download is needed.
 
 ## Notebook evidence
 

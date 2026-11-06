@@ -44,7 +44,7 @@ class TargetMiniLMPreparationTests(unittest.TestCase):
             frame["ProductContents"] = "Ingredients"
             frame["ProductCategory"] = "<b>Health</b> &gt; Care"
             frame["Category"] = "FORBIDDEN_OTHER_LABEL"
-            frame.to_csv(path, index=False)
+            frame.to_csv(path, index=False, lineterminator="\r\n")
         (self.source / "model_config.json").write_text(json.dumps(ModelConfig().to_dict()), encoding="utf8")
         (self.source / "tokenizer").mkdir()
         (self.source / "tokenizer" / "tokenizer.json").write_text("{}", encoding="utf8")
