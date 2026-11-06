@@ -125,11 +125,15 @@ already implemented dashboard contract):
   "artifact_sha256": "19d0b22672d8e1e4033c4b9a511eee101bf9653da951f1d8c0cd574b909f2fe8",
   "predicted_label": "UnItemised brand",
   "confidence": 0.62603586,
+  "raw_confidence": 0.62603586,
   "probabilities_calibrated": false,
+  "calibration_id": null,
+  "policy_version": "catalogiq-review-proposal-v1-20261106",
+  "policy_approved": false,
   "probabilities": {"probability_0": "<numeric value; include every class>"},
   "status": "suggestion",
   "review_required": true,
-  "review_reasons": ["automatic_acceptance_disabled", "unseen_brand_key"],
+  "review_reasons": ["automatic_acceptance_disabled", "no_approved_threshold", "lookup_without_matching_training_key"],
   "operational_threshold": null
 }
 ```
@@ -188,6 +192,129 @@ versioned relationship registry. Preserve both retailer Vitamins breadcrumbs
 and curated Digestive Health labels when they disagree. A fixed single-parent
 Segment/Sub-Segment whitelist is explicitly disallowed by the decision log;
 do not invent one or auto-rewrite manufacturer from Brand.
+
+## November 6 application review-policy specification
+
+The November 6 review-policy specification below extends the earlier handoff.
+It does not change the selected models, fitted scores, existing primitive API or
+any saved policy. See the [calibration completion](../findings/03_modeling/17_confidence_calibration_review_20261103.md#practical-cutoffs-observed-workload-escaping-errors-and-uncertainty)
+for measured workload and the [Ravi proposal](review_policy_po_proposal_20261106.md)
+for business choices.
+
+### Review severity, reason codes and precedence
+
+The following are **proposed application requirements**. Existing primitive codes
+are identified explicitly; new app-only codes require Max's wrapper. They do not
+imply that the dashboard already implements them or that Ravi has approved them.
+
+| Severity | Condition and machine-readable code | Implementation/evidence |
+|---|---|---|
+| Mandatory | Disabled/unapproved policy: `automatic_acceptance_disabled`; missing/invalid approved cutoff: `no_approved_threshold` | Existing `review_decision`; active default for every model. Passing an experimental number does not constitute approval. |
+| Mandatory | Provisional target: `provisional_model`; confidence below a future approved target cutoff: `below_confidence_threshold` | Existing primitive. Sub-Segment stays provisional. Threshold equality passes only this check. |
+| Mandatory | Invalid probabilities: `invalid_probabilities`; unsupported output: `unsupported_classification`; probability/label mismatch: `conflicting_probability_classification` | Existing primitive. Wrapper also checks confidence against max probability, complete mapping and score version. |
+| Mandatory | Existing quarantine: `existing_quarantine`; all name/description/contents absent: `missing_essential_product_text` | Existing primitive; upstream quarantine information must be wired in. Brand/category alone do not satisfy the essential-text rule. |
+| Mandatory | Missing/unseen lookup key: `lookup_without_matching_training_key` | Existing primitive accepts `lookup_status=missing/unseen`; calibration never removes this requirement. |
+| Mandatory | Broken approved relationship: `invalid_approved_classification_relationship`; incomplete related prediction: `missing_relationship_classification` | Existing primitive, only with explicitly approved/evidenced allowed pairs. Multi-parent pairs remain valid. No complete approved map is currently loaded. |
+| Mandatory | Unapproved/malformed relationship settings: `unapproved_relationship_rule`, `invalid_approved_relationship_rule` | Existing primitive. Configuration failure, not evidence that a product violates taxonomy. |
+| Mandatory | Deferred/unknown target: `target_unavailable`; missing prediction: `prediction_missing`; model exception: `prediction_failed`; missing model/checksum mismatch: `model_unavailable` / `artifact_mismatch`; invalid required schema: `required_input_invalid` | Proposed wrapper codes, not existing primitive outputs. Platform is unavailable; null label/confidence/probabilities rather than fabricated success. |
+| Recommended | Known weak/sparsely supported predicted class: `class_reliability_concern`; new retailer/feature distribution: `domain_shift_suspected`; unusually small top-two margin: `ambiguous_prediction` | Proposed prioritization flags. Class list, drift criteria and margin cutoff unresolved; no invented numeric defaults. Rare true-class errors cannot all be detected by checking the predicted label. |
+| Recommended | Unresolved curated-label dispute or suspicious catch-all: `taxonomy_adjudication_needed` | Proposed priority for taxonomy owners. `Other Brands`, `UnItemised brand` and Mnfr `All others` are supported classes, not invalid labels merely because they are catch-alls. |
+| Informational | Retailer Vitamins breadcrumb versus curated Digestive Health: `retailer_taxonomy_differs` | Existing example crosses different taxonomies. Preserve both; this is not an approved incompatibility rule and must not independently reject a classification. Escalate an actual dispute for adjudication. |
+| Informational | Confidence method/provenance: `confidence_not_operationally_qualified` | Explain raw/scaled research status. Positive calibration results alone never establish an approval policy. |
+
+Initial high-priority review examples: J&J emissions, Infant suggestions,
+Sub-Segment rare/weak labels and Brand catch-all/fallback cases. The evidence
+shows missed true classes too, so these priorities supplement full review;
+they are not detectors for every problematic product. Any future rare-class
+rule must use saved training support or a versioned reliability registry known
+at arrival, not hidden validation truth or audit support counts.
+
+Combine reasons with **OR**, keep every unique code, and never let high confidence
+cancel a mandatory reason. For a proposed primary display state, use this order:
+`failed/unavailable` (cannot supply a valid model suggestion), then mandatory
+review, recommended review, informational warning, then suggestion. Sorting
+reasons alphabetically in the existing primitive is not severity precedence;
+Max's wrapper selects the display priority from the registry above.
+
+Until a policy is approved, `review_required=true` for all targets. For a
+future approved policy, any mandatory condition still requires review.
+Recommend treating elevated-risk recommended flags as review-required in the
+initial qualified rollout until Ravi explicitly changes their handling. An
+informational warning alone would not add a review requirement. All of this
+is specification, not enablement; `review_decision` still defaults to disabled.
+
+### Exact information passed between model, policy and UI
+
+Keep three stages separate: model generates suggestions/probabilities; policy
+evaluates gates and returns reasons; UI displays/records the person's decision.
+Reuse `review_decision` (`review_required = not accept`) rather than rebuilding
+its checks in JavaScript. The wrapper handles unavailable outputs/schema and
+attaches policy state before calling the primitive. Only explicit release
+configuration may supply `enabled=true`; it must bind target, model hash,
+calibration identity, approved threshold and policy version together.
+
+The proposed envelope above carries `record_id`, exact target, nullable predicted
+label and confidence, raw confidence, calibrated flag/calibration ID, immutable
+`model_id`/artifact hash, `policy_version`/approval status, decision status,
+review flag and all reason codes. Add a `review_explanations` array or a versioned
+code-to-explanation dictionary for readable UI text, e.g.:
+
+- `no_approved_threshold`: "This target's review policy has not been approved."
+- `lookup_without_matching_training_key`: "This brand name was absent from the saved lookup; its fallback needs a person."
+- `target_unavailable`: "Platform has no selected classifier. Enter or review this label manually."
+
+Unknown reason codes must retain the code and require review; do not silently
+hide them. Missing outputs are null, not zero confidence or an empty string
+pretending to be a label. Always retain raw model outputs; if a future approved
+calibrator is applied, store the calibrated vector and its identity separately,
+keeping confidence equal to the maximum of the displayed probability variant.
+Human edits never change the original model confidence to 1.0.
+
+### CSV upload, correction and export workflow
+
+1. **Upload/validate:** preserve source columns and product identifiers. Require
+   the expected feature columns; do not silently classify under a different
+   representation. Propose a unique upload/row correlation `record_id` if source
+   product IDs are blank or duplicated, while preserving the original identifier
+   separately. This is an app identity proposal, not a change to frozen evaluation
+   IDs/hashes. A missing required column blocks classification for affected
+   targets; per-row missing values follow the formatter and review rules.
+2. **Classify/evaluate policy:** return one outcome per requested row/target,
+   including explicit failed/unavailable outcomes. Combine target review flags
+   with OR for the product's queue entry and deduplicate products; do not add
+   per-target percentages to estimate product workload. Missing a required
+   target prevents a complete product from being marked ready.
+3. **Review/correct:** show suggestions, source evidence, warnings and explanations.
+   Store `final_label` separately from `predicted_label`, with `review_status`
+   (`pending`, `confirmed`, `corrected`, or `unresolved`), reviewer identity,
+   timestamp, previous/new value and reason/comment. Confirming without changing
+   a value still needs an explicit action. Validate edits against the versioned
+   approved taxonomy; an unsupported new label stays unresolved pending owner
+   approval. A model failure may still receive an explicitly manual classification.
+4. **Export:** write final confirmed/corrected labels without silently losing
+   input columns/identifiers. Retain suggestions, review status, reason codes and
+   model/policy/correction provenance in agreed CSV columns or an audit sidecar.
+   Do not substitute an unreviewed suggestion for an unresolved final label.
+   Before approval, a completed export requires human confirmation of every
+   required target; an explicitly labeled draft export may retain pending/null
+   values. Platform stays pending/manual unless Ravi excludes it from required
+   export scope. Quarantine resolution needs its existing authorized workflow.
+
+These correction/status/export field names are proposed; Max and Ravi should
+settle them before wiring. No automatic retraining, taxonomy mutation or feedback
+learning follows from a correction. Log reviewer time, corrections, unresolved
+rows and separately sampled final-export accuracy; review itself is not a
+measured guarantee of correctness.
+
+### PO approval and application follow-ups
+
+Recommend the conservative reviewer-confirmed pilot in the meeting proposal:
+zero automatic acceptance initially; preserve existing experimental recipes
+as candidates for fresh qualification. Max can implement the disabled-policy
+contract without waiting for arbitrary cutoff choices. Policy activation,
+critical-class decisions, required output targets and review service levels need
+named approval. No new operational threshold or dashboard behavior is enabled
+by publishing this document.
 
 ## Maria's evaluation compatibility requirements
 

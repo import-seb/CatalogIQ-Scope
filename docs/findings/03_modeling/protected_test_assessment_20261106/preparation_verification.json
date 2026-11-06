@@ -1,0 +1,88 @@
+{
+  "status": "prepared_not_executed",
+  "protocol_sha256": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+  "readiness": {
+    "status": "prepared_not_executed",
+    "protocol_sha256": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+    "artifact_and_code_pins_verified": 75,
+    "protected_records": 12160,
+    "protected_groups": 11979,
+    "test_opened_or_hashed": false,
+    "models_loaded": false,
+    "pending": [
+      "Explicit execution authorization",
+      "256-token test input-equality audit during authorized assessment",
+      "Approved relationship registry remains unavailable; relationship rates will be null"
+    ]
+  },
+  "readiness_report": {
+    "path": "data/processed/protected_test_preparation_v1_20261106/summary.json",
+    "sha256": "660c8a1cc72806e9bdc54e0e69c110756093e2ddb634e1004e6a80c0171c32af"
+  },
+  "preparation_file_open_guard": {
+    "guarded_apis": [
+      "builtins.open",
+      "io.open"
+    ],
+    "rejected_basename": "test.csv",
+    "attempts": 0,
+    "phases": [
+      "freeze",
+      "preflight"
+    ]
+  },
+  "protected_test_features_or_labels_read": false,
+  "protected_test_scored": false,
+  "runtime": {
+    "device": "cpu",
+    "precision": "fp32",
+    "threads": 2,
+    "batch_size": 64,
+    "seed": 42,
+    "python": "3.13.7",
+    "libraries": {
+      "numpy": "2.3.3",
+      "pandas": "2.3.2",
+      "scipy": "1.16.2",
+      "scikit-learn": "1.7.2",
+      "tokenizers": "0.22.2",
+      "torch": "2.11.0+cu128",
+      "transformers": "5.3.0",
+      "threadpoolctl": "3.6.0"
+    }
+  },
+  "tests": {
+    "command": ".venv-gpu/Scripts/python.exe -m unittest discover -s tests -q",
+    "pythonpath": "src;tests",
+    "passed": 681,
+    "new_assessment_tests": 8,
+    "result": "OK"
+  },
+  "wheel": {
+    "built": true,
+    "sha256": "1df67010b396bb8714eff998a9964bc7a167337d24b703af650250a470abe427",
+    "assessment_source_matches": true,
+    "required_members_verified": [
+      "catalogiq/protected_test_assessment.py",
+      "catalogiq/resources/maria_review_a41608e.py"
+    ]
+  },
+  "validation_only_smoke": {
+    "records_per_target": 8,
+    "all_saved_predicted_labels_reproduced": true,
+    "protected_test_used": false,
+    "full_representation_audit": false,
+    "maximum_absolute_probability_delta": {
+      "segment": 1.432853699023795e-07,
+      "mnfr": 2.771911622456713e-08,
+      "targetagegroup": 2.9013061508820215e-08,
+      "brand_lookup_probabilistic_v1": 1.1102230246251565e-16,
+      "sub_segment": 2.9797499084827095e-06
+    }
+  },
+  "operational_policy": {
+    "automatic_acceptance_enabled": false,
+    "production_approval": false,
+    "operational_threshold": null
+  }
+}

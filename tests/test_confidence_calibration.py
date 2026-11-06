@@ -15,9 +15,13 @@ from catalogiq.confidence_calibration import (
     per_class_table, reliability, review_decision, temperature_scale, threshold_grid,
     threshold_table, validate_probabilities,
 )
-from catalogiq.confidence_experiment import choose_policy, evaluate_model, load_run, model_gates, run_experiment
+from catalogiq.confidence_experiment import (
+    SUMMARY_THRESHOLDS, _summarize_saved_run, choose_policy, evaluate_model,
+    load_run, model_gates, run_experiment, summarize_saved,
+)
 from catalogiq.prediction_contract import Evidence, REGISTRY_NAME, contract_metadata, write_json
 from catalogiq.features import sha256
+from catalogiq.maria_harness_compatibility import REVIEW_REFERENCE, review_namespace
 
 
 def synthetic_frame():
@@ -49,7 +53,7 @@ class CalibrationCalculationTests(unittest.TestCase):
                          "unidentifiable_infinite_nll")
 
     def test_reliability_matches_maria_pinned_definition(self):
-        path = Path(__file__).parent/"fixtures/maria_harness_calibration_05e52e2.py"
+        path = REVIEW_REFERENCE
         tree = ast.parse(path.read_text())
         node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "ece_and_reliability")
         namespace = {"np": np, "pd": pd}
@@ -314,6 +318,92 @@ class ReviewRuleTests(unittest.TestCase):
         self.assertIn("unapproved_relationship_rule", self.decision(approved_relations=[relation])["review_reasons"])
         self.assertIn("invalid_approved_relationship_rule", self.decision(approved_relations=[
             {"status": "approved", "evidence": "synthetic test"}])["review_reasons"])
+
+
+class SavedSummaryTests(unittest.TestCase):
+    def inputs(self):
+        frame = synthetic_frame()
+        matrix = np.tile([[.99, .01], [.95, .05], [.9, .1], [.2, .8]], (len(frame)//4, 1))
+        frame["predicted_label"] = np.asarray(["A", "B"])[matrix.argmax(axis=1)]
+        frame["probability_0"], frame["probability_1"] = matrix.T
+        assignments = frame[["record_id", "group_id", "split"]].copy()
+        assignments["experiment_role"] = frame.group_id.map(group_role)
+        assignments["eligible_measured_gates"] = "True"
+        assignments["cohort"] = "neural"
+        metrics, tables = [], []
+        for variant in ("raw", "temperature"):
+            for role in ROLES:
+                mask = assignments.experiment_role.eq(role).to_numpy()
+                score, _ = calibration_metrics(matrix[mask], frame.true_label[mask], ["A", "B"])
+                metrics.append({"variant": variant, "subset": role, **score})
+                if role != "calibration_fit":
+                    table = threshold_table(matrix[mask].max(axis=1),
+                        frame.true_label[mask].eq(frame.predicted_label[mask]), frame.group_id[mask],
+                        thresholds=SUMMARY_THRESHOLDS)
+                    table["variant"], table["subset"] = variant, role
+                    tables.append(table)
+        return dict(name="segment", frame=frame, labels=["A", "B"],
+                    columns=["probability_0", "probability_1"],
+                    eligible=np.ones(len(frame), bool), cohorts=np.repeat("neural", len(frame)),
+                    assignments=assignments, temperature=1.,
+                    policy={"enabled": False, "operational_threshold": None,
+                            "selected_candidate": {"variant": "temperature"}},
+                    existing=pd.concat(tables, ignore_index=True), saved_cal=pd.DataFrame(metrics),
+                    reference=review_namespace(), bootstrap_samples=100, seed=20261106)
+
+    def test_saved_replay_retains_counts_without_fitting_and_handles_empty_denominators(self):
+        inputs = self.inputs()
+        inputs["reference"]["temperature_scale"] = lambda *a: self.fail("Must not fit Maria temperature")
+        with patch("catalogiq.confidence_experiment.fit_temperature", side_effect=AssertionError("No fitting")):
+            shortlist, distributions, practical, coverage, calibration_checks, threshold_checks = _summarize_saved_run(**inputs)
+        self.assertEqual((len(shortlist), len(distributions), len(practical)), (44, 6, 4))
+        self.assertEqual((calibration_checks, threshold_checks), (6, 8))
+        first = next(r for r in practical if r["threshold"] == .8)
+        self.assertEqual(first["review_rows"], 0)
+        self.assertIsNone(first["queue_flag_precision_percent"])
+        self.assertGreater(first["accepted_errors"], 0)
+        self.assertEqual(coverage.iloc[0].answered, first["rows"])
+
+    def test_saved_replay_rejects_changed_assignments_results_and_enabled_policy(self):
+        for field in ("assignments", "existing", "saved_cal", "policy"):
+            inputs = self.inputs()
+            if field == "assignments":
+                inputs[field].loc[0, "group_id"] = "tampered"
+            elif field == "existing":
+                inputs[field].loc[:, "accepted_rows"] += 1
+            elif field == "saved_cal":
+                inputs[field].loc[:, "nll"] += .1
+            else:
+                inputs[field]["enabled"] = True
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                _summarize_saved_run(**inputs)
+
+    def test_reference_functions_are_pinned_and_top_level_code_is_never_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)/"reference.py"
+            source = REVIEW_REFERENCE.read_text(encoding="utf8")
+            path.write_text("raise AssertionError('Do not execute module setup')\n" + source, encoding="utf8")
+            self.assertIn("queue_metrics", review_namespace(path))
+            path.write_text(source.replace("def queue_metrics(", "def changed_metrics("), encoding="utf8")
+            with self.assertRaisesRegex(ValueError, "Unexpected"):
+                review_namespace(path)
+
+    def test_saved_summary_refuses_overwrites_and_source_overlap_before_reading(self):
+        with tempfile.TemporaryDirectory() as tmp, patch("catalogiq.confidence_experiment.frozen_identity_context") as loader:
+            root = Path(tmp)
+            with self.assertRaises(FileExistsError):
+                summarize_saved(root, root/"source", root/"previous", root)
+            with self.assertRaisesRegex(ValueError, "separate"):
+                summarize_saved(root, root/"source", root/"previous", root/"source"/"new")
+            loader.assert_not_called()
+
+    def test_summary_cli_reuses_entrypoint_and_requires_a_fresh_explicit_output(self):
+        from catalogiq.cli import confidence_review_main
+        with patch("catalogiq.confidence_experiment.summarize_saved", return_value={"runs":6, "output_root":"new"}) as summary:
+            self.assertEqual(confidence_review_main(["--summarize-saved", "old", "--output-root", "new"]), 0)
+            self.assertEqual(summary.call_args.args[2:], (Path("old"), Path("new")))
+            with self.assertRaises(SystemExit):
+                confidence_review_main(["--summarize-saved", "old"])
 
 
 if __name__ == "__main__":

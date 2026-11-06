@@ -49,4 +49,4 @@ where = ["src"]
 include = ["catalogiq", "catalogiq.*"]
 
 [tool.setuptools.package-data]
-catalogiq = ["resources/segment_final_20261009/*", "resources/segment_final_20261009/tokenizer/*"]
+catalogiq = ["resources/segment_final_20261009/*", "resources/segment_final_20261009/tokenizer/*", "resources/maria_review_a41608e.py"]
