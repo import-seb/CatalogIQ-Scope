@@ -1,0 +1,174 @@
+{
+  "status": "completed_and_saved_outputs_verified",
+  "protocol_sha256": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+  "receipt": {
+    "protocol_sha256": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+    "authorization_reference": "User instruction 2026-11-06: Run the authorized test once using the frozen protocol. Record results, checksums, environment details, and limitations.",
+    "started_utc": "2026-11-06T19:32:41.910307+00:00",
+    "status": "completed",
+    "completed_utc": "2026-11-06T20:13:55.641011+00:00"
+  },
+  "real_assessment_attempt_receipts": [
+    "data/processed/protected_test_assessment_v1_20261106/assessment_receipt.json"
+  ],
+  "real_protected_assessment_command_invocations_this_task": 1,
+  "assessment_retries": 0,
+  "verified_pinned_files": 75,
+  "sealed_output_files_verified": 42,
+  "reconciliation": [
+    {
+      "run": "segment",
+      "target": "Segment",
+      "predicted_rows": 12160,
+      "groups": 11979,
+      "labeled_rows": 11477,
+      "missing_truth_rows": 683,
+      "review_required_rows": 12160,
+      "oov_truth_rows": 0,
+      "class_union_count": 8,
+      "zero_support_classes": 0,
+      "classes_with_1_to_49_truth_rows": 0,
+      "minimum_positive_truth_support": 154,
+      "counts_and_probabilities_verified": true
+    },
+    {
+      "run": "mnfr",
+      "target": "Mnfr",
+      "predicted_rows": 12160,
+      "groups": 11979,
+      "labeled_rows": 11228,
+      "missing_truth_rows": 932,
+      "review_required_rows": 12160,
+      "oov_truth_rows": 0,
+      "class_union_count": 2,
+      "zero_support_classes": 0,
+      "classes_with_1_to_49_truth_rows": 1,
+      "minimum_positive_truth_support": 47,
+      "counts_and_probabilities_verified": true
+    },
+    {
+      "run": "targetagegroup",
+      "target": "TargetAgeGroup",
+      "predicted_rows": 12160,
+      "groups": 11979,
+      "labeled_rows": 11033,
+      "missing_truth_rows": 1127,
+      "review_required_rows": 12160,
+      "oov_truth_rows": 0,
+      "class_union_count": 3,
+      "zero_support_classes": 0,
+      "classes_with_1_to_49_truth_rows": 0,
+      "minimum_positive_truth_support": 128,
+      "counts_and_probabilities_verified": true
+    },
+    {
+      "run": "brand_lookup_probabilistic_v1",
+      "target": "Brand",
+      "predicted_rows": 12160,
+      "groups": 11979,
+      "labeled_rows": 12112,
+      "missing_truth_rows": 48,
+      "review_required_rows": 12160,
+      "oov_truth_rows": 2,
+      "class_union_count": 144,
+      "zero_support_classes": 10,
+      "classes_with_1_to_49_truth_rows": 123,
+      "minimum_positive_truth_support": 1,
+      "counts_and_probabilities_verified": true
+    },
+    {
+      "run": "sub_segment",
+      "target": "Sub-Segment",
+      "predicted_rows": 12160,
+      "groups": 11979,
+      "labeled_rows": 10982,
+      "missing_truth_rows": 1178,
+      "review_required_rows": 12160,
+      "oov_truth_rows": 0,
+      "class_union_count": 49,
+      "zero_support_classes": 3,
+      "classes_with_1_to_49_truth_rows": 18,
+      "minimum_positive_truth_support": 1,
+      "counts_and_probabilities_verified": true
+    }
+  ],
+  "interval_caveats": [
+    {
+      "run": "brand_lookup_probabilistic_v1",
+      "metric": "macro_f1",
+      "point_outside_percentile_interval": true,
+      "estimate": 0.8882991569906875,
+      "lower": 0.8372921717467046,
+      "upper": 0.8846073867143532,
+      "handling": "Retain frozen interval verbatim; sparse-class fixed-union resamples can omit rare truth classes and receive zero class F1. Descriptive interval, not calibrated coverage certification."
+    }
+  ],
+  "recording_used_saved_predictions_only": true,
+  "recording_reopened_test_csv": false,
+  "pre_execution_unit_checks": {
+    "passed": 21,
+    "command": ".venv-gpu/Scripts/python.exe -m unittest test_protected_test_assessment test_segment_validation_analysis -q",
+    "pythonpath": "src;tests"
+  },
+  "execution_log_sha256": "abb88b784b0f2caccf20b113346e56dad09cd72d62d490a8bb2985e045b680b6",
+  "automatic_acceptance_enabled": false,
+  "production_approval": false,
+  "limits": [
+    "Supplied labels have not been certified as independent ground truth",
+    "Frozen grouping used four fields/128 tokens; selected neural inputs use five fields/256 tokens",
+    "Known grouping misses, taxonomy ambiguity and historical development reuse remain",
+    "No approved complete relationship map; relationship-validity requirements remain unresolved",
+    "No final corrected-export, reviewer-time or live retailer quality claim follows from model test metrics"
+  ],
+  "pending_capabilities": {
+    "platform": "deferred",
+    "relationship_validity": "unmeasured_no_approved_machine_readable_registry",
+    "human_corrected_export_quality": "unmeasured",
+    "live_retailer_quality": "unmeasured"
+  },
+  "post_execution_unit_checks": {
+    "passed": 681,
+    "exit_code": 0,
+    "seconds": 90.95,
+    "command": ".venv-gpu/Scripts/python.exe -m unittest discover -s tests -q",
+    "pythonpath": "src;tests",
+    "log_sha256": "e17adf718164195a6c1fb1f3cc21c723e73f186d59deedece0f811259ff53364"
+  },
+  "saved_report_cli_help_import_check": {
+    "passed": true,
+    "command": ".venv-gpu/Scripts/python.exe scripts/evaluate_confidence_review.py --help"
+  },
+  "supporting_freeze_recovery": {
+    "commit": "988a6b752df4226cddf538b9a98c9b0b369b78b7",
+    "timing": "Supporting reporting/helper/test/document files restored after completed assessment; frozen model/scoring pins unchanged.",
+    "paths": [
+      "docs/findings/03_modeling/17_confidence_calibration_review_20261103.md",
+      "docs/findings/03_modeling/confidence_review_20261103/calibration_comparison.csv",
+      "docs/findings/03_modeling/confidence_review_20261103/threshold_shortlist.csv",
+      "docs/findings/03_modeling/confidence_review_20261103/verification.json",
+      "docs/integration/model_selection_handoff_20261106.md",
+      "docs/integration/review_policy_po_proposal_20261106.md",
+      "scripts/evaluate_confidence_review.py",
+      "src/catalogiq/confidence_experiment.py",
+      "src/catalogiq/maria_harness_compatibility.py",
+      "tests/fixtures/maria_harness_calibration_05e52e2.py",
+      "tests/test_brand_probabilistic_lookup.py",
+      "tests/test_confidence_calibration.py"
+    ],
+    "existing_load_run_and_run_experiment_function_bodies_unchanged": true
+  },
+  "executed_command": [
+    ".venv-gpu/Scripts/python.exe",
+    "scripts/assess_protected_test.py",
+    "assess",
+    "--protocol",
+    "docs/findings/03_modeling/protected_test_assessment_20261106/protocol.json",
+    "--protocol-sha256",
+    "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+    "--execute",
+    "--authorization-reference",
+    "User instruction 2026-11-06: Run the authorized test once using the frozen protocol. Record results, checksums, environment details, and limitations.",
+    "--output-root",
+    "data/processed/protected_test_assessment_v1_20261106"
+  ]
+}

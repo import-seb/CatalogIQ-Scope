@@ -1,5 +1,9 @@
 # Frozen model evaluation protocol and protected-test preparation
 
+**Execution update:** the separately authorized assessment completed once on
+November 6. See the [results and limitations](22_protected_test_assessment_20261106.md).
+This document preserves the earlier preparation record; the frozen JSON is unchanged.
+
 November 6, 2026. **Freeze the selected artifacts and assessment method; keep
 the protected test closed until a separately authorized assessment.** This is a
 technical model assessment for a reviewer-assisted product, not approval for
@@ -164,6 +168,7 @@ future warnings do not affect the passing result.
 Compact reproducibility evidence, including the validation-only smoke deltas,
 runtime, readiness-report hash and build hash, is in
 [`preparation_verification.json`](protected_test_assessment_20261106/preparation_verification.json).
-The remaining assessment action is a separately authorized execution of this
-exact protocol. Relationship rates remain unmeasured without an approved map;
-the test-input equality audit is scheduled inside that execution.
+The separately authorized execution is now recorded in the
+[assessment findings](22_protected_test_assessment_20261106.md). Relationship
+rates remain unmeasured without an approved map; the completed test-input audit
+is reported with those findings.

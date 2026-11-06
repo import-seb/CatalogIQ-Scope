@@ -12,7 +12,8 @@
 
 ## Evidence
 
-- [Frozen protected-test assessment protocol](findings/03_modeling/21_protected_test_assessment_protocol_20261106.md): pinned models, metrics, runtime and preparation checks; protected test remains closed until separate execution authorization.
+- [November 6 protected-test assessment](findings/03_modeling/22_protected_test_assessment_20261106.md): the single authorized execution, frozen scores, checksums, environment and interpretation limits.
+- [Frozen protected-test protocol](findings/03_modeling/21_protected_test_assessment_protocol_20261106.md): fixed models, population, scoring and execution controls.
 - [Confidence calibration and review-policy assessment](findings/03_modeling/17_confidence_calibration_review_20261103.md): practical thresholds, uncertainty, minority coverage and acceptance criteria, with a maintained saved-results replay command and required-file inventory.
 - [Ravi meeting proposal](integration/review_policy_po_proposal_20261106.md): recommended reviewer-confirmed pilot, three quantified alternatives, proposed 99% definition and five prioritized business decisions.
 - [November 6 model-selection decision](findings/03_modeling/20_model_selection_20261106.md): all six target recommendations, checked artifacts, confidence limitations, controlled Sub-Segment CPU benchmark and ticket acceptance status.

@@ -1,0 +1,257 @@
+{
+  "protocol_sha256": "f51fcbaa6db6aef775b7b3a5b48fb94bbf3fc0008a504c2938ecfe0daaa9ed2e",
+  "test_records": 12160,
+  "models": [
+    {
+      "target": "Segment",
+      "model_identity": "segment_category_ablation_256_20261010/with_category",
+      "selection_status": "selected",
+      "predicted_rows": 12160,
+      "labeled_rows": 11477,
+      "missing_truth_rows": 683,
+      "prediction_coverage": 1.0,
+      "load_audit_and_prediction_seconds": 539.9656368999858,
+      "representation_audit": {
+        "method": "exact_256_token_inputs",
+        "test_rows_matching_development_input": 0,
+        "interpretation": "No rows removed; any crossing limits independence claims and is not repaired using test results"
+      },
+      "timing_scope": "Model load, exact-input audit and batch inference; not request latency",
+      "metrics": {
+        "records": 11477,
+        "accuracy": 0.9669774331271238,
+        "macro_f1": 0.9407492555581112,
+        "macro_precision": 0.9417434725652678,
+        "macro_recall": 0.9401999782205472,
+        "weighted": {
+          "precision": 0.9669539909250527,
+          "recall": 0.9669774331271238,
+          "f1-score": 0.9668795292651344,
+          "support": 11477.0
+        },
+        "macro_class_set": "model_vocabulary_union_truth",
+        "oov_truth_rows": 0,
+        "calibration_raw": {
+          "rows": 11477,
+          "accuracy": 0.9669774331271238,
+          "mean_confidence": 0.9821211460589977,
+          "confidence_minus_accuracy": 0.015143712931873887,
+          "ece_10_bins": 0.015143712931873946,
+          "brier_multiclass_sum": 0.053202614150856274,
+          "oov_truth_rows": 0,
+          "nll": 0.11184347163869987,
+          "nll_is_infinite": false,
+          "nll_clipped_1e15": 0.11184347163869987,
+          "zero_true_probability_rows": 0
+        }
+      }
+    },
+    {
+      "target": "Mnfr",
+      "model_identity": "minilm-mnfr-category256-c3458037a670c8f0",
+      "selection_status": "selected",
+      "predicted_rows": 12160,
+      "labeled_rows": 11228,
+      "missing_truth_rows": 932,
+      "prediction_coverage": 1.0,
+      "load_audit_and_prediction_seconds": 565.6161368000321,
+      "representation_audit": {
+        "method": "exact_256_token_inputs",
+        "test_rows_matching_development_input": 0,
+        "interpretation": "No rows removed; any crossing limits independence claims and is not repaired using test results"
+      },
+      "timing_scope": "Model load, exact-input audit and batch inference; not request latency",
+      "metrics": {
+        "records": 11228,
+        "accuracy": 0.9994656216601354,
+        "macro_f1": 0.9698658078368223,
+        "macro_precision": 0.9433962264150944,
+        "macro_recall": 0.9997316876844647,
+        "weighted": {
+          "precision": 0.9995261173212522,
+          "recall": 0.9994656216601354,
+          "f1-score": 0.999481581300946,
+          "support": 11228.0
+        },
+        "macro_class_set": "model_vocabulary_union_truth",
+        "oov_truth_rows": 0,
+        "calibration_raw": {
+          "rows": 11228,
+          "accuracy": 0.9994656216601354,
+          "mean_confidence": 0.9998616610008464,
+          "confidence_minus_accuracy": 0.00039603934071097413,
+          "ece_10_bins": 0.00041408432547922734,
+          "brier_multiclass_sum": 0.0007919362119466561,
+          "oov_truth_rows": 0,
+          "nll": 0.001953312791694227,
+          "nll_is_infinite": false,
+          "nll_clipped_1e15": 0.001953312791694227,
+          "zero_true_probability_rows": 0
+        }
+      }
+    },
+    {
+      "target": "TargetAgeGroup",
+      "model_identity": "minilm-targetagegroup-category256-48256ce8adfceee1",
+      "selection_status": "selected",
+      "predicted_rows": 12160,
+      "labeled_rows": 11033,
+      "missing_truth_rows": 1127,
+      "prediction_coverage": 1.0,
+      "load_audit_and_prediction_seconds": 655.134318299999,
+      "representation_audit": {
+        "method": "exact_256_token_inputs",
+        "test_rows_matching_development_input": 0,
+        "interpretation": "No rows removed; any crossing limits independence claims and is not repaired using test results"
+      },
+      "timing_scope": "Model load, exact-input audit and batch inference; not request latency",
+      "metrics": {
+        "records": 11033,
+        "accuracy": 0.9978247076950966,
+        "macro_f1": 0.9792898752862366,
+        "macro_precision": 0.9765234376066753,
+        "macro_recall": 0.9820955897499278,
+        "weighted": {
+          "precision": 0.9978350313396255,
+          "recall": 0.9978247076950966,
+          "f1-score": 0.997829132280028,
+          "support": 11033.0
+        },
+        "macro_class_set": "model_vocabulary_union_truth",
+        "oov_truth_rows": 0,
+        "calibration_raw": {
+          "rows": 11033,
+          "accuracy": 0.9978247076950966,
+          "mean_confidence": 0.9993643487350663,
+          "confidence_minus_accuracy": 0.0015396410399697302,
+          "ece_10_bins": 0.0015596679440568989,
+          "brier_multiclass_sum": 0.0033538751460322463,
+          "oov_truth_rows": 0,
+          "nll": 0.008764369639822736,
+          "nll_is_infinite": false,
+          "nll_clipped_1e15": 0.008764369639822736,
+          "zero_true_probability_rows": 0
+        }
+      }
+    },
+    {
+      "target": "Brand",
+      "model_identity": "brand-productbrand-empirical-prior-v1-8cbdb95a5638dbed",
+      "selection_status": "selected",
+      "predicted_rows": 12160,
+      "labeled_rows": 12112,
+      "missing_truth_rows": 48,
+      "prediction_coverage": 1.0,
+      "load_audit_and_prediction_seconds": 0.26818270003423095,
+      "representation_audit": {
+        "method": "lookup_key_familiarity",
+        "seen_keys": 9099
+      },
+      "timing_scope": "Model load, exact-input audit and batch inference; not request latency",
+      "metrics": {
+        "records": 12112,
+        "accuracy": 0.9381605019815059,
+        "macro_f1": 0.8882991569906875,
+        "macro_precision": 0.9019943784569244,
+        "macro_recall": 0.8834194457895893,
+        "weighted": {
+          "precision": 0.9241516586550436,
+          "recall": 0.9381605019815059,
+          "f1-score": 0.9207203835856062,
+          "support": 12112.0
+        },
+        "macro_class_set": "model_vocabulary_union_truth",
+        "oov_truth_rows": 2,
+        "calibration_raw": {
+          "rows": 12112,
+          "accuracy": 0.9381605019815059,
+          "mean_confidence": 0.8535635825249843,
+          "confidence_minus_accuracy": -0.08459691945652159,
+          "ece_10_bins": 0.08480649919361721,
+          "brier_multiclass_sum": 0.12225802573178736,
+          "oov_truth_rows": 2,
+          "nll": null,
+          "nll_is_infinite": true,
+          "nll_clipped_1e15": 0.35642179722059425,
+          "zero_true_probability_rows": 2
+        }
+      }
+    },
+    {
+      "target": "Sub-Segment",
+      "model_identity": "minilm-sub_segment-category256-8a1e8f3e742eb3a7",
+      "selection_status": "provisional",
+      "predicted_rows": 12160,
+      "labeled_rows": 10982,
+      "missing_truth_rows": 1178,
+      "prediction_coverage": 1.0,
+      "load_audit_and_prediction_seconds": 640.6948963999748,
+      "representation_audit": {
+        "method": "exact_256_token_inputs",
+        "test_rows_matching_development_input": 0,
+        "interpretation": "No rows removed; any crossing limits independence claims and is not repaired using test results"
+      },
+      "timing_scope": "Model load, exact-input audit and batch inference; not request latency",
+      "metrics": {
+        "records": 10982,
+        "accuracy": 0.8869058459297031,
+        "macro_f1": 0.6575226347927848,
+        "macro_precision": 0.6902812658079833,
+        "macro_recall": 0.6619274826843285,
+        "weighted": {
+          "precision": 0.884632076735945,
+          "recall": 0.8869058459297031,
+          "f1-score": 0.8837498601979634,
+          "support": 10982.0
+        },
+        "macro_class_set": "model_vocabulary_union_truth",
+        "oov_truth_rows": 0,
+        "calibration_raw": {
+          "rows": 10982,
+          "accuracy": 0.8869058459297031,
+          "mean_confidence": 0.9085848547096492,
+          "confidence_minus_accuracy": 0.021679008779946107,
+          "ece_10_bins": 0.02430116446088046,
+          "brier_multiclass_sum": 0.1764758417527232,
+          "oov_truth_rows": 0,
+          "nll": 0.3857259295463244,
+          "nll_is_infinite": false,
+          "nll_clipped_1e15": 0.3857259295463244,
+          "zero_true_probability_rows": 0
+        }
+      }
+    }
+  ],
+  "runtime": {
+    "device": "cpu",
+    "precision": "fp32",
+    "threads": 2,
+    "batch_size": 64,
+    "seed": 42,
+    "python": "3.13.7",
+    "libraries": {
+      "numpy": "2.3.3",
+      "pandas": "2.3.2",
+      "scipy": "1.16.2",
+      "scikit-learn": "1.7.2",
+      "tokenizers": "0.22.2",
+      "torch": "2.11.0+cu128",
+      "transformers": "5.3.0",
+      "threadpoolctl": "3.6.0"
+    },
+    "platform": "Windows-11-10.0.26300-SP0",
+    "cpu": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel"
+  },
+  "platform": {
+    "status": "deferred",
+    "model": null,
+    "metrics": null,
+    "prediction_coverage": 0
+  },
+  "relationship_rates": {
+    "status": "unmeasured_no_approved_machine_readable_registry",
+    "valid_pair_rate": null
+  },
+  "human_corrected_accuracy": null,
+  "automatic_acceptance_enabled": false
+}

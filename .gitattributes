@@ -9,7 +9,6 @@
 /src/catalogiq/resources/segment_final_20261009/tokenizer/* -text -eol whitespace=cr-at-eol
 /tests/fixtures/portable_split_protocol/** text eol=lf
 /src/catalogiq/resources/maria_review_a41608e.py text eol=lf
-/docs/findings/03_modeling/protected_test_assessment_20261106/*.json text eol=lf
 
 # New classical modules use LF. Previously fingerprinted sources stay unchanged.
 /src/catalogiq/classical_*.py text eol=lf
@@ -20,3 +19,7 @@
 /docs/findings/03_modeling/04_multitarget_baseline_20261029.md text eol=lf
 /docs/findings/03_modeling/05_classical_contract_20261031.md text eol=lf
 /docs/findings/03_modeling/06_subsegment_comparison_20261103.md text eol=lf
+/docs/findings/03_modeling/protected_test_assessment_20261106/*.json text eol=lf
+/docs/findings/03_modeling/protected_test_assessment_20261106/*.csv text eol=lf
+/docs/findings/03_modeling/21_protected_test_assessment_protocol_20261106.md text eol=lf
+/docs/findings/03_modeling/22_protected_test_assessment_20261106.md text eol=lf
