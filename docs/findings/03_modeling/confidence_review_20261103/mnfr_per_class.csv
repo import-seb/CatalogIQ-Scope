@@ -1,0 +1,3 @@
+class,truth_rows,accepted_truth_rows,truth_class_coverage,accepted_predictions,incorrect_accepted_predictions,missed_true_class_errors,accepted_precision,minority_under_50_rows
+All others,4003,4003,1,4002,0,1,1,False
+J&J,73,73,1,74,1,0,0.986486486486,False

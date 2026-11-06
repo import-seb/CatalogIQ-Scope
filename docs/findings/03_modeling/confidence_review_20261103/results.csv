@@ -1,0 +1,7 @@
+run,target,provisional,candidate_variant,candidate_threshold,temperature,audit_rows,audit_accepted,candidate_auto_per_100,candidate_review_per_100,candidate_wrong_per_100_incoming,audit_accepted_accuracy,audit_accepted_errors,audit_cluster_lower_accuracy,selection_status,development_supports_99_percent,operational_auto_per_100,operational_review_per_100
+segment,Segment,False,temperature,0.93,1.17665115025,4131,3803,92.0600338901,7.9399661099,0.750423626241,0.991848540626,31,0.872671784999,exploratory_only,False,0,100
+mnfr,Mnfr,False,temperature,0.5,1.18542645136,4076,4076,100,0,0.0245338567223,0.999754661433,1,0.905605365173,exploratory_only,False,0,100
+targetagegroup,TargetAgeGroup,False,temperature,0.5,1.41498396408,4010,4010,100,0,0.124688279302,0.998753117207,5,0.900277821802,exploratory_only,False,0,100
+brand,Brand,False,raw,0.97,1.03860005077,4345,3600,82.8538550058,17.1461449942,1.01265822785,0.987777777778,44,0.849585079194,exploratory_only,False,0,100
+sub_segment,Sub-Segment,True,temperature,0.977,0.997083824764,3957,1822,46.0449835734,53.9550164266,0.555976750063,0.987925356751,22,0.799444343242,exploratory_only,False,0,100
+brand_lookup_probabilistic_v1,Brand,False,temperature,0.955,0.75303402508,4345,3298,75.9033371692,24.0966628308,0.506329113924,0.993329290479,22,0.855453196171,exploratory_only,False,0,100

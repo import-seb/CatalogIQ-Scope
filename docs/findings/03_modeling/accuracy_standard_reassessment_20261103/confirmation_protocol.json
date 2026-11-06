@@ -1,0 +1,19 @@
+{
+  "cases": [
+    "singletons_row_independent_0.01010",
+    "unequal_beta_binomial_rho_0.2_0.01010",
+    "long_tail_whole_family_0.01010",
+    "equal_two_row_independent_0.00025"
+  ],
+  "trials": 1000,
+  "bootstrap_repetitions": 19999,
+  "seed": 30361103,
+  "catalog_data_read": false,
+  "frozen_method_decision_changed": false,
+  "purpose": "Sensitivity to finite bootstrap repetition count; independent simulation seeds",
+  "code_sha256": {
+    "clustered_accuracy.py": "b8e0ed49bdefb022ac44bf6c68dece54a0fe53b1c115b20413f731958dfc1022",
+    "accuracy_simulations.py": "82824bee0ea121d348d50f0e2f555e23545fa65440e7874df55157980287fa68",
+    "accuracy_reassessment.py": "645e9eb8e1533ae79677eec1c6bd5c924897b38b93f90735bf60beab767aacb5"
+  }
+}

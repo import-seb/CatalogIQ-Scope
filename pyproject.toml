@@ -19,6 +19,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+tests = [
+    "torch>=2.6,<3",
+]
+calibration = [
+    "matplotlib>=3.8,<4",
+]
 splitting = [
     "numpy==2.3.3",
     "pandas==2.3.2",

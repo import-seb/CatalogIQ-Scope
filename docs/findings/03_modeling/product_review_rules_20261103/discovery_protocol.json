@@ -1,0 +1,65 @@
+{
+  "format": "catalogiq-product-rule-discovery-v1",
+  "models": [
+    "segment",
+    "brand_lookup_probabilistic_v1"
+  ],
+  "fixed_confidence_floors": {
+    "segment": 0.93,
+    "brand_lookup_probabilistic_v1": 0.955
+  },
+  "class_screens": [
+    "all",
+    "discovered_99",
+    "discovered_995",
+    "discovered_error_free",
+    "training_common"
+  ],
+  "gates": {
+    "segment": [
+      "all",
+      "description",
+      "category",
+      "description_category",
+      "seen_brand",
+      "seen_brand_description_category"
+    ],
+    "brand_lookup_probabilistic_v1": [
+      "all",
+      "description",
+      "category",
+      "description_category",
+      "unambiguous_key",
+      "unambiguous_key_support20"
+    ]
+  },
+  "searched_rules": 60,
+  "selection_alpha": 0.0008333333333333334,
+  "discovery_role": "calibration_fit",
+  "selection_role": "threshold_selection",
+  "audit_role_forbidden_for_rule_design": "policy_audit",
+  "min_discovery_class_groups": 25,
+  "min_recommended_policy_groups": 300,
+  "min_recommended_effective_rows": 300,
+  "common_training_rows": 1000,
+  "feature_definitions": {
+    "description_present": "Existing structural blank/null missingness; presence is not verified completeness",
+    "category_present": "Retailer ProductCategory supplied and nonmissing; no inferred hierarchy rule",
+    "brand_seen": "Normalized ProductBrand occurs in this target's approved labeled training records",
+    "brand_training_groups": "Distinct frozen groups containing that normalized key in this target's labeled training",
+    "brand_key_unambiguous": "Training key has exactly one observed target label; not a taxonomy assertion",
+    "common_class": "Predicted class has at least 1000 approved labeled training rows",
+    "class_whitelist": "Class screen learned only from the old calibration-fit subset; no true label required at arrival"
+  },
+  "confidence_ranges": "Diagnostics only; no confidence threshold or score variant changes",
+  "selection": "Maximum coverage with search-adjusted beta >=.99; else nominal >=.99; else best lower bound among sufficiently large observed-99% improvements; never audit fallback",
+  "untouched_independent_confirmation_available": false,
+  "evidence_status": "Historical development exploration; role separation does not undo previous exposure",
+  "code_sha256": {
+    "product_review_rules.py": "2b9b5991c8addd151686b552639a38806fe7ed566608576d12422ed14c57fcfb",
+    "product_rule_experiment.py": "67fc80273bdab9306cff25eb763a7900fd8fbedfcd3a4b1804c3c8c12b6ceb91",
+    "product_rule_plots.py": "7657c422b10f9b3a7722f63fc22dd730b57eed1e93a0193c47c9d3d8b23f56f1",
+    "clustered_accuracy.py": "b8e0ed49bdefb022ac44bf6c68dece54a0fe53b1c115b20413f731958dfc1022"
+  },
+  "automatic_acceptance_enabled": false
+}

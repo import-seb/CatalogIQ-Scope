@@ -1,0 +1,4 @@
+class,truth_rows,accepted_truth_rows,truth_class_coverage,accepted_predictions,incorrect_accepted_predictions,missed_true_class_errors,accepted_precision,minority_under_50_rows
+Adult,3768,3768,1,3771,4,1,0.998939273402,False
+Children,201,201,1,199,1,3,0.994974874372,False
+Infant,41,41,1,40,0,1,1,True

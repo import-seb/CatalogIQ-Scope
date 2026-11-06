@@ -1,0 +1,601 @@
+role,characteristic,value,available_at_arrival,descriptive_not_confirmatory,all_predictions_errors,all_predictions_accuracy,population_rows,population_groups,accepted_rows,review_rows,coverage,review_fraction,errors,accepted_accuracy,accepted_error_rate,accepted_groups,n_eff_df,max_accepted_group_rows,beta_lower,sufficient_groups,alpha,model
+calibration_fit,predicted_class,Allergy,True,True,8,0.9398496240601504,133,63,109,24,0.8195488721804511,0.18045112781954886,4,0.963302752293578,0.03669724770642202,54,22.801756703834414,14,0.8186460926302843,False,0.05,segment
+calibration_fit,predicted_class,CCFS,True,True,10,0.9494949494949495,198,128,179,19,0.9040404040404041,0.09595959595959591,6,0.9664804469273743,0.03351955307262566,113,66.90686491501292,11,0.9037461456559823,False,0.05,segment
+calibration_fit,predicted_class,Digestive Health,True,True,17,0.9508670520231214,346,197,327,19,0.9450867052023122,0.054913294797687806,8,0.9755351681957186,0.024464831804281384,186,75.4531458669309,15,0.9218462971875561,False,0.05,segment
+calibration_fit,predicted_class,External Analgesics,True,True,8,0.9745222929936306,314,202,290,24,0.9235668789808917,0.07643312101910826,2,0.993103448275862,0.006896551724137945,186,92.71695846338051,15,0.9561150802218714,False,0.05,segment
+calibration_fit,predicted_class,Internal Analgesics,True,True,17,0.9247787610619469,226,150,199,27,0.8805309734513275,0.11946902654867253,9,0.9547738693467337,0.045226130653266305,131,75.50985886541963,8,0.8931053084645038,False,0.05,segment
+calibration_fit,predicted_class,Lifestyle CHC,True,True,2,0.9913419913419913,231,124,224,7,0.9696969696969697,0.030303030303030276,1,0.9955357142857143,0.004464285714285698,118,62.512089429637804,12,0.9451767682353162,False,0.05,segment
+calibration_fit,predicted_class,Other Self Care,True,True,5,0.9342105263157895,76,28,66,10,0.868421052631579,0.13157894736842102,1,0.9848484848484849,0.015151515151515138,22,7.007483357277813,18,0.6312104383152699,False,0.05,segment
+calibration_fit,predicted_class,"Vitamins, Minerals & Supplements",True,True,39,0.9842424242424243,2475,1499,2352,123,0.9503030303030303,0.049696969696969684,8,0.9965986394557823,0.003401360544217691,1410,531.2146305437268,53,0.9887402024808675,True,0.05,segment
+calibration_fit,true_class,Allergy,False,True,7,0.946969696969697,132,64,111,21,0.8409090909090909,0.15909090909090906,6,0.9459459459459459,0.05405405405405406,57,24.369564966945486,14,0.8012279238801826,False,0.05,segment
+calibration_fit,true_class,CCFS,False,True,8,0.9591836734693877,196,126,175,21,0.8928571428571429,0.1071428571428571,2,0.9885714285714285,0.011428571428571455,111,65.03526310037161,11,0.9353534638161867,False,0.05,segment
+calibration_fit,true_class,Digestive Health,False,True,21,0.94,350,201,320,30,0.9142857142857143,0.08571428571428574,1,0.996875,0.0031250000000000444,182,74.08951687973052,15,0.9546851347288808,False,0.05,segment
+calibration_fit,true_class,External Analgesics,False,True,12,0.9622641509433962,318,208,294,24,0.9245283018867925,0.07547169811320753,6,0.9795918367346939,0.020408163265306145,191,97.93496621359868,14,0.9371296630391319,False,0.05,segment
+calibration_fit,true_class,Internal Analgesics,False,True,10,0.954337899543379,219,145,192,27,0.8767123287671232,0.12328767123287676,2,0.9895833333333334,0.01041666666666663,124,69.82843218565557,8,0.9400440985798648,False,0.05,segment
+calibration_fit,true_class,Lifestyle CHC,False,True,14,0.9423868312757202,243,135,227,16,0.934156378600823,0.06584362139917699,4,0.9823788546255506,0.017621145374449365,122,64.15041139761587,12,0.9250416331934925,False,0.05,segment
+calibration_fit,true_class,Other Self Care,False,True,5,0.9342105263157895,76,30,69,7,0.9078947368421053,0.09210526315789469,4,0.9420289855072463,0.05797101449275366,25,7.5741937058920055,18,0.5957494174575151,False,0.05,segment
+calibration_fit,true_class,"Vitamins, Minerals & Supplements",False,True,29,0.9882352941176471,2465,1484,2358,107,0.9565922920892495,0.04340770791075055,14,0.9940627650551315,0.00593723494486853,1411,536.1973919556725,53,0.9851207603860431,True,0.05,segment
+calibration_fit,predicted_class_frequency,common,True,True,101,0.974254397145042,3923,2265,3680,243,0.9380576089727249,0.06194239102727506,38,0.9896739130434783,0.010326086956521707,2140,861.2776749380644,53,0.9819914010916758,True,0.05,segment
+calibration_fit,predicted_class_frequency,uncommon,True,True,5,0.9342105263157895,76,28,66,10,0.868421052631579,0.13157894736842102,1,0.9848484848484849,0.015151515151515138,22,7.007483357277813,18,0.6312104383152699,False,0.05,segment
+calibration_fit,true_class_frequency,common,False,True,101,0.974254397145042,3923,2264,3677,246,0.937292888095845,0.06270711190415501,35,0.9904813706826217,0.009518629317378346,2138,860.475790249919,53,0.983006383788754,True,0.05,segment
+calibration_fit,true_class_frequency,uncommon,False,True,5,0.9342105263157895,76,30,69,7,0.9078947368421053,0.09210526315789469,4,0.9420289855072463,0.05797101449275366,25,7.5741937058920055,18,0.5957494174575151,False,0.05,segment
+calibration_fit,brand_familiarity,missing,True,True,2,0.5,4,4,3,1,0.75,0.25,1,0.6666666666666667,0.33333333333333326,3,0.9519504745879592,1,0.006520191446031844,False,0.05,segment
+calibration_fit,brand_familiarity,seen,True,True,80,0.9761122723200956,3349,1808,3141,208,0.9378919080322484,0.06210809196775158,31,0.9901305316778096,0.009869468322190378,1711,650.3790837178368,53,0.9810340048477937,True,0.05,segment
+calibration_fit,brand_familiarity,unfamiliar,True,True,24,0.9628482972136223,646,496,602,44,0.9318885448916409,0.06811145510835914,7,0.9883720930232558,0.011627906976744207,464,339.24362277150755,8,0.9734445277524966,True,0.05,segment
+calibration_fit,description,missing,True,True,75,0.9729534799855752,2773,1779,2630,143,0.9484313018391634,0.051568698160836646,34,0.9870722433460076,0.012927756653992373,1699,831.851030923947,29,0.9785716328916299,True,0.05,segment
+calibration_fit,description,present,True,True,31,0.9747145187601958,1226,871,1116,110,0.9102773246329527,0.08972267536704726,5,0.9955197132616488,0.0044802867383512135,793,437.51553397888483,24,0.9858159100344047,True,0.05,segment
+calibration_fit,product_category,present,True,True,106,0.9734933733433359,3999,2289,3746,253,0.9367341835458864,0.06326581645411355,39,0.9895888948211425,0.01041110517885746,2160,860.468662135309,53,0.9818798618724097,True,0.05,segment
+calibration_fit,brand_key_relationship,mixed_or_unseen,True,True,88,0.9698320191978059,2917,1688,2729,188,0.9355502228316763,0.06444977716832367,33,0.9879076584829608,0.012092341517039196,1587,717.6790525297184,36,0.9787820473784208,True,0.05,segment
+calibration_fit,brand_key_relationship,unambiguous,True,True,18,0.9833641404805915,1082,612,1017,65,0.9399260628465804,0.060073937153419577,6,0.9941002949852508,0.005899705014749235,583,175.25054846674843,53,0.9729100035436096,False,0.05,segment
+calibration_fit,brand_training_support,1_to_4_groups,True,True,21,0.976897689768977,909,564,838,71,0.9218921892189219,0.07810781078107809,7,0.9916467780429594,0.00835322195704058,525,146.885633723198,53,0.9656832656057928,False,0.05,segment
+calibration_fit,brand_training_support,20_plus_groups,True,True,33,0.9778076664425017,1487,750,1415,72,0.9515803631472763,0.04841963685272366,16,0.9886925795053003,0.011307420494699683,722,310.3470240462307,36,0.9729179257742084,True,0.05,segment
+calibration_fit,brand_training_support,5_to_19_groups,True,True,26,0.9727177334732424,953,513,888,65,0.9317943336831059,0.06820566631689406,8,0.990990990990991,0.009009009009009028,483,205.5247976216291,21,0.9707546859858918,False,0.05,segment
+calibration_fit,brand_training_support,unseen_or_missing,True,True,26,0.96,650,500,605,45,0.9307692307692308,0.0692307692307692,8,0.9867768595041322,0.013223140495867813,467,341.6786783369818,8,0.9713614872824938,True,0.05,segment
+calibration_fit,confidence_range,50_to_90,True,True,58,0.7211538461538461,208,176,0,208,0.0,1.0,0,,,0,,0,,False,0.05,segment
+calibration_fit,confidence_range,90_to_93,True,True,8,0.8095238095238095,42,37,0,42,0.0,1.0,0,,,0,,0,,False,0.05,segment
+calibration_fit,confidence_range,93_to_95.5,True,True,11,0.8472222222222222,72,62,72,0,1.0,0.0,11,0.8472222222222222,0.1527777777777778,62,47.43146622575277,5,0.73454095167248,False,0.05,segment
+calibration_fit,confidence_range,95.5_to_97,True,True,8,0.9272727272727272,110,90,110,0,1.0,0.0,8,0.9272727272727272,0.07272727272727275,90,58.66043828001807,8,0.8448955991628053,False,0.05,segment
+calibration_fit,confidence_range,97_to_99,True,True,14,0.9791666666666666,672,445,672,0,1.0,0.0,14,0.9791666666666666,0.02083333333333337,445,215.99496879153847,18,0.9550159803598037,False,0.05,segment
+calibration_fit,confidence_range,99.5_to_100,True,True,1,0.9995313964386129,2134,1283,2134,0,1.0,0.0,1,0.9995313964386129,0.00046860356138711534,1283,497.19843457941,50,0.9931173577314492,True,0.05,segment
+calibration_fit,confidence_range,99_to_99.5,True,True,5,0.9934036939313984,758,456,758,0,1.0,0.0,5,0.9934036939313984,0.006596306068601621,456,245.5908651918095,12,0.9769020060517829,False,0.05,segment
+calibration_fit,confidence_range,below_50,True,True,1,0.6666666666666666,3,3,0,3,0.0,1.0,0,,,0,,0,,False,0.05,segment
+threshold_selection,predicted_class,Allergy,True,True,17,0.859504132231405,121,60,95,26,0.7851239669421488,0.2148760330578512,3,0.968421052631579,0.03157894736842104,51,32.31845848681673,7,0.8605038605214088,False,0.05,segment
+threshold_selection,predicted_class,CCFS,True,True,7,0.9644670050761421,197,109,171,26,0.868020304568528,0.13197969543147203,3,0.9824561403508771,0.01754385964912286,95,49.512038452372124,10,0.9118334017506738,False,0.05,segment
+threshold_selection,predicted_class,Digestive Health,True,True,17,0.9453376205787781,311,216,287,24,0.9228295819935691,0.07717041800643087,10,0.9651567944250871,0.03484320557491294,206,129.771417982991,12,0.9255228891884223,False,0.05,segment
+threshold_selection,predicted_class,External Analgesics,True,True,13,0.9532374100719424,278,190,252,26,0.9064748201438849,0.09352517985611508,2,0.9920634920634921,0.007936507936507908,176,113.41774197635135,9,0.9602586090085834,False,0.05,segment
+threshold_selection,predicted_class,Internal Analgesics,True,True,19,0.9314079422382672,277,150,230,47,0.8303249097472925,0.16967509025270755,5,0.9782608695652174,0.021739130434782594,131,28.127685080850046,35,0.862984458282602,False,0.05,segment
+threshold_selection,predicted_class,Lifestyle CHC,True,True,13,0.9346733668341709,199,124,182,17,0.914572864321608,0.085427135678392,4,0.978021978021978,0.02197802197802201,111,48.46489744585502,17,0.9037682699051954,False,0.05,segment
+threshold_selection,predicted_class,Other Self Care,True,True,8,0.8297872340425532,47,26,40,7,0.851063829787234,0.14893617021276595,2,0.95,0.050000000000000044,22,11.07563387854801,8,0.6901048768913991,False,0.05,segment
+threshold_selection,predicted_class,"Vitamins, Minerals & Supplements",True,True,48,0.979933110367893,2392,1457,2251,141,0.9410535117056856,0.05894648829431437,6,0.9973345179920036,0.0026654820079964336,1374,706.8257717915903,33,0.9913651542708269,True,0.05,segment
+threshold_selection,true_class,Allergy,False,True,7,0.9369369369369369,111,62,95,16,0.8558558558558559,0.14414414414414412,3,0.968421052631579,0.03157894736842104,53,33.61503323060147,7,0.8637777651129723,False,0.05,segment
+threshold_selection,true_class,CCFS,False,True,23,0.892018779342723,213,116,171,42,0.8028169014084507,0.19718309859154926,3,0.9824561403508771,0.01754385964912286,96,49.69406913756392,10,0.9120444333941472,False,0.05,segment
+threshold_selection,true_class,Digestive Health,False,True,29,0.9102167182662538,323,218,279,44,0.8637770897832817,0.13622291021671828,2,0.992831541218638,0.007168458781361964,202,127.47953216934928,12,0.9644068871953929,False,0.05,segment
+threshold_selection,true_class,External Analgesics,False,True,7,0.9742647058823529,272,187,252,20,0.9264705882352942,0.07352941176470584,2,0.9920634920634921,0.007936507936507908,176,113.41774197635135,9,0.9602586090085834,False,0.05,segment
+threshold_selection,true_class,Internal Analgesics,False,True,17,0.9381818181818182,275,150,231,44,0.84,0.16000000000000003,6,0.974025974025974,0.025974025974025983,132,28.483457273949572,35,0.8576605867331222,False,0.05,segment
+threshold_selection,true_class,Lifestyle CHC,False,True,19,0.9073170731707317,205,125,180,25,0.8780487804878049,0.12195121951219512,2,0.9888888888888889,0.011111111111111072,109,47.53214050882988,17,0.9197082842609041,False,0.05,segment
+threshold_selection,true_class,Other Self Care,False,True,5,0.8863636363636364,44,25,39,5,0.8863636363636364,0.11363636363636365,1,0.9743589743589743,0.02564102564102566,21,10.560296642309945,8,0.7145517064262821,False,0.05,segment
+threshold_selection,true_class,"Vitamins, Minerals & Supplements",False,True,35,0.9852879361076082,2379,1462,2261,118,0.9503993274485077,0.04960067255149225,16,0.9929234851835471,0.0070765148164528835,1381,707.1976455285528,33,0.9851836308533705,True,0.05,segment
+threshold_selection,predicted_class_frequency,common,True,True,134,0.9645033112582782,3775,2187,3468,307,0.9186754966887417,0.08132450331125829,33,0.990484429065744,0.009515570934256035,2076,973.4516699872892,35,0.9835829707918192,True,0.05,segment
+threshold_selection,predicted_class_frequency,uncommon,True,True,8,0.8297872340425532,47,26,40,7,0.851063829787234,0.14893617021276595,2,0.95,0.050000000000000044,22,11.07563387854801,8,0.6901048768913991,False,0.05,segment
+threshold_selection,true_class_frequency,common,False,True,137,0.9637374272101641,3778,2193,3469,309,0.9182106934886183,0.08178930651138172,34,0.9901989045834535,0.009801095416546501,2077,973.9346614204323,35,0.9832278193470028,True,0.05,segment
+threshold_selection,true_class_frequency,uncommon,False,True,5,0.8863636363636364,44,25,39,5,0.8863636363636364,0.11363636363636365,1,0.9743589743589743,0.02564102564102566,21,10.560296642309945,8,0.7145517064262821,False,0.05,segment
+threshold_selection,brand_familiarity,seen,True,True,120,0.9626284646527562,3211,1785,2950,261,0.9187169106197446,0.08128308938025541,32,0.9891525423728813,0.010847457627118695,1692,770.7898159849841,35,0.9807573269611782,True,0.05,segment
+threshold_selection,brand_familiarity,unfamiliar,True,True,22,0.9639934533551555,611,444,558,53,0.9132569558101473,0.08674304418985268,3,0.9946236559139785,0.005376344086021501,420,282.32120951529066,15,0.9804365625087984,False,0.05,segment
+threshold_selection,description,missing,True,True,86,0.9674981103552532,2646,1736,2465,181,0.9315948601662888,0.06840513983371121,26,0.9894523326572008,0.010547667342799216,1659,918.0815083203378,25,0.9820236146069306,True,0.05,segment
+threshold_selection,description,present,True,True,56,0.9523809523809523,1176,863,1043,133,0.8869047619047619,0.11309523809523814,9,0.9913710450623202,0.00862895493767979,774,487.7497186884276,16,0.9807488942880644,True,0.05,segment
+threshold_selection,product_category,present,True,True,142,0.9628466771323915,3822,2211,3508,314,0.9178440607012036,0.08215593929879639,35,0.9900228050171037,0.009977194982896287,2097,985.349283247273,35,0.9830599469117461,True,0.05,segment
+threshold_selection,brand_key_relationship,mixed_or_unseen,True,True,115,0.9592198581560284,2820,1632,2576,244,0.9134751773049645,0.08652482269503547,27,0.9895186335403726,0.010481366459627384,1545,855.2020065494366,19,0.9817609867515453,True,0.05,segment
+threshold_selection,brand_key_relationship,unambiguous,True,True,27,0.9730538922155688,1002,598,932,70,0.9301397205588823,0.06986027944111772,8,0.9914163090128756,0.008583690987124415,565,186.91123450702221,35,0.9698560682739498,False,0.05,segment
+threshold_selection,brand_training_support,1_to_4_groups,True,True,29,0.9649334945586457,827,544,756,71,0.9141475211608222,0.08585247883917779,9,0.9880952380952381,0.011904761904761862,512,330.70011357569814,10,0.9727959342687742,True,0.05,segment
+threshold_selection,brand_training_support,20_plus_groups,True,True,58,0.9595536959553695,1434,710,1320,114,0.9205020920502092,0.07949790794979084,16,0.9878787878787879,0.012121212121212088,675,306.457413866254,33,0.9716539194159253,True,0.05,segment
+threshold_selection,brand_training_support,5_to_19_groups,True,True,33,0.9652631578947368,950,543,874,76,0.92,0.07999999999999996,7,0.9919908466819222,0.008009153318077833,514,198.00198160625703,35,0.9716689820677107,False,0.05,segment
+threshold_selection,brand_training_support,unseen_or_missing,True,True,22,0.9639934533551555,611,444,558,53,0.9132569558101473,0.08674304418985268,3,0.9946236559139785,0.005376344086021501,420,282.32120951529066,15,0.9804365625087984,False,0.05,segment
+threshold_selection,confidence_range,50_to_90,True,True,94,0.6439393939393939,264,191,0,264,0.0,1.0,0,,,0,,0,,False,0.05,segment
+threshold_selection,confidence_range,90_to_93,True,True,11,0.7441860465116279,43,39,0,43,0.0,1.0,0,,,0,,0,,False,0.05,segment
+threshold_selection,confidence_range,93_to_95.5,True,True,8,0.873015873015873,63,60,63,0,1.0,0.0,8,0.873015873015873,0.12698412698412698,60,55.72951519700722,2,0.7753485789254895,False,0.05,segment
+threshold_selection,confidence_range,95.5_to_97,True,True,6,0.9340659340659341,91,84,91,0,1.0,0.0,6,0.9340659340659341,0.06593406593406592,84,77.11592460814097,2,0.8671067920536464,False,0.05,segment
+threshold_selection,confidence_range,97_to_99,True,True,20,0.9709724238026125,689,447,689,0,1.0,0.0,20,0.9709724238026125,0.029027576197387495,447,167.46402443945755,34,0.9393397677598088,False,0.05,segment
+threshold_selection,confidence_range,99.5_to_100,True,True,0,1.0,2031,1260,2031,0,1.0,0.0,0,1.0,0.0,1260,660.6083119219396,33,0.9954754580901913,True,0.05,segment
+threshold_selection,confidence_range,99_to_99.5,True,True,1,0.998422712933754,634,424,634,0,1.0,0.0,1,0.998422712933754,0.001577287066246047,424,239.63910730743294,17,0.9846930269726232,False,0.05,segment
+threshold_selection,confidence_range,below_50,True,True,2,0.7142857142857143,7,5,0,7,0.0,1.0,0,,,0,,0,,False,0.05,segment
+calibration_fit,predicted_class,21st Century,True,True,0,1.0,12,5,12,0,1.0,0.0,0,1.0,0.0,5,2.678891035989334,4,0.32684367418872945,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Advil,True,True,0,1.0,10,3,10,0,1.0,0.0,0,1.0,0.0,3,0.8814356246184807,4,0.03341679654629647,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Airborne,True,True,0,1.0,16,2,16,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,8,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Aleve,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Allegra,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Amazing Nutrition,True,True,0,1.0,20,12,20,0,1.0,0.0,0,1.0,0.0,12,7.626141690266204,4,0.6751474931427291,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Amazon Basic Care,True,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Ancient Nutrition,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Andrew Lessman,True,True,0,1.0,8,3,8,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,4,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Ark Labs,True,True,0,1.0,10,7,10,0,1.0,0.0,0,1.0,0.0,7,4.47825007424004,2,0.5122453662697473,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Astepro,True,True,0,1.0,13,1,0,13,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Bayer,True,True,0,1.0,10,3,10,0,1.0,0.0,0,1.0,0.0,3,0.4807830679737167,8,0.001967594017019739,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Benadryl,True,True,0,1.0,15,1,15,0,1.0,0.0,0,1.0,0.0,1,0.0,15,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Bengay,True,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Best Naturals,True,True,0,1.0,12,8,12,0,1.0,0.0,0,1.0,0.0,8,4.9336583020398574,3,0.5448727320714151,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Biofreeze,True,True,1,0.8333333333333334,6,3,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Biotrue,True,True,2,0.8,10,1,0,10,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Bluebonnet,True,True,0,1.0,23,10,23,0,1.0,0.0,0,1.0,0.0,10,5.258316513047113,6,0.5656876604337823,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Boiron,True,True,0,1.0,11,8,11,0,1.0,0.0,0,1.0,0.0,8,5.364950326809681,2,0.5721297006366606,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Botanic Choice,True,True,0,1.0,7,6,7,0,1.0,0.0,0,1.0,0.0,6,3.6277481690533437,2,0.4378920482450974,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Bronson,True,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,BulkSupplements,True,True,0,1.0,30,16,30,0,1.0,0.0,0,1.0,0.0,16,12.005059173503174,3,0.7791597753676538,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,CVS Health,True,True,3,0.9387755102040817,49,21,0,49,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Carlson,True,True,0,1.0,9,5,9,0,1.0,0.0,0,1.0,0.0,5,2.0965234194699134,4,0.23957116881466006,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Carlyle,True,True,0,1.0,31,21,31,0,1.0,0.0,0,1.0,0.0,21,15.334398013737976,3,0.8225382614421178,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Centrum,True,True,0,1.0,16,6,16,0,1.0,0.0,0,1.0,0.0,6,2.1322274952803326,8,0.24537250617816442,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Claritin,True,True,0,1.0,7,2,7,0,1.0,0.0,0,1.0,0.0,2,0.1146773435846744,5,4.517150423673436e-12,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Codeage,True,True,0,1.0,19,1,19,0,1.0,0.0,0,1.0,0.0,1,0.0,19,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Country Life,True,True,0,1.0,20,13,20,0,1.0,0.0,0,1.0,0.0,13,9.463601722238561,3,0.7286563334176716,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Culturelle,True,True,0,1.0,9,3,9,0,1.0,0.0,0,1.0,0.0,3,0.7788685701174212,5,0.021359437465754076,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Designs for health,True,True,0,1.0,7,5,7,0,1.0,0.0,0,1.0,0.0,5,2.6518315305752997,2,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Doctor's Best,True,True,0,1.0,8,5,7,1,0.875,0.125,0,1.0,0.0,4,1.5958105498443786,3,0.15301060148614049,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Dr. Mercola,True,True,0,1.0,5,5,5,0,1.0,0.0,0,1.0,0.0,5,2.9765455955437043,1,0.3655157333273554,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Emergen-C,True,True,0,1.0,16,5,16,0,1.0,0.0,0,1.0,0.0,5,2.7214131159256723,4,0.33260480586944813,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Equate,True,True,0,1.0,17,11,17,0,1.0,0.0,0,1.0,0.0,11,7.212752284025757,3,0.6601169252255885,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Force Factor,True,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,GNC,True,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Gaia Herbs,True,True,0,1.0,4,2,4,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,2,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Garden of Life,True,True,0,1.0,33,13,33,0,1.0,0.0,0,1.0,0.0,13,6.770274487566433,7,0.6424391762316608,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Generic,True,True,0,1.0,23,16,23,0,1.0,0.0,0,1.0,0.0,16,9.504413514369384,5,0.7296474501918,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,HAWAIIPHARM,True,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,HUM,True,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Herb Pharm,True,True,0,1.0,7,5,7,0,1.0,0.0,0,1.0,0.0,5,2.6518315305752997,2,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Horbäach,True,True,1,0.9333333333333333,15,11,15,0,1.0,0.0,1,0.9333333333333333,0.06666666666666665,11,8.056970920549308,2,0.599802838183675,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Hyland's,True,True,0,1.0,7,5,7,0,1.0,0.0,0,1.0,0.0,5,2.6518315305752997,2,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,IDEAL PERFORMANCE,True,True,0,1.0,13,3,13,0,1.0,0.0,0,1.0,0.0,3,0.6620560913801032,8,0.010835885268819175,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Icy Hot,True,True,0,1.0,15,7,15,0,1.0,0.0,0,1.0,0.0,7,2.9312182304116625,5,0.35987112642639835,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Imodium,True,True,0,1.0,9,1,9,0,1.0,0.0,0,1.0,0.0,1,0.0,9,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Irwin Naturals,True,True,2,0.7777777777777778,9,2,9,0,1.0,0.0,2,0.7777777777777778,0.2222222222222222,2,0.08457679123403458,8,1.6196872750228133e-20,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Jarrow Formulas,True,True,0,1.0,20,1,20,0,1.0,0.0,0,1.0,0.0,1,0.0,20,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,KAL,True,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Kirkland Signature,True,True,0,1.0,11,5,11,0,1.0,0.0,0,1.0,0.0,5,2.3236259165212143,4,0.2754776028100224,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Lactaid,True,True,0,1.0,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Life Extension,True,True,0,1.0,15,6,15,0,1.0,0.0,0,1.0,0.0,6,3.4865638549278697,4,0.42349144205728245,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Love Wellness,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,MaryRuth Organics,True,True,0,1.0,11,7,11,0,1.0,0.0,0,1.0,0.0,7,3.4679568574914867,4,0.4215436080478848,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Mason Natural,True,True,0,1.0,7,3,7,0,1.0,0.0,0,1.0,0.0,3,0.9146190834276471,3,0.037802203134234595,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,MegaFood,True,True,0,1.0,8,5,8,0,1.0,0.0,0,1.0,0.0,5,2.3812364764349634,3,0.28420557605011343,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Metamucil,True,True,0,1.0,7,3,7,0,1.0,0.0,0,1.0,0.0,3,0.5758712747507407,5,0.005505065253921,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Micro Ingredients,True,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,MiraLax,True,True,0,1.0,6,1,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Mommy's Bliss,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Mucinex,True,True,0,1.0,16,7,14,2,0.875,0.125,0,1.0,0.0,5,2.6518315305752997,4,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,NOW,True,True,0,1.0,71,43,71,0,1.0,0.0,0,1.0,0.0,43,23.067341493872917,8,0.8782104803369635,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nasonex,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Natrol,True,True,0,1.0,6,4,6,0,1.0,0.0,0,1.0,0.0,4,1.7586483610529888,2,0.18205821078563758,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,NaturaNectar,True,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Natural Factors,True,True,0,1.0,5,5,5,0,1.0,0.0,0,1.0,0.0,5,2.9765455955437043,1,0.3655157333273554,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature Made,True,True,0,1.0,41,9,41,0,1.0,0.0,0,1.0,0.0,9,4.022163036225985,13,0.4748262761489376,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Answer,True,True,0,1.0,5,3,5,0,1.0,0.0,0,1.0,0.0,3,0.8814356246184807,2,0.03341679654629647,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Bounty,True,True,0,1.0,30,7,30,0,1.0,0.0,0,1.0,0.0,7,3.161117699463558,11,0.3876387828053161,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Nutrition,True,True,0,1.0,13,4,13,0,1.0,0.0,0,1.0,0.0,4,1.7565695804843682,5,0.18169157075881143,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Plus,True,True,0,1.0,41,5,41,0,1.0,0.0,0,1.0,0.0,5,0.7288526068621947,37,0.016404441784275456,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Sunshine,True,True,0,1.0,5,3,5,0,1.0,0.0,0,1.0,0.0,3,0.7211746019605751,3,0.015702073124500608,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Truth,True,True,0,1.0,26,12,26,0,1.0,0.0,0,1.0,0.0,12,5.786529551920356,8,0.5958847897127487,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nature's Way,True,True,0,1.0,27,16,27,0,1.0,0.0,0,1.0,0.0,16,11.25948181430666,4,0.7663907913819573,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Natures Craft,True,True,0,1.0,7,7,7,0,1.0,0.0,0,1.0,0.0,7,5.015640083148845,1,0.550307449031528,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,NeilMed,True,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,New Chapter,True,True,1,0.9375,16,9,16,0,1.0,0.0,1,0.9375,0.0625,9,6.259356634602723,3,0.5408338108908881,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nordic Naturals,True,True,0,1.0,18,4,18,0,1.0,0.0,0,1.0,0.0,4,1.438894113588809,9,0.12468452427001848,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,NusaPure,True,True,0,1.0,10,10,10,0,1.0,0.0,0,1.0,0.0,10,8.051486532264956,1,0.6893046470604394,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Nutricost,True,True,0,1.0,21,15,21,0,1.0,0.0,0,1.0,0.0,15,8.54690586345251,5,0.7043323916903415,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Olly,True,True,0,1.0,6,1,6,0,1.0,0.0,0,1.0,0.0,1,0.0,6,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,One A Day,True,True,0,1.0,8,3,8,0,1.0,0.0,0,1.0,0.0,3,0.6769425597069931,5,0.011969587547553477,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Other Brands,True,True,12,0.7209302325581395,43,27,0,43,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Pedialyte,True,True,1,0.8,5,2,5,0,1.0,0.0,1,0.8,0.19999999999999996,2,0.0998092126037082,4,4.92877260711155e-17,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Pepcid,True,True,0,1.0,16,1,16,0,1.0,0.0,0,1.0,0.0,1,0.0,16,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Pepto Bismol,True,True,1,0.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Pipping Rock,True,True,0,1.0,9,7,9,0,1.0,0.0,0,1.0,0.0,7,4.4644708432423785,2,0.5111888421273405,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Pure Encapsulations,True,True,0,1.0,11,8,11,0,1.0,0.0,0,1.0,0.0,8,4.800218713461294,3,0.5357527809845882,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Pure Organic Ingredients,True,True,0,1.0,12,10,12,0,1.0,0.0,0,1.0,0.0,10,6.441189225811965,3,0.6280786168673557,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Puritan's Pride,True,True,0,1.0,13,8,13,0,1.0,0.0,0,1.0,0.0,8,5.0953726574956075,3,0.5554748593518701,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Qunol,True,True,0,1.0,8,1,8,0,1.0,0.0,0,1.0,0.0,1,0.0,8,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Rae Wellness,True,True,1,0.6666666666666666,3,1,0,3,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Refresh,True,True,3,0.8636363636363636,22,2,0,22,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Ricola,True,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Robitussin,True,True,0,1.0,9,3,9,0,1.0,0.0,0,1.0,0.0,3,0.6268942149725585,6,0.00840701623313054,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Rolaids,True,True,3,0.5,6,1,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,SOLARAY,True,True,0,1.0,25,10,25,0,1.0,0.0,0,1.0,0.0,10,5.187813487284122,7,0.5613247508803298,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,SmartyPants,True,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Solgar,True,True,0,1.0,26,14,26,0,1.0,0.0,0,1.0,0.0,14,7.673317377300581,6,0.6767800051915734,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Source Naturals,True,True,0,1.0,8,5,8,0,1.0,0.0,0,1.0,0.0,5,2.7214131159256723,2,0.33260480586944813,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Spring Valley,True,True,0,1.0,20,4,20,0,1.0,0.0,0,1.0,0.0,4,1.1771408039176632,12,0.0784791234777894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Standard Process Inc.,True,True,0,1.0,5,5,5,0,1.0,0.0,0,1.0,0.0,5,2.9765455955437043,1,0.3655157333273554,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Starwest Botanicals,True,True,0,1.0,6,6,6,0,1.0,0.0,0,1.0,0.0,6,3.9979265536506237,1,0.4726871679378619,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Sudafed,True,True,0,1.0,7,1,7,0,1.0,0.0,0,1.0,0.0,1,0.0,7,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Sunwarrior,True,True,1,0.5,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Swanson,True,True,0,1.0,15,3,11,4,0.7333333333333333,0.2666666666666667,0,1.0,0.0,2,0.11249728784976863,8,2.722764745061649e-12,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,TUMS,True,True,0,1.0,13,3,13,0,1.0,0.0,0,1.0,0.0,3,0.43598815773811683,11,0.0010373019564745524,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Theraflu,True,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Thorne Research,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Tylenol,True,True,1,0.9444444444444444,18,8,17,1,0.9444444444444444,0.05555555555555558,1,0.9411764705882353,0.05882352941176472,7,2.22660519820279,9,0.2207853877915526,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,UnItemised brand,True,True,145,0.9466715704303053,2719,1729,1909,810,0.7020963589554984,0.2979036410445016,23,0.9879518072289156,0.012048192771084376,1173,433.93227670634286,54,0.9752287111268888,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Vicks,True,True,0,1.0,5,4,5,0,1.0,0.0,0,1.0,0.0,4,1.7446908343779652,2,0.17959405338511716,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Visine,True,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Vitafusion,True,True,0,1.0,14,9,14,0,1.0,0.0,0,1.0,0.0,9,5.476937055277382,3,0.5786993501939798,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Vitamatic,True,True,0,1.0,6,4,6,0,1.0,0.0,0,1.0,0.0,4,1.7586483610529888,2,0.18205821078563758,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Vitauthority,True,True,5,0.7368421052631579,19,1,0,19,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Walgreens,True,True,1,0.9791666666666666,48,27,48,0,1.0,0.0,1,0.9791666666666666,0.02083333333333337,27,17.85633157969468,5,0.8118079121573183,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Xyzal,True,True,0,1.0,6,1,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Zarbee's,True,True,0,1.0,15,2,15,0,1.0,0.0,0,1.0,0.0,2,0.07751679963638251,14,1.6449564737699027e-17,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,Zicam,True,True,0,1.0,6,3,6,0,1.0,0.0,0,1.0,0.0,3,0.8159575496468222,3,0.025440025749822955,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class,up & up,True,True,0,1.0,10,6,10,0,1.0,0.0,0,1.0,0.0,6,2.7763378844796,4,0.33992749214061146,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,21st Century,False,True,0,1.0,12,5,12,0,1.0,0.0,0,1.0,0.0,5,2.678891035989334,4,0.32684367418872945,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Advil,False,True,0,1.0,10,3,10,0,1.0,0.0,0,1.0,0.0,3,0.8814356246184807,4,0.03341679654629647,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Airborne,False,True,0,1.0,16,2,16,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,8,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Aleve,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Allegra,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Amazing Nutrition,False,True,0,1.0,20,12,20,0,1.0,0.0,0,1.0,0.0,12,7.626141690266204,4,0.6751474931427291,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Amazon Basic Care,False,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Ancient Nutrition,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Andrew Lessman,False,True,0,1.0,8,3,8,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,4,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Ark Labs,False,True,0,1.0,10,7,10,0,1.0,0.0,0,1.0,0.0,7,4.47825007424004,2,0.5122453662697473,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Astepro,False,True,0,1.0,13,1,0,13,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Bayer,False,True,2,0.8333333333333334,12,5,10,2,0.8333333333333334,0.16666666666666663,0,1.0,0.0,3,0.4807830679737167,8,0.001967594017019739,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Benadryl,False,True,0,1.0,15,1,15,0,1.0,0.0,0,1.0,0.0,1,0.0,15,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Bengay,False,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Best Naturals,False,True,0,1.0,12,8,12,0,1.0,0.0,0,1.0,0.0,8,4.9336583020398574,3,0.5448727320714151,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Biofreeze,False,True,0,1.0,5,3,0,5,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Biotrue,False,True,0,1.0,8,1,0,8,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Bluebonnet,False,True,0,1.0,23,10,23,0,1.0,0.0,0,1.0,0.0,10,5.258316513047113,6,0.5656876604337823,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Boiron,False,True,0,1.0,11,8,11,0,1.0,0.0,0,1.0,0.0,8,5.364950326809681,2,0.5721297006366606,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Botanic Choice,False,True,0,1.0,7,6,7,0,1.0,0.0,0,1.0,0.0,6,3.6277481690533437,2,0.4378920482450974,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Bronson,False,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,BulkSupplements,False,True,0,1.0,30,16,30,0,1.0,0.0,0,1.0,0.0,16,12.005059173503174,3,0.7791597753676538,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,CVS Health,False,True,0,1.0,46,19,0,46,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Carlson,False,True,0,1.0,9,5,9,0,1.0,0.0,0,1.0,0.0,5,2.0965234194699134,4,0.23957116881466006,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Carlyle,False,True,0,1.0,31,21,31,0,1.0,0.0,0,1.0,0.0,21,15.334398013737976,3,0.8225382614421178,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Centrum,False,True,0,1.0,16,6,16,0,1.0,0.0,0,1.0,0.0,6,2.1322274952803326,8,0.24537250617816442,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Claritin,False,True,5,0.5833333333333334,12,3,7,5,0.5833333333333334,0.41666666666666663,0,1.0,0.0,2,0.1146773435846744,5,4.517150423673436e-12,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Codeage,False,True,0,1.0,19,1,19,0,1.0,0.0,0,1.0,0.0,1,0.0,19,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Country Life,False,True,0,1.0,20,13,20,0,1.0,0.0,0,1.0,0.0,13,9.463601722238561,3,0.7286563334176716,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Culturelle,False,True,0,1.0,9,3,9,0,1.0,0.0,0,1.0,0.0,3,0.7788685701174212,5,0.021359437465754076,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Designs for health,False,True,0,1.0,7,5,7,0,1.0,0.0,0,1.0,0.0,5,2.6518315305752997,2,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Doctor's Best,False,True,0,1.0,8,5,7,1,0.875,0.125,0,1.0,0.0,4,1.5958105498443786,3,0.15301060148614049,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Dr. Mercola,False,True,1,0.8333333333333334,6,6,5,1,0.8333333333333334,0.16666666666666663,0,1.0,0.0,5,2.9765455955437043,1,0.3655157333273554,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Emergen-C,False,True,2,0.8888888888888888,18,6,16,2,0.8888888888888888,0.11111111111111116,0,1.0,0.0,5,2.7214131159256723,4,0.33260480586944813,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Equate,False,True,0,1.0,17,11,17,0,1.0,0.0,0,1.0,0.0,11,7.212752284025757,3,0.6601169252255885,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Force Factor,False,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,GNC,False,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Gaia Herbs,False,True,0,1.0,4,2,4,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,2,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Garden of Life,False,True,0,1.0,33,13,33,0,1.0,0.0,0,1.0,0.0,13,6.770274487566433,7,0.6424391762316608,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Generic,False,True,0,1.0,23,16,23,0,1.0,0.0,0,1.0,0.0,16,9.504413514369384,5,0.7296474501918,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,HAWAIIPHARM,False,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,HUM,False,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Herb Pharm,False,True,0,1.0,7,5,7,0,1.0,0.0,0,1.0,0.0,5,2.6518315305752997,2,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Horbäach,False,True,0,1.0,14,11,14,0,1.0,0.0,0,1.0,0.0,11,8.071294424408062,2,0.689934343880874,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Hyland's,False,True,0,1.0,7,5,7,0,1.0,0.0,0,1.0,0.0,5,2.6518315305752997,2,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,IDEAL PERFORMANCE,False,True,0,1.0,13,3,13,0,1.0,0.0,0,1.0,0.0,3,0.6620560913801032,8,0.010835885268819175,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Icy Hot,False,True,0,1.0,15,7,15,0,1.0,0.0,0,1.0,0.0,7,2.9312182304116625,5,0.35987112642639835,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Imodium,False,True,0,1.0,9,1,9,0,1.0,0.0,0,1.0,0.0,1,0.0,9,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Irwin Naturals,False,True,0,1.0,7,1,7,0,1.0,0.0,0,1.0,0.0,1,0.0,7,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Jarrow Formulas,False,True,0,1.0,20,1,20,0,1.0,0.0,0,1.0,0.0,1,0.0,20,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,KAL,False,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Kirkland Signature,False,True,2,0.8461538461538461,13,7,13,0,1.0,0.0,2,0.8461538461538461,0.15384615384615385,7,3.6694509699227478,4,0.3004525051161471,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Lactaid,False,True,0,1.0,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Life Extension,False,True,0,1.0,15,6,15,0,1.0,0.0,0,1.0,0.0,6,3.4865638549278697,4,0.42349144205728245,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Love Wellness,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,MaryRuth Organics,False,True,0,1.0,11,7,11,0,1.0,0.0,0,1.0,0.0,7,3.4679568574914867,4,0.4215436080478848,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Mason Natural,False,True,0,1.0,7,3,7,0,1.0,0.0,0,1.0,0.0,3,0.9146190834276471,3,0.037802203134234595,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,MegaFood,False,True,0,1.0,8,5,8,0,1.0,0.0,0,1.0,0.0,5,2.3812364764349634,3,0.28420557605011343,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Metamucil,False,True,0,1.0,7,3,7,0,1.0,0.0,0,1.0,0.0,3,0.5758712747507407,5,0.005505065253921,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Micro Ingredients,False,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,MiraLax,False,True,0,1.0,6,1,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Mommy's Bliss,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Mucinex,False,True,2,0.8888888888888888,18,8,14,4,0.7777777777777778,0.2222222222222222,0,1.0,0.0,5,2.6518315305752997,4,0.323135275174894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,NOW,False,True,0,1.0,71,43,71,0,1.0,0.0,0,1.0,0.0,43,23.067341493872917,8,0.8782104803369635,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nasonex,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Natrol,False,True,0,1.0,6,4,6,0,1.0,0.0,0,1.0,0.0,4,1.7586483610529888,2,0.18205821078563758,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,NaturaNectar,False,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Natural Factors,False,True,0,1.0,5,5,5,0,1.0,0.0,0,1.0,0.0,5,2.9765455955437043,1,0.3655157333273554,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature Made,False,True,0,1.0,41,9,41,0,1.0,0.0,0,1.0,0.0,9,4.022163036225985,13,0.4748262761489376,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Answer,False,True,0,1.0,5,3,5,0,1.0,0.0,0,1.0,0.0,3,0.8814356246184807,2,0.03341679654629647,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Bounty,False,True,0,1.0,30,7,30,0,1.0,0.0,0,1.0,0.0,7,3.161117699463558,11,0.3876387828053161,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Nutrition,False,True,0,1.0,13,4,13,0,1.0,0.0,0,1.0,0.0,4,1.7565695804843682,5,0.18169157075881143,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Plus,False,True,0,1.0,41,5,41,0,1.0,0.0,0,1.0,0.0,5,0.7288526068621947,37,0.016404441784275456,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Sunshine,False,True,0,1.0,5,3,5,0,1.0,0.0,0,1.0,0.0,3,0.7211746019605751,3,0.015702073124500608,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Truth,False,True,0,1.0,26,12,26,0,1.0,0.0,0,1.0,0.0,12,5.786529551920356,8,0.5958847897127487,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nature's Way,False,True,0,1.0,27,16,27,0,1.0,0.0,0,1.0,0.0,16,11.25948181430666,4,0.7663907913819573,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Natures Craft,False,True,0,1.0,7,7,7,0,1.0,0.0,0,1.0,0.0,7,5.015640083148845,1,0.550307449031528,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,NeilMed,False,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,New Chapter,False,True,0,1.0,15,9,15,0,1.0,0.0,0,1.0,0.0,9,6.070496736144882,3,0.6104917691242031,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nordic Naturals,False,True,0,1.0,18,4,18,0,1.0,0.0,0,1.0,0.0,4,1.438894113588809,9,0.12468452427001848,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,NusaPure,False,True,0,1.0,10,10,10,0,1.0,0.0,0,1.0,0.0,10,8.051486532264956,1,0.6893046470604394,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Nutricost,False,True,0,1.0,21,15,21,0,1.0,0.0,0,1.0,0.0,15,8.54690586345251,5,0.7043323916903415,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Olly,False,True,0,1.0,6,1,6,0,1.0,0.0,0,1.0,0.0,1,0.0,6,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,One A Day,False,True,0,1.0,8,3,8,0,1.0,0.0,0,1.0,0.0,3,0.6769425597069931,5,0.011969587547553477,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Other Brands,False,True,130,0.19254658385093168,161,127,23,138,0.14285714285714285,0.8571428571428572,23,0.0,1.0,21,17.820098790158447,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Pedialyte,False,True,0,1.0,4,2,4,0,1.0,0.0,0,1.0,0.0,2,0.10859242331283453,3,1.0450709035649548e-12,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Pepcid,False,True,0,1.0,16,1,16,0,1.0,0.0,0,1.0,0.0,1,0.0,16,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Pipping Rock,False,True,0,1.0,9,7,9,0,1.0,0.0,0,1.0,0.0,7,4.4644708432423785,2,0.5111888421273405,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Pure Encapsulations,False,True,0,1.0,11,8,11,0,1.0,0.0,0,1.0,0.0,8,4.800218713461294,3,0.5357527809845882,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Pure Organic Ingredients,False,True,0,1.0,12,10,12,0,1.0,0.0,0,1.0,0.0,10,6.441189225811965,3,0.6280786168673557,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Puritan's Pride,False,True,2,0.8666666666666667,15,9,13,2,0.8666666666666667,0.1333333333333333,0,1.0,0.0,8,5.0953726574956075,3,0.5554748593518701,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Qunol,False,True,0,1.0,8,1,8,0,1.0,0.0,0,1.0,0.0,1,0.0,8,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Rae Wellness,False,True,0,1.0,2,1,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Refresh,False,True,1,0.95,20,3,0,20,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Ricola,False,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Robitussin,False,True,0,1.0,9,3,9,0,1.0,0.0,0,1.0,0.0,3,0.6268942149725585,6,0.00840701623313054,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Rolaids,False,True,0,1.0,3,1,0,3,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,SOLARAY,False,True,0,1.0,25,10,25,0,1.0,0.0,0,1.0,0.0,10,5.187813487284122,7,0.5613247508803298,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,SmartyPants,False,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Solgar,False,True,0,1.0,26,14,26,0,1.0,0.0,0,1.0,0.0,14,7.673317377300581,6,0.6767800051915734,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Source Naturals,False,True,0,1.0,8,5,8,0,1.0,0.0,0,1.0,0.0,5,2.7214131159256723,2,0.33260480586944813,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Spring Valley,False,True,0,1.0,20,4,20,0,1.0,0.0,0,1.0,0.0,4,1.1771408039176632,12,0.0784791234777894,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Standard Process Inc.,False,True,0,1.0,5,5,5,0,1.0,0.0,0,1.0,0.0,5,2.9765455955437043,1,0.3655157333273554,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Starwest Botanicals,False,True,1,0.8571428571428571,7,7,6,1,0.8571428571428571,0.1428571428571429,0,1.0,0.0,6,3.9979265536506237,1,0.4726871679378619,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Sudafed,False,True,0,1.0,7,1,7,0,1.0,0.0,0,1.0,0.0,1,0.0,7,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Sunwarrior,False,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Swanson,False,True,0,1.0,15,3,11,4,0.7333333333333333,0.2666666666666667,0,1.0,0.0,2,0.11249728784976863,8,2.722764745061649e-12,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,TUMS,False,True,0,1.0,13,3,13,0,1.0,0.0,0,1.0,0.0,3,0.43598815773811683,11,0.0010373019564745524,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Theraflu,False,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Thorne Research,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Tylenol,False,True,0,1.0,17,7,16,1,0.9411764705882353,0.05882352941176472,0,1.0,0.0,6,1.8541108654611587,9,0.1987466346424684,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,UnItemised brand,False,True,35,0.9865848984285167,2609,1664,1891,718,0.7247987734764277,0.27520122652357226,5,0.997355896351137,0.0026441036488630276,1163,429.5730499903906,54,0.988499023233842,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Vicks,False,True,1,0.8333333333333334,6,5,5,1,0.8333333333333334,0.16666666666666663,0,1.0,0.0,4,1.7446908343779652,2,0.17959405338511716,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Visine,False,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Vitafusion,False,True,0,1.0,14,9,14,0,1.0,0.0,0,1.0,0.0,9,5.476937055277382,3,0.5786993501939798,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Vitamatic,False,True,0,1.0,6,4,6,0,1.0,0.0,0,1.0,0.0,4,1.7586483610529888,2,0.18205821078563758,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Vitauthority,False,True,0,1.0,14,1,0,14,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Walgreens,False,True,0,1.0,47,26,47,0,1.0,0.0,0,1.0,0.0,26,17.21297568871187,5,0.8402639706220333,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Xyzal,False,True,0,1.0,6,1,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Zarbee's,False,True,0,1.0,15,2,15,0,1.0,0.0,0,1.0,0.0,2,0.07751679963638251,14,1.6449564737699027e-17,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,Zicam,False,True,0,1.0,6,3,6,0,1.0,0.0,0,1.0,0.0,3,0.8159575496468222,3,0.025440025749822955,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class,up & up,False,True,0,1.0,10,6,10,0,1.0,0.0,0,1.0,0.0,6,2.7763378844796,4,0.33992749214061146,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class_frequency,common,True,True,157,0.943157132512672,2762,1756,1909,853,0.6911658218682114,0.3088341781317886,23,0.9879518072289156,0.012048192771084376,1173,433.93227670634286,54,0.9752287111268888,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,predicted_class_frequency,uncommon,True,True,27,0.981645139360979,1471,658,1317,154,0.8953093133922502,0.10469068660774983,7,0.9946848899012908,0.005315110098709219,614,248.70566402130657,37,0.9790273230554011,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class_frequency,common,False,True,165,0.9404332129963899,2770,1762,1914,856,0.6909747292418773,0.3090252707581227,28,0.9853709508881923,0.014629049111807735,1178,435.9513130723146,54,0.9718921717657161,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,true_class_frequency,uncommon,False,True,19,0.987012987012987,1463,663,1312,151,0.8967874231032126,0.10321257689678742,2,0.9984756097560976,0.0015243902439023849,613,247.85336426118727,37,0.9851980291925048,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_familiarity,missing,True,True,0,1.0,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_familiarity,seen,True,True,79,0.9775312855517634,3516,1898,3226,290,0.9175199089874858,0.08248009101251419,30,0.990700557966522,0.00929944203347799,1778,675.7818485663349,54,0.9820025485974311,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_familiarity,unfamiliar,True,True,105,0.8531468531468531,715,528,0,715,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,description,missing,True,True,122,0.9572230014025246,2852,1828,2207,645,0.7738429172510519,0.22615708274894808,19,0.991391028545537,0.008608971454463044,1381,641.1376861175149,30,0.9825976208673595,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,description,present,True,True,62,0.9551049963794352,1381,969,1019,362,0.7378711078928313,0.2621288921071687,11,0.9892051030421982,0.01079489695780178,713,395.13952950642937,24,0.9760723639990408,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,product_category,missing,True,True,1,0.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,product_category,present,True,True,183,0.956758034026465,4232,2404,3226,1006,0.7622873345935728,0.23771266540642721,30,0.990700557966522,0.00929944203347799,1778,675.7818485663349,54,0.9820025485974311,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_key_relationship,mixed_or_unseen,True,True,156,0.88,1300,763,341,959,0.2623076923076923,0.7376923076923076,8,0.9765395894428153,0.02346041055718473,143,46.44625964177648,25,0.8989578369983071,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_key_relationship,unambiguous,True,True,28,0.9904534606205251,2933,1666,2885,48,0.9836345039209001,0.016365496079099873,22,0.9923743500866551,0.007625649913344912,1640,645.0321064159476,54,0.9839392867207443,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_training_support,1_to_4_groups,True,True,36,0.9643211100099108,1009,616,900,109,0.8919722497522299,0.10802775024777012,17,0.9811111111111112,0.018888888888888844,560,163.49078642089935,54,0.9525094113204933,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_training_support,20_plus_groups,True,True,14,0.9909443725743855,1546,783,1465,81,0.9476067270375161,0.05239327296248386,6,0.9959044368600682,0.004095563139931757,753,318.829540890318,37,0.9836903479183258,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_training_support,5_to_19_groups,True,True,29,0.9698231009365245,961,519,861,100,0.8959417273673257,0.10405827263267431,7,0.991869918699187,0.008130081300813052,483,207.1456173007818,25,0.9721906139959419,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,brand_training_support,unseen_or_missing,True,True,105,0.8535564853556485,717,530,0,717,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,50_to_90,True,True,136,0.8424101969872537,863,597,0,863,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,90_to_93,True,True,12,0.8723404255319149,94,33,0,94,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,93_to_95.5,True,True,6,0.88,50,22,0,50,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,95.5_to_97,True,True,12,0.9565217391304348,276,185,276,0,1.0,0.0,12,0.9565217391304348,0.04347826086956519,185,127.38321801414162,8,0.9137851890046458,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,97_to_99,True,True,9,0.9802197802197802,455,257,455,0,1.0,0.0,9,0.9802197802197802,0.01978021978021982,257,91.14384149871995,25,0.9356794640407016,False,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,99.5_to_100,True,True,6,0.9971537001897534,2108,1147,2108,0,1.0,0.0,6,0.9971537001897534,0.002846299810246644,1147,534.2585101139109,37,0.9896189346753119,True,0.05,brand_lookup_probabilistic_v1
+calibration_fit,confidence_range,99_to_99.5,True,True,3,0.9922480620155039,387,206,387,0,1.0,0.0,3,0.9922480620155039,0.007751937984496138,206,36.51129879969887,54,0.9076514275615912,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,21st Century,True,True,0,1.0,10,3,10,0,1.0,0.0,0,1.0,0.0,3,0.5876237497456538,7,0.006108677838871497,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Advil,True,True,0,1.0,14,2,14,0,1.0,0.0,0,1.0,0.0,2,0.10232747581401715,11,1.9302966993964248e-13,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Airborne,True,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Alka Seltzer,True,True,0,1.0,17,5,17,0,1.0,0.0,0,1.0,0.0,5,2.177776397752229,6,0.2526899030158276,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Allegra,True,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Amazing Nutrition,True,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Amazon Basic Care,True,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,3,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Ancient Nutrition,True,True,0,1.0,8,4,8,0,1.0,0.0,0,1.0,0.0,4,1.7369366528918406,3,0.17822265071989848,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Andrew Lessman,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Ark Labs,True,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Bayer,True,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Best Naturals,True,True,0,1.0,18,9,18,0,1.0,0.0,0,1.0,0.0,9,4.526856137525184,5,0.5159379222621268,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Biofreeze,True,True,1,0.75,4,4,0,4,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Bluebonnet,True,True,0,1.0,7,4,7,0,1.0,0.0,0,1.0,0.0,4,1.5958105498443786,3,0.15301060148614049,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Boiron,True,True,0,1.0,8,6,8,0,1.0,0.0,0,1.0,0.0,6,3.5537124921338874,2,0.43042306846017014,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Botanic Choice,True,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Bronson,True,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,BulkSupplements,True,True,0,1.0,14,9,14,0,1.0,0.0,0,1.0,0.0,9,5.898239905683335,3,0.6017562891753168,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,CVS Health,True,True,5,0.782608695652174,23,13,0,23,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Carlson,True,True,0,1.0,13,10,13,0,1.0,0.0,0,1.0,0.0,10,7.161585389225146,2,0.6581609717324263,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Carlyle,True,True,0,1.0,13,12,13,0,1.0,0.0,0,1.0,0.0,12,9.451331601469915,2,0.7283569443844475,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Centrum,True,True,0,1.0,17,6,17,0,1.0,0.0,0,1.0,0.0,6,2.8741312786194784,6,0.3526395733165698,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Claritin,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Codeage,True,True,1,0.8333333333333334,6,1,6,0,1.0,0.0,1,0.8333333333333334,0.16666666666666663,1,0.0,6,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Country Life,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Culturelle,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Designs for health,True,True,0,1.0,13,6,13,0,1.0,0.0,0,1.0,0.0,6,3.2173789884140733,4,0.39411617957476147,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Doctor's Best,True,True,0,1.0,10,5,7,3,0.7,0.30000000000000004,0,1.0,0.0,5,2.2438574489483307,3,0.2631367635537007,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Dr. Mercola,True,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Emergen-C,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Equate,True,True,0,1.0,34,20,34,0,1.0,0.0,0,1.0,0.0,20,13.4109962521853,5,0.799811821758882,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Estroven,True,True,1,0.5,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Excedrin,True,True,0,1.0,7,4,7,0,1.0,0.0,0,1.0,0.0,4,1.2598504340876675,4,0.09275000214578896,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Force Factor,True,True,0,1.0,13,4,13,0,1.0,0.0,0,1.0,0.0,4,1.130942058668018,8,0.07073023207216872,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,GNC,True,True,0,1.0,34,6,34,0,1.0,0.0,0,1.0,0.0,6,3.209446594458417,11,0.39321023936575894,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Gaia Herbs,True,True,0,1.0,18,5,18,0,1.0,0.0,0,1.0,0.0,5,1.2524685363067016,12,0.0914592007392159,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Garden of Life,True,True,0,1.0,16,7,16,0,1.0,0.0,0,1.0,0.0,7,3.2755200543012863,6,0.40068400470946186,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Generic,True,True,0,1.0,29,23,29,0,1.0,0.0,0,1.0,0.0,23,16.418709871095224,4,0.8332192675560347,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Genexa,True,True,1,0.5,2,1,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,HALLS,True,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,HAWAIIPHARM,True,True,0,1.0,8,4,7,1,0.875,0.125,0,1.0,0.0,3,0.9146190834276471,3,0.037802203134234595,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,HUM,True,True,0,1.0,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Herb Pharm,True,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Horbäach,True,True,0,1.0,15,10,15,0,1.0,0.0,0,1.0,0.0,10,6.7095721102207975,3,0.639872502777523,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Hyland's,True,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,IDEAL PERFORMANCE,True,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,3,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Icy Hot,True,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Jarrow Formulas,True,True,0,1.0,9,1,9,0,1.0,0.0,0,1.0,0.0,1,0.0,9,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,KAL,True,True,0,1.0,9,4,9,0,1.0,0.0,0,1.0,0.0,4,1.7204168749431412,3,0.175295391437763,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Kirkland Signature,True,True,0,1.0,11,5,11,0,1.0,0.0,0,1.0,0.0,5,1.3591019511727858,7,0.11033878108496326,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Lactaid,True,True,2,0.75,8,2,0,8,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Life Extension,True,True,0,1.0,29,10,29,0,1.0,0.0,0,1.0,0.0,10,5.2490699020425025,9,0.5651202265021935,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,MaryRuth Organics,True,True,0,1.0,9,6,9,0,1.0,0.0,0,1.0,0.0,6,3.1748240278990245,3,0.3892279871775979,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Mason Natural,True,True,0,1.0,8,4,8,0,1.0,0.0,0,1.0,0.0,4,1.7369366528918406,3,0.17822265071989848,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,MegaFood,True,True,0,1.0,8,3,8,0,1.0,0.0,0,1.0,0.0,3,0.6769425597069931,5,0.011969587547553477,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Metagenics,True,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Metamucil,True,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Micro Ingredients,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,MiraLax,True,True,0,1.0,2,1,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Mommy's Bliss,True,True,0,1.0,10,2,9,1,0.9,0.09999999999999998,0,1.0,0.0,2,0.12216647622693884,6,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Motrin,True,True,0,1.0,35,1,35,0,1.0,0.0,0,1.0,0.0,1,0.0,35,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Mucinex,True,True,0,1.0,15,5,15,0,1.0,0.0,0,1.0,0.0,5,2.4353554872630307,5,0.2922631712313035,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,NOW,True,True,0,1.0,63,38,63,0,1.0,0.0,0,1.0,0.0,38,21.80776423939453,8,0.8716476688187876,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Natrol,True,True,0,1.0,22,4,22,0,1.0,0.0,0,1.0,0.0,4,1.065047305742801,14,0.060038502485436136,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Natural Factors,True,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature Made,True,True,0,1.0,56,8,56,0,1.0,0.0,0,1.0,0.0,8,3.939617518221456,19,0.46747380743565037,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Answer,True,True,0,1.0,7,6,7,0,1.0,0.0,0,1.0,0.0,6,3.6277481690533437,2,0.4378920482450974,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Bounty,True,True,0,1.0,28,11,28,0,1.0,0.0,0,1.0,0.0,11,7.33754038582551,5,0.6647962184657547,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Nutrition,True,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Plus,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Sunshine,True,True,0,1.0,5,5,4,1,0.8,0.19999999999999996,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Truth,True,True,0,1.0,10,6,10,0,1.0,0.0,0,1.0,0.0,6,3.3316054613755197,3,0.406900829481648,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nature's Way,True,True,0,1.0,32,20,32,0,1.0,0.0,0,1.0,0.0,20,14.945349545911153,3,0.8183658591714039,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Natures Craft,True,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,NeilMed,True,True,0,1.0,14,5,14,0,1.0,0.0,0,1.0,0.0,5,1.1219287244741654,10,0.06924095633351618,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,New Chapter,True,True,0,1.0,9,5,9,0,1.0,0.0,0,1.0,0.0,5,2.0965234194699134,4,0.23957116881466006,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nexium,True,True,2,0.8461538461538461,13,1,0,13,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nordic Naturals,True,True,0,1.0,22,4,22,0,1.0,0.0,0,1.0,0.0,4,1.3135583437494547,12,0.10222043323268708,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,NusaPure,True,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Nutricost,True,True,0,1.0,37,26,37,0,1.0,0.0,0,1.0,0.0,26,20.149770293415393,3,0.8618506599018403,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Olly,True,True,0,1.0,11,1,11,0,1.0,0.0,0,1.0,0.0,1,0.0,11,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,One A Day,True,True,0,1.0,8,5,7,1,0.875,0.125,0,1.0,0.0,4,1.5958105498443786,3,0.15301060148614049,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Other Brands,True,True,17,0.5641025641025641,39,26,2,37,0.05128205128205128,0.9487179487179487,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Pepto Bismol,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Pipping Rock,True,True,0,1.0,11,9,11,0,1.0,0.0,0,1.0,0.0,9,5.568986417550952,3,0.5839550136301521,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Pure Encapsulations,True,True,0,1.0,20,11,20,0,1.0,0.0,0,1.0,0.0,11,6.863345598986448,4,0.6463056171531313,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Pure Organic Ingredients,True,True,0,1.0,9,6,9,0,1.0,0.0,0,1.0,0.0,6,3.1748240278990245,3,0.3892279871775979,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Puritan's Pride,True,True,0,1.0,23,7,23,0,1.0,0.0,0,1.0,0.0,7,3.9898851187755473,6,0.471973843245663,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Qunol,True,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Rae Wellness,True,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Ricola,True,True,0,1.0,8,2,8,0,1.0,0.0,0,1.0,0.0,2,0.1277557921327465,5,6.550491583841911e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,SOLARAY,True,True,0,1.0,16,10,16,0,1.0,0.0,0,1.0,0.0,10,6.8706018408660965,3,0.6466036211816851,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,SmartyPants,True,True,0,1.0,11,6,11,0,1.0,0.0,0,1.0,0.0,6,2.986105635751392,4,0.3666953773012261,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Solgar,True,True,0,1.0,27,18,27,0,1.0,0.0,0,1.0,0.0,18,12.779377799531924,4,0.7910300999172526,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Source Naturals,True,True,0,1.0,28,7,28,0,1.0,0.0,0,1.0,0.0,7,1.494020450299656,19,0.13464035341697972,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Spring Valley,True,True,0,1.0,11,2,11,0,1.0,0.0,0,1.0,0.0,2,0.12634310789281708,7,5.039718395232448e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Standard Process Inc.,True,True,0,1.0,6,6,6,0,1.0,0.0,0,1.0,0.0,6,3.9979265536506237,1,0.4726871679378619,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Starwest Botanicals,True,True,0,1.0,10,8,10,0,1.0,0.0,0,1.0,0.0,8,5.38395251214667,2,0.5732583580454066,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Sunwarrior,True,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Swanson,True,True,0,1.0,21,6,21,0,1.0,0.0,0,1.0,0.0,6,3.7195898948521626,5,0.44691218230954133,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,TUMS,True,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.09397421248226064,5,1.4303993976729518e-14,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Theraflu,True,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,4,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Thorne Research,True,True,0,1.0,9,7,9,0,1.0,0.0,0,1.0,0.0,7,3.869208064143395,3,0.46104968511142486,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Tylenol,True,True,0,1.0,8,5,8,0,1.0,0.0,0,1.0,0.0,5,1.904989181147971,4,0.20751081832037874,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,UnItemised brand,True,True,145,0.9455296769346356,2662,1689,1830,832,0.6874530428249437,0.3125469571750563,28,0.9846994535519126,0.015300546448087426,1134,611.9007732175786,23,0.9737335618421348,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Vicks,True,True,0,1.0,32,15,31,1,0.96875,0.03125,0,1.0,0.0,14,5.1492925867224555,11,0.5589051485422052,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Visine,True,True,0,1.0,4,2,4,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,2,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Vitafusion,True,True,0,1.0,12,8,12,0,1.0,0.0,0,1.0,0.0,8,4.9336583020398574,3,0.5448727320714151,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Vital Proteins,True,True,0,1.0,33,1,33,0,1.0,0.0,0,1.0,0.0,1,0.0,33,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Vitamatic,True,True,0,1.0,13,6,13,0,1.0,0.0,0,1.0,0.0,6,3.2173789884140733,4,0.39411617957476147,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Walgreens,True,True,0,1.0,36,20,36,0,1.0,0.0,0,1.0,0.0,20,12.216071845632456,6,0.7825254993652111,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Zarbee's,True,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Zicam,True,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,Zyrtec,True,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class,up & up,True,True,0,1.0,18,9,18,0,1.0,0.0,0,1.0,0.0,9,5.070078874028206,4,0.5538479858836617,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,21st Century,False,True,0,1.0,10,3,10,0,1.0,0.0,0,1.0,0.0,3,0.5876237497456538,7,0.006108677838871497,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Advil,False,True,0,1.0,14,2,14,0,1.0,0.0,0,1.0,0.0,2,0.10232747581401715,11,1.9302966993964248e-13,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Airborne,False,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Alka Seltzer,False,True,0,1.0,17,5,17,0,1.0,0.0,0,1.0,0.0,5,2.177776397752229,6,0.2526899030158276,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Allegra,False,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Amazing Nutrition,False,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Amazon Basic Care,False,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,3,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Ancient Nutrition,False,True,0,1.0,8,4,8,0,1.0,0.0,0,1.0,0.0,4,1.7369366528918406,3,0.17822265071989848,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Andrew Lessman,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Ark Labs,False,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Bayer,False,True,1,0.75,4,3,3,1,0.75,0.25,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Best Naturals,False,True,0,1.0,18,9,18,0,1.0,0.0,0,1.0,0.0,9,4.526856137525184,5,0.5159379222621268,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Biofreeze,False,True,0,1.0,3,3,0,3,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Bluebonnet,False,True,0,1.0,7,4,7,0,1.0,0.0,0,1.0,0.0,4,1.5958105498443786,3,0.15301060148614049,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Boiron,False,True,0,1.0,8,6,8,0,1.0,0.0,0,1.0,0.0,6,3.5537124921338874,2,0.43042306846017014,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Botanic Choice,False,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Bronson,False,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,BulkSupplements,False,True,0,1.0,14,9,14,0,1.0,0.0,0,1.0,0.0,9,5.898239905683335,3,0.6017562891753168,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,CVS Health,False,True,0,1.0,18,11,0,18,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Carlson,False,True,0,1.0,13,10,13,0,1.0,0.0,0,1.0,0.0,10,7.161585389225146,2,0.6581609717324263,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Carlyle,False,True,0,1.0,13,12,13,0,1.0,0.0,0,1.0,0.0,12,9.451331601469915,2,0.7283569443844475,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Centrum,False,True,0,1.0,17,6,17,0,1.0,0.0,0,1.0,0.0,6,2.8741312786194784,6,0.3526395733165698,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Claritin,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Codeage,False,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Country Life,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Culturelle,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Designs for health,False,True,0,1.0,13,6,13,0,1.0,0.0,0,1.0,0.0,6,3.2173789884140733,4,0.39411617957476147,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Doctor's Best,False,True,0,1.0,10,5,7,3,0.7,0.30000000000000004,0,1.0,0.0,5,2.2438574489483307,3,0.2631367635537007,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Dr. Mercola,False,True,0,1.0,3,2,3,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,2,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Emergen-C,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Equate,False,True,0,1.0,34,20,34,0,1.0,0.0,0,1.0,0.0,20,13.4109962521853,5,0.799811821758882,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Estroven,False,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Excedrin,False,True,0,1.0,7,4,7,0,1.0,0.0,0,1.0,0.0,4,1.2598504340876675,4,0.09275000214578896,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Force Factor,False,True,0,1.0,13,4,13,0,1.0,0.0,0,1.0,0.0,4,1.130942058668018,8,0.07073023207216872,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,GNC,False,True,0,1.0,34,6,34,0,1.0,0.0,0,1.0,0.0,6,3.209446594458417,11,0.39321023936575894,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Gaia Herbs,False,True,0,1.0,18,5,18,0,1.0,0.0,0,1.0,0.0,5,1.2524685363067016,12,0.0914592007392159,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Garden of Life,False,True,0,1.0,16,7,16,0,1.0,0.0,0,1.0,0.0,7,3.2755200543012863,6,0.40068400470946186,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Generic,False,True,0,1.0,29,23,29,0,1.0,0.0,0,1.0,0.0,23,16.418709871095224,4,0.8332192675560347,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Genexa,False,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,HALLS,False,True,0,1.0,5,2,5,0,1.0,0.0,0,1.0,0.0,2,0.13051973955869534,3,1.0762899112440411e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,HAWAIIPHARM,False,True,0,1.0,8,4,7,1,0.875,0.125,0,1.0,0.0,3,0.9146190834276471,3,0.037802203134234595,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,HUM,False,True,0,1.0,2,2,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Herb Pharm,False,True,0,1.0,4,4,4,0,1.0,0.0,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Horbäach,False,True,0,1.0,15,10,15,0,1.0,0.0,0,1.0,0.0,10,6.7095721102207975,3,0.639872502777523,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Hyland's,False,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,IDEAL PERFORMANCE,False,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,3,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Icy Hot,False,True,0,1.0,4,3,4,0,1.0,0.0,0,1.0,0.0,3,0.8461781996337414,2,0.029004364110494275,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Jarrow Formulas,False,True,0,1.0,9,1,9,0,1.0,0.0,0,1.0,0.0,1,0.0,9,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,KAL,False,True,0,1.0,9,4,9,0,1.0,0.0,0,1.0,0.0,4,1.7204168749431412,3,0.175295391437763,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Kirkland Signature,False,True,1,0.9166666666666666,12,6,12,0,1.0,0.0,1,0.9166666666666666,0.08333333333333337,6,1.7768562460669437,7,0.14292782507075702,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Lactaid,False,True,0,1.0,6,2,0,6,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Life Extension,False,True,0,1.0,29,10,29,0,1.0,0.0,0,1.0,0.0,10,5.2490699020425025,9,0.5651202265021935,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,MaryRuth Organics,False,True,0,1.0,9,6,9,0,1.0,0.0,0,1.0,0.0,6,3.1748240278990245,3,0.3892279871775979,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Mason Natural,False,True,0,1.0,8,4,8,0,1.0,0.0,0,1.0,0.0,4,1.7369366528918406,3,0.17822265071989848,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,MegaFood,False,True,0,1.0,8,3,8,0,1.0,0.0,0,1.0,0.0,3,0.6769425597069931,5,0.011969587547553477,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Metagenics,False,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Metamucil,False,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Micro Ingredients,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,MiraLax,False,True,0,1.0,2,1,0,2,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Mommy's Bliss,False,True,0,1.0,10,2,9,1,0.9,0.09999999999999998,0,1.0,0.0,2,0.12216647622693884,6,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Motrin,False,True,0,1.0,35,1,35,0,1.0,0.0,0,1.0,0.0,1,0.0,35,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Mucinex,False,True,0,1.0,15,5,15,0,1.0,0.0,0,1.0,0.0,5,2.4353554872630307,5,0.2922631712313035,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,NOW,False,True,1,0.984375,64,39,63,1,0.984375,0.015625,0,1.0,0.0,38,21.80776423939453,8,0.8716476688187876,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Natrol,False,True,0,1.0,22,4,22,0,1.0,0.0,0,1.0,0.0,4,1.065047305742801,14,0.060038502485436136,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Natural Factors,False,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature Made,False,True,0,1.0,56,8,56,0,1.0,0.0,0,1.0,0.0,8,3.939617518221456,19,0.46747380743565037,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Answer,False,True,0,1.0,7,6,7,0,1.0,0.0,0,1.0,0.0,6,3.6277481690533437,2,0.4378920482450974,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Bounty,False,True,0,1.0,28,11,28,0,1.0,0.0,0,1.0,0.0,11,7.33754038582551,5,0.6647962184657547,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Nutrition,False,True,0,1.0,3,1,3,0,1.0,0.0,0,1.0,0.0,1,0.0,3,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Plus,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Sunshine,False,True,0,1.0,5,5,4,1,0.8,0.19999999999999996,0,1.0,0.0,4,1.9540537345033209,1,0.21586848484183904,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Truth,False,True,0,1.0,10,6,10,0,1.0,0.0,0,1.0,0.0,6,3.3316054613755197,3,0.406900829481648,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nature's Way,False,True,0,1.0,32,20,32,0,1.0,0.0,0,1.0,0.0,20,14.945349545911153,3,0.8183658591714039,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Natures Craft,False,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,NeilMed,False,True,0,1.0,14,5,14,0,1.0,0.0,0,1.0,0.0,5,1.1219287244741654,10,0.06924095633351618,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,New Chapter,False,True,0,1.0,9,5,9,0,1.0,0.0,0,1.0,0.0,5,2.0965234194699134,4,0.23957116881466006,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nexium,False,True,0,1.0,11,1,0,11,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nordic Naturals,False,True,0,1.0,22,4,22,0,1.0,0.0,0,1.0,0.0,4,1.3135583437494547,12,0.10222043323268708,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,NusaPure,False,True,0,1.0,3,3,3,0,1.0,0.0,0,1.0,0.0,3,0.9519504745879592,1,0.0429833988968892,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Nutricost,False,True,0,1.0,37,26,37,0,1.0,0.0,0,1.0,0.0,26,20.149770293415393,3,0.8618506599018403,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Olly,False,True,0,1.0,11,1,11,0,1.0,0.0,0,1.0,0.0,1,0.0,11,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,One A Day,False,True,0,1.0,8,5,7,1,0.875,0.125,0,1.0,0.0,4,1.5958105498443786,3,0.15301060148614049,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Other Brands,False,True,140,0.13580246913580246,162,142,29,133,0.17901234567901234,0.8209876543209876,27,0.06896551724137934,0.9310344827586207,26,21.076644610507326,3,0.0077269783572169095,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Pepto Bismol,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Pipping Rock,False,True,0,1.0,11,9,11,0,1.0,0.0,0,1.0,0.0,9,5.568986417550952,3,0.5839550136301521,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Pure Encapsulations,False,True,0,1.0,20,11,20,0,1.0,0.0,0,1.0,0.0,11,6.863345598986448,4,0.6463056171531313,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Pure Organic Ingredients,False,True,0,1.0,9,6,9,0,1.0,0.0,0,1.0,0.0,6,3.1748240278990245,3,0.3892279871775979,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Puritan's Pride,False,True,0,1.0,23,7,23,0,1.0,0.0,0,1.0,0.0,7,3.9898851187755473,6,0.471973843245663,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Qunol,False,True,0,1.0,5,1,5,0,1.0,0.0,0,1.0,0.0,1,0.0,5,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Rae Wellness,False,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Ricola,False,True,0,1.0,8,2,8,0,1.0,0.0,0,1.0,0.0,2,0.1277557921327465,5,6.550491583841911e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,SOLARAY,False,True,0,1.0,16,10,16,0,1.0,0.0,0,1.0,0.0,10,6.8706018408660965,3,0.6466036211816851,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,SmartyPants,False,True,0,1.0,11,6,11,0,1.0,0.0,0,1.0,0.0,6,2.986105635751392,4,0.3666953773012261,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Solgar,False,True,0,1.0,27,18,27,0,1.0,0.0,0,1.0,0.0,18,12.779377799531924,4,0.7910300999172526,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Source Naturals,False,True,0,1.0,28,7,28,0,1.0,0.0,0,1.0,0.0,7,1.494020450299656,19,0.13464035341697972,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Spring Valley,False,True,0,1.0,11,2,11,0,1.0,0.0,0,1.0,0.0,2,0.12634310789281708,7,5.039718395232448e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Standard Process Inc.,False,True,0,1.0,6,6,6,0,1.0,0.0,0,1.0,0.0,6,3.9979265536506237,1,0.4726871679378619,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Starwest Botanicals,False,True,0,1.0,10,8,10,0,1.0,0.0,0,1.0,0.0,8,5.38395251214667,2,0.5732583580454066,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Sunwarrior,False,True,0,1.0,1,1,0,1,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Swanson,False,True,0,1.0,21,6,21,0,1.0,0.0,0,1.0,0.0,6,3.7195898948521626,5,0.44691218230954133,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,TUMS,False,True,1,0.8571428571428571,7,3,6,1,0.8571428571428571,0.1428571428571429,0,1.0,0.0,2,0.09397421248226064,5,1.4303993976729518e-14,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Theraflu,False,True,0,1.0,6,2,6,0,1.0,0.0,0,1.0,0.0,2,0.12216647622693884,4,2.2405352630382576e-11,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Thorne Research,False,True,1,0.9,10,7,9,1,0.9,0.09999999999999998,0,1.0,0.0,7,3.869208064143395,3,0.46104968511142486,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Tylenol,False,True,0,1.0,8,5,8,0,1.0,0.0,0,1.0,0.0,5,1.904989181147971,4,0.20751081832037874,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,UnItemised brand,False,True,30,0.9882214369846879,2547,1601,1803,744,0.7078916372202592,0.29210836277974084,1,0.9994453688297282,0.0005546311702717688,1120,602.679426406427,23,0.9940166981022456,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Vicks,False,True,0,1.0,32,15,31,1,0.96875,0.03125,0,1.0,0.0,14,5.1492925867224555,11,0.5589051485422052,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Visine,False,True,0,1.0,4,2,4,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,2,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Vitafusion,False,True,0,1.0,12,8,12,0,1.0,0.0,0,1.0,0.0,8,4.9336583020398574,3,0.5448727320714151,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Vital Proteins,False,True,0,1.0,33,1,33,0,1.0,0.0,0,1.0,0.0,1,0.0,33,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Vitamatic,False,True,0,1.0,13,6,13,0,1.0,0.0,0,1.0,0.0,6,3.2173789884140733,4,0.39411617957476147,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Walgreens,False,True,0,1.0,36,20,36,0,1.0,0.0,0,1.0,0.0,20,12.216071845632456,6,0.7825254993652111,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Zarbee's,False,True,0,1.0,1,1,1,0,1.0,0.0,0,1.0,0.0,1,0.0,1,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Zicam,False,True,0,1.0,2,2,2,0,1.0,0.0,0,1.0,0.0,2,0.13574052914104315,1,2.6020557974711215e-10,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,Zyrtec,False,True,0,1.0,2,1,2,0,1.0,0.0,0,1.0,0.0,1,0.0,2,0.0,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class,up & up,False,True,0,1.0,18,9,18,0,1.0,0.0,0,1.0,0.0,9,5.070078874028206,4,0.5538479858836617,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class_frequency,common,True,True,162,0.9400222139948168,2701,1712,1832,869,0.6782673084042947,0.3217326915957053,28,0.9847161572052402,0.015283842794759805,1136,613.0163769172469,23,0.9737671900027861,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,predicted_class_frequency,uncommon,True,True,13,0.9902985074626866,1340,613,1274,66,0.9507462686567164,0.04925373134328359,1,0.9992150706436421,0.0007849293563578774,581,223.3428057008124,35,0.9852075625017682,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class_frequency,common,False,True,170,0.9372462163159837,2709,1716,1832,877,0.6762643041712809,0.3237356958287191,28,0.9847161572052402,0.015283842794759805,1137,613.241642594048,23,0.9737697650442949,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,true_class_frequency,uncommon,False,True,5,0.9962462462462462,1332,613,1274,58,0.9564564564564565,0.043543543543543506,1,0.9992150706436421,0.0007849293563578774,582,223.65277776486224,35,0.98522593009404,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_familiarity,seen,True,True,76,0.977252319664771,3341,1836,3106,235,0.9296617779108052,0.07033822208919482,29,0.9906632324533161,0.009336767546683888,1712,757.2522550826313,35,0.9825880551898273,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_familiarity,unfamiliar,True,True,99,0.8585714285714285,700,496,0,700,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,description,missing,True,True,116,0.957710535909588,2743,1780,2104,639,0.7670433831571273,0.23295661684287272,25,0.9881178707224335,0.011882129277566489,1332,710.4879340460436,25,0.978987651357206,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,description,present,True,True,59,0.9545454545454546,1298,946,1002,296,0.7719568567026194,0.22804314329738062,4,0.9960079840319361,0.003992015968063867,706,416.5420740234779,16,0.986178361368874,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,product_category,present,True,True,175,0.9566938876515714,4041,2317,3106,935,0.7686216283098243,0.23137837169017572,29,0.9906632324533161,0.009336767546683888,1712,757.2522550826313,35,0.9825880551898273,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_key_relationship,mixed_or_unseen,True,True,143,0.8738977072310405,1134,721,234,900,0.20634920634920634,0.7936507936507937,6,0.9743589743589743,0.02564102564102566,121,76.36518007153781,8,0.9206337487838009,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_key_relationship,unambiguous,True,True,32,0.9889920880632955,2907,1620,2872,35,0.9879600963192294,0.01203990368077057,23,0.991991643454039,0.008008356545960993,1595,686.2234980062493,35,0.9837824480215448,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_training_support,1_to_4_groups,True,True,33,0.9614485981308412,856,570,771,85,0.9007009345794392,0.09929906542056077,16,0.9792477302204928,0.02075226977950717,514,270.0848195766208,23,0.9585286748982006,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_training_support,20_plus_groups,True,True,20,0.9867899603698811,1514,729,1464,50,0.9669749009247027,0.03302509907529727,7,0.9952185792349727,0.0047814207650273,704,318.6718807433368,33,0.9826258764389577,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_training_support,5_to_19_groups,True,True,23,0.976313079299691,971,552,871,100,0.8970133882595263,0.10298661174047374,6,0.9931113662456946,0.006888633754305373,502,199.1667980820854,35,0.9734736520703514,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,brand_training_support,unseen_or_missing,True,True,99,0.8585714285714285,700,496,0,700,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,50_to_90,True,True,133,0.8399518652226233,831,578,0,831,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,90_to_93,True,True,7,0.8372093023255814,43,20,0,43,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,93_to_95.5,True,True,6,0.9016393442622951,61,29,0,61,0.0,1.0,0,,,0,,0,,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,95.5_to_97,True,True,4,0.9819819819819819,222,168,222,0,1.0,0.0,4,0.9819819819819819,0.018018018018018056,168,100.69984314302795,9,0.941487214933704,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,97_to_99,True,True,7,0.9818652849740933,386,246,386,0,1.0,0.0,7,0.9818652849740933,0.01813471502590669,246,147.87135109106333,13,0.9514184910266238,False,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,99.5_to_100,True,True,7,0.9967978042086002,2186,1124,2186,0,1.0,0.0,7,0.9967978042086002,0.003202195791399798,1124,473.9435017662682,35,0.988313182772045,True,0.05,brand_lookup_probabilistic_v1
+threshold_selection,confidence_range,99_to_99.5,True,True,11,0.9647435897435898,312,195,312,0,1.0,0.0,11,0.9647435897435898,0.03525641025641024,195,126.53087541024463,8,0.9242870987871757,False,0.05,brand_lookup_probabilistic_v1

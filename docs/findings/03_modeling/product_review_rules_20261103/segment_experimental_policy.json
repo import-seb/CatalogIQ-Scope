@@ -1,0 +1,66 @@
+{
+  "rule_id": "discovered_99__all",
+  "status": "exploratory_improvement_only",
+  "enabled": false,
+  "independently_confirmed": false,
+  "selection_summary": {
+    "rule_id": "discovered_99__all",
+    "model": "segment",
+    "population_rows": 3822,
+    "population_groups": 2211,
+    "accepted_rows": 2685,
+    "review_rows": 1137,
+    "coverage": 0.7025117739403454,
+    "review_fraction": 0.29748822605965464,
+    "errors": 12,
+    "accepted_accuracy": 0.9955307262569832,
+    "accepted_error_rate": 0.004469273743016755,
+    "accepted_groups": 1647,
+    "n_eff_df": 853.7181272407151,
+    "max_accepted_group_rows": 33,
+    "beta_lower": 0.9896075715903053,
+    "sufficient_groups": true,
+    "alpha": 0.05,
+    "beta_lower_search_adjusted": 0.9828457855059287,
+    "search_alpha": 0.0008333333333333334
+  },
+  "rule": {
+    "id": "discovered_99__all",
+    "model": "segment",
+    "class_mode": "discovered_99",
+    "gate": "all",
+    "threshold": 0.93,
+    "allowed_labels": [
+      "External Analgesics",
+      "Lifestyle CHC",
+      "Vitamins, Minerals & Supplements"
+    ],
+    "vocabulary": [
+      "Allergy",
+      "CCFS",
+      "Digestive Health",
+      "External Analgesics",
+      "Internal Analgesics",
+      "Lifestyle CHC",
+      "Other Self Care",
+      "Vitamins, Minerals & Supplements"
+    ]
+  },
+  "model": "segment",
+  "fixed_threshold": 0.93,
+  "feature_definitions": {
+    "description_present": "Existing structural blank/null missingness; presence is not verified completeness",
+    "category_present": "Retailer ProductCategory supplied and nonmissing; no inferred hierarchy rule",
+    "brand_seen": "Normalized ProductBrand occurs in this target's approved labeled training records",
+    "brand_training_groups": "Distinct frozen groups containing that normalized key in this target's labeled training",
+    "brand_key_unambiguous": "Training key has exactly one observed target label; not a taxonomy assertion",
+    "common_class": "Predicted class has at least 1000 approved labeled training rows",
+    "class_whitelist": "Class screen learned only from the old calibration-fit subset; no true label required at arrival"
+  },
+  "audit_used_to_change_rule": false,
+  "pending": [
+    "Fresh independent development evaluation",
+    "Previously documented approved relationship and serving-review integration"
+  ],
+  "unchanged_baseline_mandatory_review_rules": true
+}
