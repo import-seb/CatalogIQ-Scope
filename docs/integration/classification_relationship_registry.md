@@ -231,7 +231,42 @@ I recorded this as `rejected` with the counts rather than leaving it open, so th
 next person does not spend the sprint on it. If the sponsor wants Brand/Platform
 checked, it has to be a coverage or drift signal, not a parent-child rule.
 
-## 6. What approval needs
+## 6. Why only these two relations, out of thirty
+
+The ticket asks which relationships between the targets are valid. I screened all
+30 ordered pairs of the six targets over the training rows, counting how many
+children carry more than one parent. A relation is only usable as a parent-child
+rule if nearly every child has one parent.
+
+| Child to parent | Rows | Children | Children with 2+ parents | Most parents on one child |
+|---|---|---|---|---|
+| **Brand → Mnfr** | 75,053 | 146 | **0** | 1 |
+| **Sub-Segment → Segment** | 75,039 | 47 | **2** | 2 |
+| Platform → Mnfr | 1,103 | 62 | 4 | 2 |
+| Platform → Brand | 1,103 | 62 | 11 | 3 |
+| Mnfr → Segment | 75,045 | 4 | 2 | 8 |
+| TargetAgeGroup → Segment | 75,041 | 6 | 3 | 8 |
+| Sub-Segment → Mnfr | 75,039 | 47 | 24 | 2 |
+| Brand → Segment | 77,449 | 146 | 116 | 8 |
+| Sub-Segment → TargetAgeGroup | 75,035 | 47 | 41 | 3 |
+| Brand → Sub-Segment | 75,039 | 146 | 131 | 45 |
+
+The two I built are the only hierarchical ones in the data. Everything else is
+many-to-many, and three results are worth stating because they rule out rules
+that sound reasonable:
+
+- **Brand does not determine Segment.** 116 of 146 brands span more than one
+  Segment, up to 8. A Brand/Segment consistency check would fire constantly.
+- **Sub-Segment does not determine TargetAgeGroup.** 41 of 47 children span
+  several age groups.
+- `Platform → Mnfr` is the third most hierarchical and the only remaining
+  candidate, but it rests on 1,103 rows and Platform is unavailable. Parked, not
+  rejected on evidence.
+
+So the registry is not a sample of the relationships. It is the complete set of
+the ones the data supports.
+
+## 7. What approval needs
 
 Two decisions and an approver. The basis is no longer the blocker.
 
