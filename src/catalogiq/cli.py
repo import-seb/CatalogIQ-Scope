@@ -369,3 +369,69 @@ def split_data_main(argv=None) -> int:
         parser.exit(1, f"Error: {error}\n")
     return 0
 
+
+
+def relationship_conflicts_main(argv=None) -> int:
+    """Run the candidate relationship rules in warn mode over prediction exports."""
+    import pandas as pd
+    from .relationship_conflicts import flag_all, load_registry, summarize
+    parser = argparse.ArgumentParser(description=relationship_conflicts_main.__doc__)
+    parser.add_argument("predictions_root", type=Path,
+                        help="directory holding one subdirectory per target, each with predictions.csv")
+    parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--registry", type=Path)
+    parser.add_argument("--target-dir", action="append", default=[], metavar="TARGET=DIRNAME",
+                        help="map a target name to its subdirectory, e.g. Sub-Segment=sub_segment")
+    args = parser.parse_args(argv)
+
+    default_dirs = {"Segment": "segment", "Sub-Segment": "sub_segment", "Brand": "brand",
+                    "Mnfr": "mnfr", "TargetAgeGroup": "targetagegroup", "Platform": "platform"}
+    for item in args.target_dir:
+        if "=" not in item:
+            parser.exit(2, f"Error: --target-dir needs TARGET=DIRNAME, got {item!r}\n")
+        target, _, dirname = item.partition("=")
+        default_dirs[target.strip()] = dirname.strip()
+
+    predictions = {}
+    for target, dirname in default_dirs.items():
+        path = args.predictions_root / dirname / "predictions.csv"
+        if path.is_file():
+            predictions[target] = pd.read_csv(path, dtype={"record_id": "string"})
+    if not predictions:
+        parser.exit(1, f"Error: no predictions.csv found under {args.predictions_root}\n")
+
+    try:
+        registry = load_registry(args.registry)
+        flags = flag_all(predictions, registry)
+        summary = summarize(flags, predictions, registry)
+    except (ValueError, OSError, RuntimeError, KeyError) as error:
+        parser.exit(1, f"Error: {error}\n")
+
+    # Two files on purpose. A conflict is a product a human should look at. A
+    # missing sibling prediction only means the pair could not be checked, and on
+    # per-target validation exports there are thousands of those. Mixing them
+    # would bury the real queue.
+    conflicts = flags[flags["observation"] == "invalid_approved_classification_relationship"]
+    unchecked = flags[flags["observation"] == "missing_relationship_classification"]
+
+    args.output_root.mkdir(parents=True, exist_ok=True)
+    conflicts_path = args.output_root / "relationship_conflicts.csv"
+    conflicts.to_csv(conflicts_path, index=False, lineterminator="\n")
+    unchecked.to_csv(args.output_root / "relationship_not_checkable.csv", index=False,
+                     lineterminator="\n")
+    summary["targets_supplied"] = sorted(predictions)
+    summary["review_queue_file"] = "relationship_conflicts.csv"
+    summary["review_queue_rows"] = int(len(conflicts))
+    summary["not_checkable_file"] = "relationship_not_checkable.csv"
+    summary["not_checkable_rows"] = int(len(unchecked))
+    summary["not_checkable_note"] = (
+        "A missing sibling prediction, not a conflict. On these exports it is an artifact of each "
+        "target having its own validation set, so one side is absent for many records. In serving "
+        "every available model predicts for every product, so this should only appear when a target "
+        "is unavailable, as Platform is.")
+    (args.output_root / "relationship_conflicts_summary.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    print(f"Review queue: {len(conflicts):,} conflicts -> {conflicts_path}")
+    print(f"Not checkable (one side absent, not a conflict): {len(unchecked):,}")
+    print("No relation is approved, so these are observations and not review decisions.")
+    return 0

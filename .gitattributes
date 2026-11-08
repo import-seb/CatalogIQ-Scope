@@ -27,3 +27,7 @@
 # Relationship registry. Resources are already covered by the resources rule.
 /tests/test_relationship_registry.py text eol=lf
 /docs/integration/classification_relationship_registry.md text eol=lf
+/src/catalogiq/relationship_conflicts.py text eol=lf
+/scripts/flag_relationship_conflicts.py text eol=lf
+/tests/test_relationship_conflicts.py text eol=lf
+/docs/findings/03_modeling/relationship_conflicts_20261107/* text eol=lf
