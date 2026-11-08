@@ -1,0 +1,52 @@
+Segment,Sub-Segment,n
+Allergy,Allergy INS,578
+Allergy,Oral Antihistamine,822
+Allergy,Other Allergy,879
+Allergy,Topical Itch,32
+CCFS,Cold/Flu,1293
+CCFS,Cough,594
+CCFS,External Upper Respiratory,154
+CCFS,Nasal Sprays,464
+CCFS,Sinus excl Sprays,429
+CCFS,Sore Throat / Cough Drops,1318
+Digestive Health,Acid Relief,1147
+Digestive Health,All Other Digestive Health,2137
+Digestive Health,Anti-Diarrheal,236
+Digestive Health,Anti-Gas,372
+Digestive Health,Anti-Nausea,57
+Digestive Health,Constipation Remedies,1732
+Digestive Health,Digestive enzymes,393
+Digestive Health,Hemorrhoid Remedies,210
+Digestive Health,Lactose Intolerance,42
+Digestive Health,Motion Sickness,405
+Digestive Health,Probiotics,22
+External Analgesics,Cold & Heat Wraps,3474
+External Analgesics,Creams & Gels (Rubs),1
+External Analgesics,Creams/Gels & Medicated Patches,1002
+External Analgesics,Devices/Refills,14
+External Analgesics,Internal Pain,1
+External Analgesics,Other External Analgesics,780
+External Analgesics,Temperature Packs,417
+Internal Analgesics,Internal Pain,1975
+Internal Analgesics,Remaining Internal Pain,11
+Internal Analgesics,Sleep Aids,1064
+Internal Analgesics,Speciality Pain,1748
+Lifestyle CHC,Daily oral contracception,2
+Lifestyle CHC,Ear Care,3094
+Lifestyle CHC,Obesity treatments,393
+Lifestyle CHC,Other Lifestyle CHC,204
+Lifestyle CHC,Prostate Remedies,233
+Lifestyle CHC,Stimulants,10
+Lifestyle CHC,Systemic Cardiovasculars,521
+Lifestyle CHC,Urinary products,92
+Other Self Care,Dermatologicals,4
+Other Self Care,Eye Care,1028
+Other Self Care,Other Self Care,100
+"Vitamins, Minerals & Supplements",Herbal & Natural (H&N),10548
+"Vitamins, Minerals & Supplements",Menopausal Support,113
+"Vitamins, Minerals & Supplements",Minerals,7545
+"Vitamins, Minerals & Supplements",Multivitamins,3422
+"Vitamins, Minerals & Supplements",Pregnancy Vitamins,359
+"Vitamins, Minerals & Supplements",Probiotics,634
+"Vitamins, Minerals & Supplements",Single Vitamins,4928
+"Vitamins, Minerals & Supplements",Supplements,19467
