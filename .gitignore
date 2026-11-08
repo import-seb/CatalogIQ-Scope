@@ -223,3 +223,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local Jupyter and Anaconda
+.virtual_documents/
+anaconda_projects/
