@@ -1,0 +1,1117 @@
+{
+  "registry_version": "relationships-20261107-candidate-v2",
+  "registry_status": "candidate",
+  "supersedes": "relationships-20261107-candidate-v1",
+  "what_changed": "v1 built the pair inventory from validation truth by co-occurrence, which the serving primitive's docstring excludes. v2 builds it from the curated map and training support. R1 went from 45 pairs to 51 and from 1 multi-parent child to 2; R2 was rebuilt and its v1 instability finding withdrawn; R3 added.",
+  "created_for": "docs/integration/model_selection_handoff_20261106.md, 'a versioned relationship registry'",
+  "consumer": "confidence_calibration.review_decision(approved_relations=...)",
+  "loading_rule": "Pass ONLY relations whose status == 'approved' into approved_relations. A relation with any other status appends unapproved_relationship_rule to EVERY product, so loading this file unfiltered sends the whole catalog to review.",
+  "approved_relations_count": 0,
+  "pair_order": "allowed_pairs entries are [child_class, parent_class], child first, matching the primitive",
+  "targets_not_covered": {
+    "Platform": "see R3; not a parent or child relation",
+    "TargetAgeGroup": "no hierarchy proposed, not measured"
+  },
+  "open_decisions_blocking_approval": [
+    "Probiotics under both Vitamins, Minerals & Supplements (634 training rows) and Digestive Health (22). Keep both, or adjudicate?",
+    "Internal Pain under both Internal Analgesics (1,975) and External Analgesics (1). The single External row looks like a data error, but decisions.md forbids whitelisting it away without a decision.",
+    "Who signs a relation as approved, and is the curated map the source they are approving?"
+  ],
+  "relations": [
+    {
+      "relation_id": "R1_sub_segment_under_segment",
+      "status": "candidate",
+      "status_note": "Basis is approvable; sign-off is not yet given. Blocking items are the two multi-parent children below and a named approver.",
+      "evidence": "Curated Segment/Sub-Segment map covering 76,500 training rows, verified identical to the full training pair inventory once two column-shift pairs are removed. 51 pairs over 49 children and 8 parents.",
+      "child_target": "Sub-Segment",
+      "parent_target": "Segment",
+      "allowed_pairs": [
+        [
+          "Acid Relief",
+          "Digestive Health"
+        ],
+        [
+          "All Other Digestive Health",
+          "Digestive Health"
+        ],
+        [
+          "Allergy INS",
+          "Allergy"
+        ],
+        [
+          "Anti-Diarrheal",
+          "Digestive Health"
+        ],
+        [
+          "Anti-Gas",
+          "Digestive Health"
+        ],
+        [
+          "Anti-Nausea",
+          "Digestive Health"
+        ],
+        [
+          "Cold & Heat Wraps",
+          "External Analgesics"
+        ],
+        [
+          "Cold/Flu",
+          "CCFS"
+        ],
+        [
+          "Constipation Remedies",
+          "Digestive Health"
+        ],
+        [
+          "Cough",
+          "CCFS"
+        ],
+        [
+          "Creams & Gels (Rubs)",
+          "External Analgesics"
+        ],
+        [
+          "Creams/Gels & Medicated Patches",
+          "External Analgesics"
+        ],
+        [
+          "Daily oral contracception",
+          "Lifestyle CHC"
+        ],
+        [
+          "Dermatologicals",
+          "Other Self Care"
+        ],
+        [
+          "Devices/Refills",
+          "External Analgesics"
+        ],
+        [
+          "Digestive enzymes",
+          "Digestive Health"
+        ],
+        [
+          "Ear Care",
+          "Lifestyle CHC"
+        ],
+        [
+          "External Upper Respiratory",
+          "CCFS"
+        ],
+        [
+          "Eye Care",
+          "Other Self Care"
+        ],
+        [
+          "Hemorrhoid Remedies",
+          "Digestive Health"
+        ],
+        [
+          "Herbal & Natural (H&N)",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Internal Pain",
+          "External Analgesics"
+        ],
+        [
+          "Internal Pain",
+          "Internal Analgesics"
+        ],
+        [
+          "Lactose Intolerance",
+          "Digestive Health"
+        ],
+        [
+          "Menopausal Support",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Minerals",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Motion Sickness",
+          "Digestive Health"
+        ],
+        [
+          "Multivitamins",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Nasal Sprays",
+          "CCFS"
+        ],
+        [
+          "Obesity treatments",
+          "Lifestyle CHC"
+        ],
+        [
+          "Oral Antihistamine",
+          "Allergy"
+        ],
+        [
+          "Other Allergy",
+          "Allergy"
+        ],
+        [
+          "Other External Analgesics",
+          "External Analgesics"
+        ],
+        [
+          "Other Lifestyle CHC",
+          "Lifestyle CHC"
+        ],
+        [
+          "Other Self Care",
+          "Other Self Care"
+        ],
+        [
+          "Pregnancy Vitamins",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Probiotics",
+          "Digestive Health"
+        ],
+        [
+          "Probiotics",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Prostate Remedies",
+          "Lifestyle CHC"
+        ],
+        [
+          "Remaining Internal Pain",
+          "Internal Analgesics"
+        ],
+        [
+          "Single Vitamins",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Sinus excl Sprays",
+          "CCFS"
+        ],
+        [
+          "Sleep Aids",
+          "Internal Analgesics"
+        ],
+        [
+          "Sore Throat / Cough Drops",
+          "CCFS"
+        ],
+        [
+          "Speciality Pain",
+          "Internal Analgesics"
+        ],
+        [
+          "Stimulants",
+          "Lifestyle CHC"
+        ],
+        [
+          "Supplements",
+          "Vitamins, Minerals & Supplements"
+        ],
+        [
+          "Systemic Cardiovasculars",
+          "Lifestyle CHC"
+        ],
+        [
+          "Temperature Packs",
+          "External Analgesics"
+        ],
+        [
+          "Topical Itch",
+          "Allergy"
+        ],
+        [
+          "Urinary products",
+          "Lifestyle CHC"
+        ]
+      ],
+      "pair_support": {
+        "Acid Relief | Digestive Health": 1147,
+        "All Other Digestive Health | Digestive Health": 2137,
+        "Allergy INS | Allergy": 578,
+        "Anti-Diarrheal | Digestive Health": 236,
+        "Anti-Gas | Digestive Health": 372,
+        "Anti-Nausea | Digestive Health": 57,
+        "Cold & Heat Wraps | External Analgesics": 3474,
+        "Cold/Flu | CCFS": 1293,
+        "Constipation Remedies | Digestive Health": 1732,
+        "Cough | CCFS": 594,
+        "Creams & Gels (Rubs) | External Analgesics": 1,
+        "Creams/Gels & Medicated Patches | External Analgesics": 1002,
+        "Daily oral contracception | Lifestyle CHC": 2,
+        "Dermatologicals | Other Self Care": 4,
+        "Devices/Refills | External Analgesics": 14,
+        "Digestive enzymes | Digestive Health": 393,
+        "Ear Care | Lifestyle CHC": 3094,
+        "External Upper Respiratory | CCFS": 154,
+        "Eye Care | Other Self Care": 1028,
+        "Hemorrhoid Remedies | Digestive Health": 210,
+        "Herbal & Natural (H&N) | Vitamins, Minerals & Supplements": 10548,
+        "Internal Pain | External Analgesics": 1,
+        "Internal Pain | Internal Analgesics": 1975,
+        "Lactose Intolerance | Digestive Health": 42,
+        "Menopausal Support | Vitamins, Minerals & Supplements": 113,
+        "Minerals | Vitamins, Minerals & Supplements": 7545,
+        "Motion Sickness | Digestive Health": 405,
+        "Multivitamins | Vitamins, Minerals & Supplements": 3422,
+        "Nasal Sprays | CCFS": 464,
+        "Obesity treatments | Lifestyle CHC": 393,
+        "Oral Antihistamine | Allergy": 822,
+        "Other Allergy | Allergy": 879,
+        "Other External Analgesics | External Analgesics": 780,
+        "Other Lifestyle CHC | Lifestyle CHC": 204,
+        "Other Self Care | Other Self Care": 100,
+        "Pregnancy Vitamins | Vitamins, Minerals & Supplements": 359,
+        "Probiotics | Digestive Health": 22,
+        "Probiotics | Vitamins, Minerals & Supplements": 634,
+        "Prostate Remedies | Lifestyle CHC": 233,
+        "Remaining Internal Pain | Internal Analgesics": 11,
+        "Single Vitamins | Vitamins, Minerals & Supplements": 4928,
+        "Sinus excl Sprays | CCFS": 429,
+        "Sleep Aids | Internal Analgesics": 1064,
+        "Sore Throat / Cough Drops | CCFS": 1318,
+        "Speciality Pain | Internal Analgesics": 1748,
+        "Stimulants | Lifestyle CHC": 10,
+        "Supplements | Vitamins, Minerals & Supplements": 19467,
+        "Systemic Cardiovasculars | Lifestyle CHC": 521,
+        "Temperature Packs | External Analgesics": 417,
+        "Topical Itch | Allergy": 32,
+        "Urinary products | Lifestyle CHC": 92
+      },
+      "multi_parent_children": {
+        "Internal Pain": [
+          "External Analgesics",
+          "Internal Analgesics"
+        ],
+        "Probiotics": [
+          "Digestive Health",
+          "Vitamins, Minerals & Supplements"
+        ]
+      },
+      "provenance": {
+        "derived_from": "curated_segment_subsegment_map_plus_training_support",
+        "derived_from_is_approvable": true,
+        "training_rows_behind_the_map": 76500,
+        "cross_check": "training pair set minus column-shift pairs == curated map, asserted at build time; the build fails if that stops holding",
+        "excluded_pairs_kept": "4 pairs appear only in rows marked Exclude (Motion Sickness 408, Hemorrhoid Remedies 210, Anti-Nausea 57, Creams & Gels (Rubs) 1). They are real taxonomy pairs and stay in allowed_pairs.",
+        "rejected_pairs": {
+          "gluten-free | Keto certified": 1,
+          "lactose | IGEN Non-GMO tested.* No soy wheat": 2
+        },
+        "rejected_reason": "product attribute text shifted into the Segment and Sub-Segment columns"
+      },
+      "measured": {
+        "validation_rows_scored": 10497,
+        "validation_rows_note": "rows that are validation for BOTH models. Each target has its own validation_record_ids_sha256, so this is an intersection, not a representative product sample.",
+        "fires_rows": 192,
+        "fires_pct": 1.8291,
+        "rows_with_an_error": 1243,
+        "recall_of_errors_pct": 15.45,
+        "false_alarms_both_labels_correct": 0,
+        "false_alarm_count_is_a_real_result": true,
+        "false_alarm_note": "In v1 the allowed set came from the same rows being scored, so a zero false-alarm count was forced by construction and proved nothing. Here the allowed set comes from training support, independent of these rows, so a false alarm was possible and none occurred: every true pair in validation is present in the training map.",
+        "errors_found_that_a_070_both_confident_gate_would_skip": 53
+      },
+      "recommendation": "warn_mode_pending_signoff",
+      "caveat": "Multi-parent children are valid, not violations. decisions.md: 'Do not enforce a fixed Segment/Sub-Segment parent whitelist: shared parents can be legitimate.'"
+    },
+    {
+      "relation_id": "R2_brand_under_mnfr",
+      "status": "candidate",
+      "status_note": "Basis is approvable. Flag only. Never rewrite Mnfr from Brand.",
+      "evidence": "144 Brand/Mnfr pairs over 79,259 training rows with Exclude rows dropped. Every one of 144 brands carries exactly one manufacturer, so the relation is deterministic in training support.",
+      "child_target": "Brand",
+      "parent_target": "Mnfr",
+      "allowed_pairs": [
+        [
+          "21st Century",
+          "All others"
+        ],
+        [
+          "Advil",
+          "All others"
+        ],
+        [
+          "Airborne",
+          "All others"
+        ],
+        [
+          "Aleve",
+          "All others"
+        ],
+        [
+          "Alka Seltzer",
+          "All others"
+        ],
+        [
+          "Allegra",
+          "All others"
+        ],
+        [
+          "Amazing Nutrition",
+          "All others"
+        ],
+        [
+          "Amazon Basic Care",
+          "All others"
+        ],
+        [
+          "Ancient Nutrition",
+          "All others"
+        ],
+        [
+          "Andrew Lessman",
+          "All others"
+        ],
+        [
+          "Ark Labs",
+          "All others"
+        ],
+        [
+          "Astepro",
+          "All others"
+        ],
+        [
+          "Bayer",
+          "All others"
+        ],
+        [
+          "Benadryl",
+          "J&J"
+        ],
+        [
+          "Bengay",
+          "J&J"
+        ],
+        [
+          "Best Naturals",
+          "All others"
+        ],
+        [
+          "Better Not Younger",
+          "All others"
+        ],
+        [
+          "Biofreeze",
+          "All others"
+        ],
+        [
+          "Biotrue",
+          "All others"
+        ],
+        [
+          "Bluebonnet",
+          "All others"
+        ],
+        [
+          "Boiron",
+          "All others"
+        ],
+        [
+          "Bonafide",
+          "All others"
+        ],
+        [
+          "Botanic Choice",
+          "All others"
+        ],
+        [
+          "Bronson",
+          "All others"
+        ],
+        [
+          "BulkSupplements",
+          "All others"
+        ],
+        [
+          "CVS Health",
+          "All others"
+        ],
+        [
+          "Carlson",
+          "All others"
+        ],
+        [
+          "Carlyle",
+          "All others"
+        ],
+        [
+          "Centrum",
+          "All others"
+        ],
+        [
+          "Claritin",
+          "All others"
+        ],
+        [
+          "Codeage",
+          "All others"
+        ],
+        [
+          "Country Life",
+          "All others"
+        ],
+        [
+          "Culturelle",
+          "All others"
+        ],
+        [
+          "Designs for health",
+          "All others"
+        ],
+        [
+          "Dimetapp",
+          "All others"
+        ],
+        [
+          "Doctor's Best",
+          "All others"
+        ],
+        [
+          "Dr. Mercola",
+          "All others"
+        ],
+        [
+          "Emergen-C",
+          "All others"
+        ],
+        [
+          "Equate",
+          "All others"
+        ],
+        [
+          "Estroven",
+          "All others"
+        ],
+        [
+          "Excedrin",
+          "All others"
+        ],
+        [
+          "Flonase",
+          "All others"
+        ],
+        [
+          "Force Factor",
+          "All others"
+        ],
+        [
+          "GNC",
+          "All others"
+        ],
+        [
+          "Gaia Herbs",
+          "All others"
+        ],
+        [
+          "Garden of Life",
+          "All others"
+        ],
+        [
+          "Generic",
+          "All others"
+        ],
+        [
+          "Genexa",
+          "All others"
+        ],
+        [
+          "HALLS",
+          "All others"
+        ],
+        [
+          "HAWAIIPHARM",
+          "All others"
+        ],
+        [
+          "HUM",
+          "All others"
+        ],
+        [
+          "Health & Her",
+          "All others"
+        ],
+        [
+          "Herb Pharm",
+          "All others"
+        ],
+        [
+          "Hers",
+          "All others"
+        ],
+        [
+          "Horbäach",
+          "All others"
+        ],
+        [
+          "Hyland's",
+          "All others"
+        ],
+        [
+          "IDEAL PERFORMANCE",
+          "All others"
+        ],
+        [
+          "Icy Hot",
+          "All others"
+        ],
+        [
+          "Imodium",
+          "J&J"
+        ],
+        [
+          "Irwin Naturals",
+          "All others"
+        ],
+        [
+          "Jarrow Formulas",
+          "All others"
+        ],
+        [
+          "KAL",
+          "All others"
+        ],
+        [
+          "Kirkland Signature",
+          "All others"
+        ],
+        [
+          "Lactaid",
+          "All others"
+        ],
+        [
+          "Life Extension",
+          "All others"
+        ],
+        [
+          "Love Wellness",
+          "All others"
+        ],
+        [
+          "MaryRuth Organics",
+          "All others"
+        ],
+        [
+          "Mason Natural",
+          "All others"
+        ],
+        [
+          "MegaFood",
+          "All others"
+        ],
+        [
+          "Meno",
+          "All others"
+        ],
+        [
+          "Metagenics",
+          "All others"
+        ],
+        [
+          "Metamucil",
+          "All others"
+        ],
+        [
+          "Micro Ingredients",
+          "All others"
+        ],
+        [
+          "MiraLax",
+          "All others"
+        ],
+        [
+          "Mommy's Bliss",
+          "All others"
+        ],
+        [
+          "Motrin",
+          "J&J"
+        ],
+        [
+          "Mucinex",
+          "All others"
+        ],
+        [
+          "NOW",
+          "All others"
+        ],
+        [
+          "Nasonex",
+          "All others"
+        ],
+        [
+          "Natrol",
+          "All others"
+        ],
+        [
+          "NaturaNectar",
+          "All others"
+        ],
+        [
+          "Natural Factors",
+          "All others"
+        ],
+        [
+          "Nature Made",
+          "All others"
+        ],
+        [
+          "Nature's Answer",
+          "All others"
+        ],
+        [
+          "Nature's Bounty",
+          "All others"
+        ],
+        [
+          "Nature's Nutrition",
+          "All others"
+        ],
+        [
+          "Nature's Plus",
+          "All others"
+        ],
+        [
+          "Nature's Sunshine",
+          "All others"
+        ],
+        [
+          "Nature's Truth",
+          "All others"
+        ],
+        [
+          "Nature's Way",
+          "All others"
+        ],
+        [
+          "Natures Craft",
+          "All others"
+        ],
+        [
+          "NeilMed",
+          "All others"
+        ],
+        [
+          "New Chapter",
+          "All others"
+        ],
+        [
+          "Nexium",
+          "All others"
+        ],
+        [
+          "Nordic Naturals",
+          "All others"
+        ],
+        [
+          "NusaPure",
+          "All others"
+        ],
+        [
+          "Nutricost",
+          "All others"
+        ],
+        [
+          "Olly",
+          "All others"
+        ],
+        [
+          "One A Day",
+          "All others"
+        ],
+        [
+          "Other Brands",
+          "All others"
+        ],
+        [
+          "Pedialyte",
+          "All others"
+        ],
+        [
+          "Pepcid",
+          "J&J"
+        ],
+        [
+          "Pepto Bismol",
+          "All others"
+        ],
+        [
+          "Pipping Rock",
+          "All others"
+        ],
+        [
+          "Pure Encapsulations",
+          "All others"
+        ],
+        [
+          "Pure Organic Ingredients",
+          "All others"
+        ],
+        [
+          "Puritan's Pride",
+          "All others"
+        ],
+        [
+          "Qunol",
+          "All others"
+        ],
+        [
+          "Rae Wellness",
+          "All others"
+        ],
+        [
+          "ReNew Life",
+          "All others"
+        ],
+        [
+          "Refresh",
+          "All others"
+        ],
+        [
+          "Ricola",
+          "All others"
+        ],
+        [
+          "Robitussin",
+          "All others"
+        ],
+        [
+          "Rolaids",
+          "All others"
+        ],
+        [
+          "SOLARAY",
+          "All others"
+        ],
+        [
+          "SmartyPants",
+          "All others"
+        ],
+        [
+          "Solgar",
+          "All others"
+        ],
+        [
+          "Source Naturals",
+          "All others"
+        ],
+        [
+          "Spring Valley",
+          "All others"
+        ],
+        [
+          "Standard Process Inc.",
+          "All others"
+        ],
+        [
+          "Starwest Botanicals",
+          "All others"
+        ],
+        [
+          "Sudafed",
+          "J&J"
+        ],
+        [
+          "Sunwarrior",
+          "All others"
+        ],
+        [
+          "Swanson",
+          "All others"
+        ],
+        [
+          "TUMS",
+          "All others"
+        ],
+        [
+          "Theraflu",
+          "All others"
+        ],
+        [
+          "Thorne Research",
+          "All others"
+        ],
+        [
+          "Tylenol",
+          "J&J"
+        ],
+        [
+          "UnItemised brand",
+          "All others"
+        ],
+        [
+          "Vicks",
+          "All others"
+        ],
+        [
+          "Visine",
+          "J&J"
+        ],
+        [
+          "Vitafusion",
+          "All others"
+        ],
+        [
+          "Vital Proteins",
+          "All others"
+        ],
+        [
+          "Vitamatic",
+          "All others"
+        ],
+        [
+          "Vitauthority",
+          "All others"
+        ],
+        [
+          "Voltaren",
+          "All others"
+        ],
+        [
+          "Walgreens",
+          "All others"
+        ],
+        [
+          "Wile",
+          "All others"
+        ],
+        [
+          "Womaness",
+          "All others"
+        ],
+        [
+          "Xyzal",
+          "All others"
+        ],
+        [
+          "Zarbee's",
+          "J&J"
+        ],
+        [
+          "Zicam",
+          "All others"
+        ],
+        [
+          "Zyrtec",
+          "J&J"
+        ],
+        [
+          "up & up",
+          "All others"
+        ]
+      ],
+      "pair_support": {
+        "21st Century | All others": 146,
+        "Advil | All others": 244,
+        "Airborne | All others": 138,
+        "Aleve | All others": 98,
+        "Alka Seltzer | All others": 131,
+        "Allegra | All others": 78,
+        "Amazing Nutrition | All others": 212,
+        "Amazon Basic Care | All others": 132,
+        "Ancient Nutrition | All others": 96,
+        "Andrew Lessman | All others": 112,
+        "Ark Labs | All others": 98,
+        "Astepro | All others": 16,
+        "Bayer | All others": 107,
+        "Benadryl | J&J": 119,
+        "Bengay | J&J": 32,
+        "Best Naturals | All others": 283,
+        "Better Not Younger | All others": 2,
+        "Biofreeze | All others": 55,
+        "Biotrue | All others": 26,
+        "Bluebonnet | All others": 218,
+        "Boiron | All others": 118,
+        "Bonafide | All others": 2,
+        "Botanic Choice | All others": 87,
+        "Bronson | All others": 125,
+        "BulkSupplements | All others": 393,
+        "CVS Health | All others": 607,
+        "Carlson | All others": 218,
+        "Carlyle | All others": 403,
+        "Centrum | All others": 249,
+        "Claritin | All others": 118,
+        "Codeage | All others": 164,
+        "Country Life | All others": 155,
+        "Culturelle | All others": 103,
+        "Designs for health | All others": 174,
+        "Dimetapp | All others": 20,
+        "Doctor's Best | All others": 189,
+        "Dr. Mercola | All others": 111,
+        "Emergen-C | All others": 141,
+        "Equate | All others": 440,
+        "Estroven | All others": 6,
+        "Excedrin | All others": 70,
+        "Flonase | All others": 64,
+        "Force Factor | All others": 110,
+        "GNC | All others": 261,
+        "Gaia Herbs | All others": 155,
+        "Garden of Life | All others": 368,
+        "Generic | All others": 453,
+        "Genexa | All others": 42,
+        "HALLS | All others": 185,
+        "HAWAIIPHARM | All others": 120,
+        "HUM | All others": 35,
+        "Health & Her | All others": 1,
+        "Herb Pharm | All others": 160,
+        "Hers | All others": 1,
+        "Horbäach | All others": 257,
+        "Hyland's | All others": 157,
+        "IDEAL PERFORMANCE | All others": 151,
+        "Icy Hot | All others": 115,
+        "Imodium | J&J": 45,
+        "Irwin Naturals | All others": 99,
+        "Jarrow Formulas | All others": 203,
+        "KAL | All others": 130,
+        "Kirkland Signature | All others": 181,
+        "Lactaid | All others": 60,
+        "Life Extension | All others": 337,
+        "Love Wellness | All others": 22,
+        "MaryRuth Organics | All others": 187,
+        "Mason Natural | All others": 130,
+        "MegaFood | All others": 144,
+        "Meno | All others": 1,
+        "Metagenics | All others": 94,
+        "Metamucil | All others": 128,
+        "Micro Ingredients | All others": 103,
+        "MiraLax | All others": 56,
+        "Mommy's Bliss | All others": 70,
+        "Motrin | J&J": 104,
+        "Mucinex | All others": 263,
+        "NOW | All others": 1214,
+        "Nasonex | All others": 9,
+        "Natrol | All others": 302,
+        "NaturaNectar | All others": 8,
+        "Natural Factors | All others": 166,
+        "Nature Made | All others": 863,
+        "Nature's Answer | All others": 138,
+        "Nature's Bounty | All others": 749,
+        "Nature's Nutrition | All others": 157,
+        "Nature's Plus | All others": 254,
+        "Nature's Sunshine | All others": 95,
+        "Nature's Truth | All others": 237,
+        "Nature's Way | All others": 518,
+        "Natures Craft | All others": 190,
+        "NeilMed | All others": 131,
+        "New Chapter | All others": 180,
+        "Nexium | All others": 52,
+        "Nordic Naturals | All others": 238,
+        "NusaPure | All others": 114,
+        "Nutricost | All others": 440,
+        "Olly | All others": 289,
+        "One A Day | All others": 197,
+        "Other Brands | All others": 17,
+        "Pedialyte | All others": 35,
+        "Pepcid | J&J": 87,
+        "Pepto Bismol | All others": 79,
+        "Pipping Rock | All others": 221,
+        "Pure Encapsulations | All others": 259,
+        "Pure Organic Ingredients | All others": 183,
+        "Puritan's Pride | All others": 363,
+        "Qunol | All others": 70,
+        "Rae Wellness | All others": 32,
+        "ReNew Life | All others": 149,
+        "Refresh | All others": 122,
+        "Ricola | All others": 136,
+        "Robitussin | All others": 96,
+        "Rolaids | All others": 20,
+        "SOLARAY | All others": 449,
+        "SmartyPants | All others": 99,
+        "Solgar | All others": 377,
+        "Source Naturals | All others": 303,
+        "Spring Valley | All others": 250,
+        "Standard Process Inc. | All others": 127,
+        "Starwest Botanicals | All others": 149,
+        "Sudafed | J&J": 43,
+        "Sunwarrior | All others": 31,
+        "Swanson | All others": 772,
+        "TUMS | All others": 195,
+        "Theraflu | All others": 47,
+        "Thorne Research | All others": 134,
+        "Tylenol | J&J": 312,
+        "UnItemised brand | All others": 50034,
+        "Vicks | All others": 381,
+        "Visine | J&J": 54,
+        "Vitafusion | All others": 185,
+        "Vital Proteins | All others": 126,
+        "Vitamatic | All others": 150,
+        "Vitauthority | All others": 23,
+        "Voltaren | All others": 7,
+        "Walgreens | All others": 576,
+        "Wile | All others": 6,
+        "Womaness | All others": 1,
+        "Xyzal | All others": 27,
+        "Zarbee's | J&J": 133,
+        "Zicam | All others": 85,
+        "Zyrtec | J&J": 99,
+        "up & up | All others": 237
+      },
+      "multi_parent_children": {},
+      "provenance": {
+        "derived_from": "training_support",
+        "derived_from_is_approvable": true,
+        "training_rows": 79259,
+        "mnfr_vocabulary_enforced": [
+          "All others",
+          "J&J"
+        ],
+        "mnfr_values_rejected": "2 column-shift values ('coffee', and a collagen description) are outside the J&J / All others vocabulary and fall under target reason 6 quarantine, which does not change the source label",
+        "superseded_v1_finding": "v1 derived this from 9,833 validation rows and reported that 78% of half-splits produced a false alarm. That was a coverage artifact of the small slice, not a property of the relation.",
+        "contradictions_live_in_excluded_rows": "Benadryl, Bengay, Sudafed and Tylenol each show a second manufacturer, but only in rows marked Exclude"
+      },
+      "measured": {
+        "validation_rows_scored": 9833,
+        "validation_rows_note": "rows that are validation for BOTH models. Each target has its own validation_record_ids_sha256, so this is an intersection, not a representative product sample.",
+        "fires_rows": 5,
+        "fires_pct": 0.0508,
+        "rows_with_an_error": 202,
+        "recall_of_errors_pct": 2.48,
+        "false_alarms_both_labels_correct": 0,
+        "false_alarm_count_is_a_real_result": true,
+        "false_alarm_note": "In v1 the allowed set came from the same rows being scored, so a zero false-alarm count was forced by construction and proved nothing. Here the allowed set comes from training support, independent of these rows, so a false alarm was possible and none occurred: every true pair in validation is present in the training map.",
+        "errors_found_that_a_070_both_confident_gate_would_skip": 2
+      },
+      "recommendation": "warn_mode_pending_signoff",
+      "caveat": "decisions.md: 'Preserve supplied Mnfr, including missing and invalid values. Do not infer J&J from Brand.' This relation may raise a review reason and nothing else."
+    },
+    {
+      "relation_id": "R3_brand_platform_not_a_relation",
+      "status": "rejected",
+      "status_note": "Recorded so nobody builds it. Brand to Platform is not hierarchical.",
+      "evidence": "Only 1,103 of 79,259 training rows carry a Platform label (1.4%), across 62 classes. Of the 17 brands that carry one, 12 carry more than one, up to 22 on a single brand.",
+      "child_target": "Platform",
+      "parent_target": "Brand",
+      "allowed_pairs": [],
+      "platforms_per_brand": {
+        "Tylenol": 22,
+        "Benadryl": 8,
+        "Motrin": 7,
+        "Zyrtec": 6,
+        "Excedrin": 6,
+        "Zarbee's": 5,
+        "Sudafed": 4,
+        "Visine": 3,
+        "Bengay": 3,
+        "Imodium": 3,
+        "Pepcid": 3,
+        "UnItemised brand": 2,
+        "Advil": 1,
+        "Kirkland Signature": 1,
+        "Claritin": 1,
+        "gluten-free": 1,
+        "tea": 1
+      },
+      "provenance": {
+        "derived_from": "training_support",
+        "derived_from_is_approvable": true
+      },
+      "why_rejected": "The ticket asks for incompatible Brand/Platform combinations. One brand legitimately spans many platforms (Tylenol 22, Benadryl 8, Motrin 7), so an unseen Brand/Platform pair is evidence of thin coverage, not of a taxonomy violation. Platform is also unavailable per the handoff."
+    }
+  ]
+}

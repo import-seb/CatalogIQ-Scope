@@ -1,0 +1,37 @@
+{
+  "registry_version": "relationships-20261107-candidate-v2",
+  "approved_relations_count": 0,
+  "mode": "warn_only",
+  "mode_note": "No relation in the registry is approved, so these are observations and not review decisions. Nothing here may gate or reject a product.",
+  "distinct_records_with_at_least_one_observation": 6908,
+  "per_relation": {
+    "R1_sub_segment_under_segment": {
+      "evaluated": true,
+      "relation_status": "candidate",
+      "records_with_both_predictions": 10497,
+      "conflicts": 192,
+      "conflicts_pct_of_checkable": 1.8291,
+      "not_checkable_one_side_missing": 2520
+    },
+    "R2_brand_under_mnfr": {
+      "evaluated": true,
+      "relation_status": "candidate",
+      "records_with_both_predictions": 9833,
+      "conflicts": 5,
+      "conflicts_pct_of_checkable": 0.0508,
+      "not_checkable_one_side_missing": 4765
+    }
+  },
+  "targets_supplied": [
+    "Brand",
+    "Mnfr",
+    "Segment",
+    "Sub-Segment",
+    "TargetAgeGroup"
+  ],
+  "review_queue_file": "relationship_conflicts.csv",
+  "review_queue_rows": 197,
+  "not_checkable_file": "relationship_not_checkable.csv",
+  "not_checkable_rows": 7285,
+  "not_checkable_note": "A missing sibling prediction, not a conflict. On these exports it is an artifact of each target having its own validation set, so one side is absent for many records. In serving every available model predicts for every product, so this should only appear when a target is unavailable, as Platform is."
+}
