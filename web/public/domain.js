@@ -61,6 +61,16 @@ export function alignResponse(response, inputs) {
   return inputs.map(input => map.get(input.record_id));
 }
 
+export function validateImport(inputs, records) {
+  if (records.length + inputs.length > MAX_ROWS) throw new Error(`This workspace supports ${MAX_ROWS} products. Export and clear it before adding another batch.`);
+  const ids = new Set(records.map(r => r.product.record_id));
+  for (const {product} of inputs) {
+    if (!product.record_id.trim()) throw new Error('Each product needs a nonempty ID.');
+    if (ids.has(product.record_id)) throw new Error(`Product ID “${product.record_id}” already exists. Use a different ID, or clear the current workspace.`);
+    ids.add(product.record_id);
+  }
+}
+
 export function alternatives(prediction, limit = 3) {
   return Object.entries(prediction?.probabilities || {}).map(([key, probability]) => ({label: prediction.label_mapping?.[key], probability}))
     .filter(v => typeof v.label === 'string' && Number.isFinite(v.probability))

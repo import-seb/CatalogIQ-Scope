@@ -1,5 +1,7 @@
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs/promises';
+import {readinessTests} from '../shared/workspace-readiness.mjs';
+readinessTests(test,expect);
 
 test('shared demo supports correction, export and refresh with no API',async({page})=>{
   const errors=[],apiRequests=[];

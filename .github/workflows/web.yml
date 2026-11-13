@@ -21,7 +21,7 @@ jobs:
           python-version: '3.12'
       - run: npm --prefix web ci --ignore-scripts
       - run: npm --prefix web test
-      - run: python -m unittest discover -s web/tests -p test_server.py -v
+      - run: python -m unittest discover -s web/tests -p "test_*.py" -v
       - run: npx playwright install --with-deps chromium
         working-directory: web
       - run: npm --prefix web run test:browser

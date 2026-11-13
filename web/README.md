@@ -63,6 +63,9 @@ access to the team repository. The CLI deployment does not require that access.
 - Single product entry and UTF-8 CSV upload (2 MB / 250 products per workspace).
 - CSV quoted commas/newlines, BOM, CRLF, leading-zero IDs, duplicate-ID and
   malformed-file validation. The downloadable template declares the fields.
+- CSV preview shows the first five products before import, with extra columns
+  identified. Existing workspace IDs and workspace capacity are checked before
+  a prediction request is sent. Invalid replacement files clear the old preview.
 - Exact `record_id` alignment; curated labels and extra CSV columns stay in
   the original source and never enter the model request. `quarantined` is
   carried as a boolean when supplied.
@@ -72,6 +75,11 @@ access to the team repository. The CLI deployment does not require that access.
   a reason; decisions record reviewer name, timestamp and append-only history
   in the local workspace. A human correction keeps the original model score
   attached to the original prediction, not to the replacement label.
+- Unfinished review notes and corrections are saved as per-product drafts in
+  this browser. Switching products, filters or refreshing keeps them. Save review
+  applies a decision; Discard draft restores the previous decision without
+  changing history. JSON exports include drafts separately; CSV final labels
+  still come only from saved decisions. Browser storage must be available.
 - Local browser persistence, CSV results and JSON audit exports. Original
   source fields, model versions, probabilities, provenance, decisions and
   review history remain separate. Pending/rejected rows have no final labels.
@@ -97,8 +105,8 @@ directory structure. Old prediction-only archives are not sufficient.
 python web/server.py --live --artifacts "C:\path\to\processed"
 ```
 
-`--live` checks that serving files exist before starting. The adapter then
-verifies their hashes and contents when it loads models. A single reused
+`--live` checks serving file paths and SHA-256 hashes before starting. The adapter
+also verifies their contents when it loads models. A single reused
 `InferenceEngine` delegates to the unchanged `infer_request`. The UI sends
 the `products` envelope for one or many records. Transport endpoints:
 
@@ -112,6 +120,20 @@ Do not mix old demo reviews with a real run: export/clear the demo workspace
 first. The example loader always marks its records `demo`, even in live mode.
 Failures never silently fall back to example predictions.
 
+Use the dependency-free checker before installing or loading the models:
+
+```powershell
+python web/check_artifacts.py --list
+python web/check_artifacts.py --artifacts "C:\path\to\processed"
+```
+
+The current pinned registry requires 36 unique files across five model routes.
+The checker reports every missing, changed, unreadable or escaped path, hashes
+large checkpoints in chunks, and returns exit code 1 for an incomplete bundle.
+`--json` produces a machine-readable report. Artifact hashes use exact bytes;
+do not normalize their line endings. A passing file check does not prove that
+inference works. Follow [the integration handoff](INTEGRATION_HANDOFF.md) next.
+
 The Python server is a **loopback-only development wrapper**, not a production
 deployment. It serves only `web/public`, limits request size, restricts Host and
 Origin, and sends a restrictive CSP. Actual inference has not been exercised
@@ -123,7 +145,7 @@ on this machine because the serving files have not been received.
 cd web
 npm ci
 npm test
-python -m unittest discover -s tests -p test_server.py -v
+python -m unittest discover -s tests -p "test_*.py" -v
 npx playwright install chromium
 npm run test:browser
 ```
@@ -140,8 +162,9 @@ history, unchanged original predictions, unavailable-model behavior, HTTP
 guards, browser imports/reviews/downloads/persistence and mobile layout.
 Browser screenshots are generated under the ignored `web/test-results/`.
 
-The suites contain 13 domain/transport tests, 7 Python server tests, 8 local
-API browser scenarios and 3 static browser scenarios. Browser scenarios include
+The suites contain 14 domain/transport tests, 12 Python server/artifact tests,
+12 local API browser scenarios and 7 static browser scenarios (45 checks).
+Browser scenarios include CSV preview and draft recovery as well as
 partial model failure and network failure/retry, plus desktop and mobile layouts.
 No real-model inference has been run with this interface yet.
 

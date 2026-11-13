@@ -1,5 +1,7 @@
 import { test,expect } from '@playwright/test';
 import fs from 'node:fs/promises';
+import {readinessTests} from '../shared/workspace-readiness.mjs';
+readinessTests(test,expect);
 
 test('example review, correction, persistence and both export formats',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
@@ -33,7 +35,7 @@ test('CSV import keeps IDs and extra columns; new products never get fake predic
   await page.goto('/');await page.getByRole('button',{name:'Add products',exact:true}).click();
   const csv='record_id,ProductCategory,ProductName,ProductBrand,ProductDescription,ProductContents,Extra\r\n000007,Health,"<img src=x onerror=alert(1)>",Brand,"Line 1\nLine 2",,"=HYPERLINK(""https://example.org"")"';
   await page.getByLabel('Upload product CSV').setInputFiles({name:'store.csv',mimeType:'text/csv',buffer:Buffer.from(csv)});
-  await expect(page.locator('#file-ready')).toContainText('1 products ready');
+  await expect(page.locator('#file-ready')).toContainText('1 product ready');
   await page.locator('#import-submit').click();
   await expect(page.locator('#input-dialog')).not.toBeVisible();
   await expect(page.locator('.review-product')).toContainText('000007');

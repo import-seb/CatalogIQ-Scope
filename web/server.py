@@ -149,11 +149,11 @@ if __name__ == "__main__":
     if args.live:
         if args.artifacts is None:
             parser.error("--live requires --artifacts pointing to the pinned serving files")
-        pins = json.loads((ROOT / "src/catalogiq/resources/inference/frozen_routes.json").read_text())
-        missing = [name for route in pins["routes"].values() for name in route["files_sha256"]
-                   if not (args.artifacts / name).is_file()]
-        if missing:
-            parser.error(f"Missing {len(missing)} serving files. First: {missing[0]}")
+        from check_artifacts import DEFAULT_PINS, verify_bundle
+        report = verify_bundle(args.artifacts, json.loads(DEFAULT_PINS.read_text(encoding="utf-8")))
+        if not report["ready"]:
+            failures = [item for item in report["files"] if item["status"] != "ok"]
+            parser.error(f"{len(failures)} serving files failed verification. Run python web/check_artifacts.py --artifacts PATH for details.")
         sys.path.insert(0, str(ROOT / "src"))
         from catalogiq.inference_engine import InferenceEngine
         from catalogiq.inference_adapter import infer_request

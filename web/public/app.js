@@ -1,4 +1,4 @@
-import {FIELDS,TARGETS,TITLES,MAX_ROWS,MAX_BYTES,SCHEMA,parseCSV,alignResponse,alternatives,canReview,recordDecision,exportCSV,auditExport,csvCell} from './domain.js';
+import {FIELDS,TARGETS,TITLES,MAX_ROWS,MAX_BYTES,SCHEMA,parseCSV,validateImport,alignResponse,alternatives,canReview,recordDecision,exportCSV,auditExport,csvCell} from './domain.js';
 import {createTransport} from './transport.js';
 
 const transport=createTransport({staticDemo:document.querySelector('meta[name="catalogiq-runtime"]')?.content==='static-demo'});
@@ -30,6 +30,16 @@ const percent = p => Number.isFinite(p) ? (p<1&&p>=0.9995?'>99.9%':`${(100*p).to
 function notify(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(notify.timer);notify.timer=setTimeout(()=>$('#toast').classList.remove('show'),4500);}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true;}catch{storageOK=false;notify('Browser storage is full or unavailable. Export your work before closing.');}}
 function selected(){return state.records.find(r=>r.product.record_id===state.selectedId);}
+function captureDraft(){
+  const r=selected();
+  if(!r||!$('#reviewer')||!$('#review-note'))return;
+  const labels=Object.fromEntries(TARGETS.filter(t=>r.result?.predictions[t]?.status==='suggestion').map(t=>[t,
+    $(`[data-target="${t}"]`)?.value??r.draft?.labels[t]??r.decision?.labels[t]??r.result.predictions[t].predicted_label]));
+  r.draft={labels,note:$('#review-note').value,reviewer:$('#reviewer').value,editing};
+  save();
+  const indicator=$('#review-draft-status');
+  if(indicator){indicator.hidden=false;indicator.textContent=storageOK?'Draft saved in this browser. Save your review to apply it.':'Draft is not saved. Keep this page open until storage is available.';}
+}
 function counts(){return {all:state.records.length,pending:state.records.filter(r=>!r.decision).length,reviewed:state.records.filter(r=>r.decision&&r.decision.action!=='rejected').length,rejected:state.records.filter(r=>r.decision?.action==='rejected').length};}
 function visibleRecords(){return state.records.filter(r=> (state.filter==='all'||(state.filter==='pending'&&!r.decision)||(state.filter==='reviewed'&&r.decision&&r.decision.action!=='rejected')||(state.filter==='rejected'&&r.decision?.action==='rejected'))&&[r.product.record_id,...FIELDS.map(f=>r.product[f])].join(' ').toLowerCase().includes(state.search.toLowerCase()));}
 const pill = r => `<span class="pill ${status(r)}">${status(r)==='approved'||status(r)==='corrected'?'✓ ':''}${statusLabel(status(r))}</span>`;
@@ -38,6 +48,7 @@ const reasonNames={automatic_acceptance_disabled:'Automatic approval is turned o
 function reasonText(code){return reasonNames[code] || code.replaceAll('_',' ').replace(/^./,s=>s.toUpperCase())+'.';}
 
 function render(){
+  editing=!!selected()?.draft?.editing;
   const c=counts();
   $('#app').innerHTML=`<div class="shell">
     <aside class="sidebar"><div class="brand"><img src="/assets/mark.svg" alt=""><div class="wordmark">Catalog<span>IQ</span></div></div>
@@ -70,7 +81,7 @@ function tableHTML(){
 function reviewHTML(){
   const r=selected();
   if(!r)return `<div class="empty">${icon('review')}<h3>A closer look, one product at a time</h3><p>Select a product to see its predictions and review details.</p></div>`;
-  const predictions=r.result?.predictions||{};
+  const predictions=r.result?.predictions||{};const draft=r.draft;
   const reasons=[...new Set(Object.values(predictions).flatMap(p=>p.review_reasons||[]))].filter(c=>c!=='target_unavailable');
   const reviewable=canReview(r);
   const anySuggestion=Object.values(predictions).some(p=>p.status==='suggestion');
@@ -81,13 +92,13 @@ function reviewHTML(){
     ${sourceDetails(r)}<div class="review-callout">${icon('shield')}<div>${reviewable?'<strong>Your review is required.</strong> '+(reasons.slice(0,2).map(reasonText).join(' ')||'Check the suggestions before approving.'):anySuggestion||failedTargets?'<strong>Some predictions are unavailable.</strong> Your product is saved. Try classification again before approving.':'<strong>Waiting for models.</strong> Your product is saved. Predictions will be available after the models are connected.'}</div></div>
     <div class="section-label">${r.decision&&r.decision.action!=='rejected'?'Reviewed classifications':'Suggested classifications'}<span>${editing?'Choose a label below':'Raw confidence'}</span></div>
     <div class="prediction-grid">${TARGETS.map(t=>{
-      const p=predictions[t];const usable=p?.status==='suggestion';const final=r.decision?.labels[t]??p?.predicted_label;
+      const p=predictions[t];const usable=p?.status==='suggestion';const final=(editing?draft?.labels[t]:null)??r.decision?.labels[t]??p?.predicted_label;
       return `<div class="prediction ${usable?'':'unavailable'}"><div class="prediction-name"><span>${TITLES[t]}</span><strong>${usable?percent(p.confidence):'—'}</strong></div>
       ${editing&&usable?`<label class="visually-hidden" for="label-${t}">${TITLES[t]}</label><select id="label-${t}" data-target="${t}" aria-label="Correct ${TITLES[t]}">${Object.values(p.label_mapping).map(label=>`<option value="${esc(label)}" ${label===final?'selected':''}>${esc(label)}</option>`).join('')}</select>`:`<div class="prediction-value">${esc(usable?final:t==='Platform'?'Not available':p?.status==='failed'?'Couldn’t classify':'Awaiting models')}</div>`}
       ${p?.selection_status==='provisional'?'<p class="micro">Provisional suggestion</p>':''}${r.decision?.labels[t]&&r.decision.labels[t]!==p?.predicted_label?`<p class="micro">Changed from ${esc(p.predicted_label)}. Score belongs to original prediction.</p>`:''}</div>`;
     }).join('')}</div>
     ${reviewable?`<details class="alternative-details"><summary>See alternatives & review notes</summary><div class="alternatives">${TARGETS.filter(t=>predictions[t]?.status==='suggestion').map(t=>`<div class="alternative-target">${TITLES[t]}</div>${alternatives(predictions[t]).map(a=>`<div class="alternative-line"><b>${esc(a.label)}</b><span>${percent(a.probability)}</span></div>`).join('')}`).join('')}</div><p class="micro">${esc(reasons.map(reasonText).join(' '))}</p><p class="micro">Alternatives are suggestions from the model, not approved relationships.</p></details>`:''}
-    ${r.decision&&!editing?`<div class="decision-banner ${r.decision.action}"><strong>${statusLabel(r.decision.action)}</strong> by ${esc(r.decision.reviewer)}<br><span>${esc(new Date(r.decision.timestamp).toLocaleString())}</span>${r.decision.note?`<p>${esc(r.decision.note)}</p>`:''}<button class="button small" data-action="edit">${icon('edit')}Review again</button></div>`:`<div class="review-controls"><div class="field"><label class="field-label" for="reviewer">Reviewed by</label><input class="text-input" id="reviewer" autocomplete="name" placeholder="Your name" value="${esc(state.reviewer)}" maxlength="100"><p class="micro">Recorded with your decision. This is a local workspace, not a verified login.</p></div><label class="field-label" for="review-note">Review note <span class="optional">${editing?'· required for a correction':'· optional for approval'}</span></label><textarea id="review-note" placeholder="Explain a correction or why you’re rejecting this product…" maxlength="2000">${esc(editing?r.decision?.note||'':'')}</textarea><p id="review-error" class="error-text" role="alert" hidden></p><div class="review-actions"><button class="button primary" data-action="${editing?'correct':'approve'}" ${reviewable?'':'disabled'}>${icon('check')}${editing?'Save review':'Approve'}</button><button class="button" data-action="${editing?'cancel-edit':'edit'}" ${reviewable?'':'disabled'}>${icon(editing?'close':'edit')}${editing?'Cancel':'Correct'}</button><button class="button danger" data-action="reject">Reject</button></div><p class="review-hint">${reviewable?'Approval covers the five available targets. Platform stays unavailable. Your decision does not change the model’s review policy.':'Approval and corrections unlock when predictions are available.'}</p></div>`}
+    ${r.decision&&!editing?`<div class="decision-banner ${r.decision.action}"><strong>${statusLabel(r.decision.action)}</strong> by ${esc(r.decision.reviewer)}<br><span>${esc(new Date(r.decision.timestamp).toLocaleString())}</span>${r.decision.note?`<p>${esc(r.decision.note)}</p>`:''}<button class="button small" data-action="edit">${icon('edit')}Review again</button></div>`:`<div class="review-controls"><div class="field"><label class="field-label" for="reviewer">Reviewed by</label><input class="text-input" id="reviewer" autocomplete="name" placeholder="Your name" value="${esc(draft?.reviewer??state.reviewer)}" maxlength="100"><p class="micro">Recorded with your decision. This is a local workspace, not a verified login.</p></div><label class="field-label" for="review-note">Review note <span class="optional">${editing?'· required for a correction':'· optional for approval'}</span></label><textarea id="review-note" placeholder="Explain a correction or why you’re rejecting this product…" maxlength="2000">${esc(draft?.note??(editing?r.decision?.note||'':''))}</textarea><p id="review-draft-status" class="micro draft-status" ${draft?'':'hidden'}>${storageOK?'Draft saved in this browser. Save your review to apply it.':'Draft is not saved. Keep this page open until storage is available.'}</p><p id="review-error" class="error-text" role="alert" hidden></p><div class="review-actions"><button class="button primary" data-action="${editing?'correct':'approve'}" ${reviewable?'':'disabled'}>${icon('check')}${editing?'Save review':'Approve'}</button><button class="button" data-action="${editing?'cancel-edit':'edit'}" ${reviewable?'':'disabled'}>${icon(editing?'close':'edit')}${editing?'Discard draft':'Correct'}</button><button class="button danger" data-action="reject">Reject</button></div><p class="review-hint">${reviewable?'Approval covers the five available targets. Platform stays unavailable. Your decision does not change the model’s review policy.':'Approval and corrections unlock when predictions are available.'}</p></div>`}
     ${r.history?.length?`<details class="alternative-details"><summary>Review history (${r.history.length})</summary><ol class="history-list">${r.history.map(h=>`<li>${esc(statusLabel(h.action))} · ${esc(h.reviewer)} · ${esc(new Date(h.timestamp).toLocaleString())}${h.note?`<br>${esc(h.note)}`:''}</li>`).join('')}</ol></details>`:''}</div>`;
 }
 
@@ -106,10 +117,7 @@ async function requestPredictions(products){
   return transport.predict(products);
 }
 async function importProducts(inputs,name){
-  if(state.records.length+inputs.length>MAX_ROWS)throw new Error(`This workspace supports ${MAX_ROWS} products. Export and clear it before adding another batch.`);
-  const existing=new Set(state.records.map(r=>r.product.record_id));
-  const duplicate=inputs.find(r=>existing.has(r.product.record_id));
-  if(duplicate)throw new Error(`Product ID “${duplicate.product.record_id}” already exists. Use a different ID, or clear the current workspace.`);
+  validateImport(inputs,state.records);
   const data=await requestPredictions(inputs.map(x=>x.product));
   const added=newRecords(inputs,data,health.mode,name);
   state.records.push(...added);state.selectedId=added[0].product.record_id;state.filter='all';state.search='';editing=false;save();
@@ -119,7 +127,7 @@ function showInput(tab='csv'){
   uploadToken++;staged=[];stagedName='';
   const dialog=$('#input-dialog');
   dialog.innerHTML=dialogHeader('input-title','Add products','Start with one product or bring in a CSV from your store.')+`<div class="dialog-content"><div class="dialog-tabs" aria-label="Input method"><button class="dialog-tab ${tab==='csv'?'active':''}" data-tab="csv" aria-pressed="${tab==='csv'}">Upload CSV</button><button class="dialog-tab ${tab==='single'?'active':''}" data-tab="single" aria-pressed="${tab==='single'}">One product</button></div>
-    ${tab==='csv'?`<label class="dropzone" id="dropzone">${icon('upload')}<strong>Drop your CSV here, or browse</strong><p>Up to ${MAX_ROWS} products · CSV · 2 MB maximum</p><input type="file" id="csv-file" accept=".csv,text/csv" aria-label="Upload product CSV"></label><div id="file-ready" class="file-ready" hidden></div><button class="button small" id="template">${icon('download')}Download CSV template</button><p class="micro">Keep product IDs as text to preserve leading zeros. Extra columns are retained for export but are not sent to the model.</p>`:`<form id="single-form"><div class="form-grid"><div class="field"><label class="field-label" for="record-id">Product ID</label><input id="record-id" class="text-input" name="record_id" placeholder="e.g. SKU-001" required maxlength="200"></div><div class="field"><label class="field-label" for="product-brand">Brand</label><input id="product-brand" class="text-input" name="ProductBrand" placeholder="e.g. Claritin" maxlength="1000"></div><div class="field full"><label class="field-label" for="product-name">Product name</label><input id="product-name" class="text-input" name="ProductName" placeholder="e.g. Claritin RediTabs" required maxlength="2000"></div><div class="field full"><label class="field-label" for="product-category">Store category</label><input id="product-category" class="text-input" name="ProductCategory" placeholder="e.g. Health > Allergy Relief" maxlength="4000"><p>Use the category from the product’s original listing.</p></div><div class="field full"><label class="field-label" for="product-description">Description</label><textarea id="product-description" name="ProductDescription" placeholder="What does the listing say?" maxlength="20000"></textarea></div><div class="field full"><label class="field-label" for="product-contents">Contents or ingredients</label><input id="product-contents" class="text-input" name="ProductContents" placeholder="Optional" maxlength="10000"></div></div></form>`}
+    ${tab==='csv'?`<label class="dropzone" id="dropzone">${icon('upload')}<strong>Drop your CSV here, or browse</strong><p>Up to ${MAX_ROWS} products · CSV · 2 MB maximum</p><input type="file" id="csv-file" accept=".csv,text/csv" aria-label="Upload product CSV"></label><div id="file-ready" class="file-ready" role="status" hidden></div><div id="csv-preview" class="csv-preview" hidden></div><button class="button small" id="template">${icon('download')}Download CSV template</button><p class="micro">Keep product IDs as text to preserve leading zeros. Extra columns are retained for export but are not sent to the model.</p>`:`<form id="single-form"><div class="form-grid"><div class="field"><label class="field-label" for="record-id">Product ID</label><input id="record-id" class="text-input" name="record_id" placeholder="e.g. SKU-001" required maxlength="200"></div><div class="field"><label class="field-label" for="product-brand">Brand</label><input id="product-brand" class="text-input" name="ProductBrand" placeholder="e.g. Claritin" maxlength="1000"></div><div class="field full"><label class="field-label" for="product-name">Product name</label><input id="product-name" class="text-input" name="ProductName" placeholder="e.g. Claritin RediTabs" required maxlength="2000"></div><div class="field full"><label class="field-label" for="product-category">Store category</label><input id="product-category" class="text-input" name="ProductCategory" placeholder="e.g. Health > Allergy Relief" maxlength="4000"><p>Use the category from the product’s original listing.</p></div><div class="field full"><label class="field-label" for="product-description">Description</label><textarea id="product-description" name="ProductDescription" placeholder="What does the listing say?" maxlength="20000"></textarea></div><div class="field full"><label class="field-label" for="product-contents">Contents or ingredients</label><input id="product-contents" class="text-input" name="ProductContents" placeholder="Optional" maxlength="10000"></div></div></form>`}
     <p class="micro">${health.mode==='demo'?'Demo mode: new products are saved with “Awaiting models.” No new predictions will be generated.':'Your products will be sent to the local classification adapter.'}</p><p class="error-text" id="input-error" role="alert" hidden></p><div class="dialog-footer"><button class="button quiet" data-close>Cancel</button><button class="button primary" id="import-submit" ${tab==='csv'?'disabled':''}>${icon('plus')}Add products</button></div></div>`;
   if(!dialog.open)dialog.showModal();
   dialog.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showInput(b.dataset.tab));
@@ -145,14 +153,20 @@ function showInput(tab='csv'){
   };
 }
 async function readFile(file){
-  if(!file||busy)return;const token=++uploadToken;staged=[];$('#import-submit').disabled=true;$('#file-ready').hidden=true;$('#input-error').hidden=true;
+  if(!file||busy)return;const token=++uploadToken;staged=[];$('#import-submit').disabled=true;$('#file-ready').hidden=true;$('#csv-preview').hidden=true;$('#csv-preview').innerHTML='';$('#input-error').hidden=true;
   try{
     if(!file.name.toLowerCase().endsWith('.csv'))throw new Error('Choose a CSV file.');
     if(file.size>MAX_BYTES)throw new Error('Choose a file smaller than 2 MB.');
     const text=new TextDecoder('utf-8',{fatal:true}).decode(await file.arrayBuffer());
     if(token!==uploadToken||!$('#csv-file'))return;
     if(text.includes('\0'))throw new Error('Save the file as a UTF-8 CSV and try again.');
-    staged=parseCSV(text);stagedName=file.name;$('#file-ready').textContent=`${file.name} · ${staged.length} products ready. Original IDs and extra columns will be preserved.`;$('#file-ready').hidden=false;$('#import-submit').disabled=false;
+    staged=parseCSV(text);stagedName=file.name;validateImport(staged,state.records);
+    $('#file-ready').textContent=`${file.name} · ${staged.length} product${staged.length===1?'':'s'} ready. Check the preview before adding.`;
+    const columns=['record_id',...FIELDS];
+    const extra=Object.keys(staged[0].source).filter(k=>!columns.includes(k));
+    const names={record_id:'Product ID',ProductCategory:'Store category',ProductName:'Product name',ProductBrand:'Brand',ProductDescription:'Description',ProductContents:'Contents'};
+    $('#csv-preview').innerHTML=`<p class="micro">Showing ${Math.min(5,staged.length)} of ${staged.length} products. Empty cells stay empty.</p><div class="table-scroll" tabindex="0" role="region" aria-label="CSV product preview"><table><thead><tr>${columns.map(k=>`<th scope="col">${names[k]}</th>`).join('')}</tr></thead><tbody>${staged.slice(0,5).map(r=>`<tr>${columns.map(k=>`<td>${esc(r.product[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="micro">${extra.length?`Also preserved in your source data: ${extra.map(esc).join(', ')}. `:''}Original IDs and source values are kept unchanged.</p>`;
+    $('#file-ready').hidden=false;$('#csv-preview').hidden=false;$('#import-submit').disabled=false;
   }catch(e){if(token===uploadToken&&$('#csv-file'))showError('#input-error',e.message);}
 }
 function showError(selector,message){$(selector).textContent=message;$(selector).hidden=false;}
@@ -167,7 +181,7 @@ function decide(action){
   for(const t of TARGETS)if(r.result?.predictions[t]?.status==='suggestion')labels[t]=editing?$(`[data-target="${t}"]`).value:r.result.predictions[t].predicted_label;
   state.reviewer=$('#reviewer').value;
   if(action==='corrected'&&!Object.keys(labels).some(t=>labels[t]!==r.result.predictions[t].predicted_label))action='approved';
-  try{const next=recordDecision(r,action,labels,$('#review-note').value,state.reviewer);state.records[state.records.indexOf(r)]=next;editing=false;save();render();notify(`Review saved: ${statusLabel(action).toLowerCase()}.`);}
+  try{const next=recordDecision(r,action,labels,$('#review-note').value,state.reviewer);delete next.draft;state.records[state.records.indexOf(r)]=next;editing=false;save();render();notify(`Review saved: ${statusLabel(action).toLowerCase()}.`);}
   catch(e){showError('#review-error',e.message);}
 }
 
@@ -183,8 +197,8 @@ document.addEventListener('click',async e=>{
   if(action==='examples')addExamples();
   if(action==='help')showHelp();
   if(action==='export')showExport();
-  if(action==='edit'){editing=true;$('#review-panel').innerHTML=reviewHTML();}
-  if(action==='cancel-edit'){editing=false;$('#review-panel').innerHTML=reviewHTML();}
+  if(action==='edit'){editing=true;captureDraft();if(!selected().draft){const r=selected();r.draft={labels:{...r.decision?.labels},note:r.decision?.note||'',reviewer:state.reviewer,editing:true};save();}$('#review-panel').innerHTML=reviewHTML();}
+  if(action==='cancel-edit'){delete selected().draft;editing=false;save();$('#review-panel').innerHTML=reviewHTML();}
   if(action==='approve')decide('approved');
   if(action==='correct')decide('corrected');
   if(action==='reject')decide('rejected');
@@ -198,8 +212,11 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('input',e=>{
   if(e.target.id==='search'){state.search=e.target.value;$('#product-table').innerHTML=tableHTML();$('.panel-bottom>span').textContent=`${visibleRecords().length} of ${state.records.length} products`;}
-  if(e.target.id==='reviewer'){state.reviewer=e.target.value;save();}
+  if(e.target.id==='reviewer')state.reviewer=e.target.value;
+  if(e.target.id==='reviewer'||e.target.id==='review-note'||e.target.matches('[data-target]'))captureDraft();
 });
+window.addEventListener('beforeunload',e=>{if(!storageOK&&state.records.some(r=>r.draft)){e.preventDefault();e.returnValue='';}});
+
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('cancel',e=>{if(busy)e.preventDefault();}));
 
 async function init(){

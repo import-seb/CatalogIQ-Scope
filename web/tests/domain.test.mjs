@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseCSV,alignResponse,recordDecision,exportCSV,auditExport,FIELDS,TARGETS,alternatives,canReview} from '../public/domain.js';
+import {parseCSV,validateImport,alignResponse,recordDecision,exportCSV,auditExport,FIELDS,TARGETS,alternatives,canReview} from '../public/domain.js';
 const request=JSON.parse(fs.readFileSync(new URL('../../docs/integration/inference_adapter_request.json',import.meta.url)));
 const response=JSON.parse(fs.readFileSync(new URL('../../docs/integration/inference_adapter_response.json',import.meta.url)));
 const header=['record_id',...FIELDS];
@@ -16,6 +16,15 @@ test('CSV rejects missing and duplicate IDs, headers, malformed quotes and ragge
   for(const csv of [header.join(',')+'\n'+row+'\n'+row,'record_id,record_id\nx,y',header.join(',')+'\n,Health,Name,Brand,Description,Contents',header.join(',')+'\n0001,Health,"bad',header.join(',')+'\n0001,Health,"bad"x,Brand,Description,Contents',header.join(',')+'\n0001,x'])assert.throws(()=>parseCSV(csv));
 });
 test('Quarantine is preserved and invalid values rejected',()=>{assert.equal(parseCSV(header.join(',')+',quarantined\n'+row+',true')[0].product.quarantined,true);assert.throws(()=>parseCSV(header.join(',')+',quarantined\n'+row+',yes'));});
+
+test('import preflight rejects duplicate IDs and workspace overflow before requesting predictions',()=>{
+  const inputs=parseCSV(header.join(',')+'\n'+row);
+  assert.throws(()=>validateImport(inputs,inputs),/already exists/);
+  assert.throws(()=>validateImport([...inputs,...inputs],[]),/already exists/);
+  assert.throws(()=>validateImport(inputs,Array.from({length:250},(_,i)=>({product:{record_id:`old-${i}`}}))),/250 products/);
+  assert.doesNotThrow(()=>validateImport(inputs,[{product:{record_id:'1'}}]));
+  assert.equal(inputs[0].product.record_id,'0001');
+});
 test('Response alignment is based on exact ID, never positional order',()=>{const shuffled={...response,products:[...response.products].reverse()};assert.deepEqual(alignResponse(shuffled,request.products).map(r=>r.record_id),request.products.map(r=>r.record_id));});
 test('Duplicate, missing, alien IDs and invalid scores are rejected atomically',()=>{
   for(const mutate of [r=>r.products.pop(),r=>r.products[1].record_id=r.products[0].record_id,r=>r.products[0].record_id='alien',r=>r.products[0].predictions.Segment.confidence=1.5]){const copy=structuredClone(response);mutate(copy);assert.throws(()=>alignResponse(copy,request.products));}
