@@ -1,0 +1,16 @@
+{
+  "name": "catalogiq-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/domain.test.mjs tests/transport.test.mjs",
+    "test:browser": "playwright test",
+    "test:static": "playwright test --config playwright.static.config.mjs",
+    "build:demo": "node build-demo.mjs",
+    "start": "python server.py"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  }
+}
