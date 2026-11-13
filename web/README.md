@@ -25,6 +25,8 @@ or newly inferred classifications are generated.
 
 ## Browser-only online demo on Vercel
 
+Demo: **https://catalogiq-team-b-demo.vercel.app**
+
 The Vercel project is `catalogiq-team-b-demo`. The repository-root `vercel.json`
 builds only this static interface. No training data or model artifacts are
 included in the public output.
