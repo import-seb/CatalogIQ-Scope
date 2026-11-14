@@ -1,0 +1,21 @@
+{
+  "schema_version": "catalogiq-inference-request-v1",
+  "products": [
+    {
+      "record_id": "demo-claritin-001",
+      "ProductName": "Claritin RediTabs",
+      "ProductBrand": "Claritin",
+      "ProductCategory": "Health > Allergy Relief",
+      "ProductDescription": "24 hour allergy relief dissolving tablets",
+      "ProductContents": "Loratadine 10 mg"
+    },
+    {
+      "record_id": "demo-culturelle-002",
+      "ProductName": "Culturelle Daily Probiotic",
+      "ProductBrand": "Culturelle",
+      "ProductCategory": "Vitamins, Minerals & Supplements > Probiotics",
+      "ProductDescription": "Daily probiotic supplement for digestive health",
+      "ProductContents": null
+    }
+  ]
+}

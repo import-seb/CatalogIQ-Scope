@@ -1,5 +1,7 @@
 # Documentation index
 
+- [Inference adapter for Max](integration/inference_adapter.md): frozen-model inference, provisional schema, examples and integration checks.
+
 ## Current workflow and policy
 
 - [Cleaning guide](target_cleaning.md): command, artifacts, and caveats.

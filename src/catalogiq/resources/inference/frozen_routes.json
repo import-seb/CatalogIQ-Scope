@@ -1,0 +1,91 @@
+{
+  "version": "model-selection-20261106-inference-v1",
+  "routes": {
+    "Segment": {
+      "directory": "segment_category_ablation_256_20261010/with_category",
+      "manifest": "predictions_contract_v2_20261031/segment/manifest.json",
+      "model_id": "segment_category_ablation_256_20261010/with_category",
+      "artifact_sha256": "7e417d8204dbaeef4cea4e54690594560e3fbd3b8288f4be850ff60f4de32e27",
+      "policy": "confidence_review_v3_20261103/segment/policy.json",
+      "temperature": "confidence_review_v3_20261103/segment/temperature.json",
+      "files_sha256": {
+        "predictions_contract_v2_20261031/segment/manifest.json": "a825d1ab6e80fc072329e5199cb071318666f51261b935dd69e7041e35fca27b",
+        "segment_category_ablation_256_20261010/with_category/checkpoint.pt": "7e417d8204dbaeef4cea4e54690594560e3fbd3b8288f4be850ff60f4de32e27",
+        "segment_category_ablation_256_20261010/with_category/model_config.json": "937985bf91f18fceebc3827924064347d5e8c8e7df41007f08d24928e6492ff9",
+        "segment_category_ablation_256_20261010/with_category/encoder_config.json": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+        "segment_category_ablation_256_20261010/with_category/tokenizer/tokenizer.json": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+        "segment_category_ablation_256_20261010/with_category/tokenizer/tokenizer_config.json": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+        "confidence_review_v3_20261103/segment/policy.json": "e4ef424c00bc5e4d22818e5720bbae28bc7621ffed87fd364ffbf7327a4296bf",
+        "confidence_review_v3_20261103/segment/temperature.json": "e126b7f2cb51a7a7e7938cd38b2d8a1ef4d09f0cd98f08a0062520df92bc1f0f"
+      }
+    },
+    "Mnfr": {
+      "directory": "mnfr_minilm_selection_v1_20261029/maria_handoff",
+      "manifest": "predictions_contract_v2_20261031/mnfr/manifest.json",
+      "model_id": "minilm-mnfr-category256-c3458037a670c8f0",
+      "artifact_sha256": "13af52155597c62e6c29ce83f229fd57fa20bee8e4184b8b654b79713deff797",
+      "policy": "confidence_review_v3_20261103/mnfr/policy.json",
+      "temperature": "confidence_review_v3_20261103/mnfr/temperature.json",
+      "files_sha256": {
+        "predictions_contract_v2_20261031/mnfr/manifest.json": "dbee9be3ad54df18a982e3fa4c47d64603b9199e740c8857ec81299a0548dff2",
+        "mnfr_minilm_selection_v1_20261029/maria_handoff/checkpoint.pt": "13af52155597c62e6c29ce83f229fd57fa20bee8e4184b8b654b79713deff797",
+        "mnfr_minilm_selection_v1_20261029/maria_handoff/model_config.json": "db7f1b23f6539ccbfe6c694644eb53416c7c2ba712e6ce82b58b6adbf32d7999",
+        "mnfr_minilm_selection_v1_20261029/maria_handoff/encoder_config.json": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+        "mnfr_minilm_selection_v1_20261029/maria_handoff/tokenizer/tokenizer.json": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+        "mnfr_minilm_selection_v1_20261029/maria_handoff/tokenizer/tokenizer_config.json": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+        "confidence_review_v3_20261103/mnfr/policy.json": "6475d3e10f7da10f8cd1459ec25dc20144ed7773c864409debd260a52aaede13",
+        "confidence_review_v3_20261103/mnfr/temperature.json": "87849c8f5b93ef81b27da248e0ebf846d9e08f6b1079d98c13c1f3fabf2c6960"
+      }
+    },
+    "TargetAgeGroup": {
+      "directory": "minilm_remaining_targets_v1_20261029/handoff/targetagegroup",
+      "manifest": "predictions_contract_v2_20261031/targetagegroup/manifest.json",
+      "model_id": "minilm-targetagegroup-category256-48256ce8adfceee1",
+      "artifact_sha256": "9d864499526a921709272982c055f70305ff98cf5c135ee1125fc33f6b6efda0",
+      "policy": "confidence_review_v3_20261103/targetagegroup/policy.json",
+      "temperature": "confidence_review_v3_20261103/targetagegroup/temperature.json",
+      "files_sha256": {
+        "predictions_contract_v2_20261031/targetagegroup/manifest.json": "682a003f4abf070c8065e50a53f65eac2d98f243d733812473e03fec00b54722",
+        "minilm_remaining_targets_v1_20261029/handoff/targetagegroup/checkpoint.pt": "9d864499526a921709272982c055f70305ff98cf5c135ee1125fc33f6b6efda0",
+        "minilm_remaining_targets_v1_20261029/handoff/targetagegroup/model_config.json": "db7f1b23f6539ccbfe6c694644eb53416c7c2ba712e6ce82b58b6adbf32d7999",
+        "minilm_remaining_targets_v1_20261029/handoff/targetagegroup/encoder_config.json": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+        "minilm_remaining_targets_v1_20261029/handoff/targetagegroup/tokenizer/tokenizer.json": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+        "minilm_remaining_targets_v1_20261029/handoff/targetagegroup/tokenizer/tokenizer_config.json": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+        "confidence_review_v3_20261103/targetagegroup/policy.json": "2d625e01f6b816a53bfddf142608872b8701b21d40826bf3f5b39f943804803c",
+        "confidence_review_v3_20261103/targetagegroup/temperature.json": "1db74c82d0e2b83c74f6413c57216a3db600831d2be16e6a00096e47487ba721"
+      }
+    },
+    "Brand": {
+      "directory": "predictions_contract_v2_20261031/brand_lookup_probabilistic_v1",
+      "manifest": "predictions_contract_v2_20261031/brand_lookup_probabilistic_v1/manifest.json",
+      "model_id": "brand-productbrand-empirical-prior-v1-8cbdb95a5638dbed",
+      "artifact_sha256": "19d0b22672d8e1e4033c4b9a511eee101bf9653da951f1d8c0cd574b909f2fe8",
+      "policy": "confidence_review_v3_20261103/brand_lookup_probabilistic_v1/policy.json",
+      "temperature": "confidence_review_v3_20261103/brand_lookup_probabilistic_v1/temperature.json",
+      "files_sha256": {
+        "predictions_contract_v2_20261031/brand_lookup_probabilistic_v1/manifest.json": "9483408504d67b887a13ca2eecce38189d00bb6122ae2750c83fa088301d726f",
+        "predictions_contract_v2_20261031/brand_lookup_probabilistic_v1/model.json": "19d0b22672d8e1e4033c4b9a511eee101bf9653da951f1d8c0cd574b909f2fe8",
+        "confidence_review_v3_20261103/brand_lookup_probabilistic_v1/policy.json": "7e1bca069fe118b8d3cc221ad2cb40b2e78dc2fe0f080968651e3f14d96dc6c3",
+        "confidence_review_v3_20261103/brand_lookup_probabilistic_v1/temperature.json": "f11b5854959a5d86ed75690aa5f6ba43e246a264174f7361d369855e0a7d9dd5"
+      }
+    },
+    "Sub-Segment": {
+      "directory": "minilm_remaining_targets_v1_20261029/handoff/sub_segment",
+      "manifest": "predictions_contract_v2_20261031/sub_segment/manifest.json",
+      "model_id": "minilm-sub_segment-category256-8a1e8f3e742eb3a7",
+      "artifact_sha256": "02f4fbb0f6ee55c80eb9068f0c8be9cc2a56982edd6bfdd8a2436918aa10997f",
+      "policy": "confidence_review_v3_20261103/sub_segment/policy.json",
+      "temperature": "confidence_review_v3_20261103/sub_segment/temperature.json",
+      "files_sha256": {
+        "predictions_contract_v2_20261031/sub_segment/manifest.json": "2dc2e9891b89525a0659d8a097bba44d398fead06f65b23d9aa0842af677454a",
+        "minilm_remaining_targets_v1_20261029/handoff/sub_segment/checkpoint.pt": "02f4fbb0f6ee55c80eb9068f0c8be9cc2a56982edd6bfdd8a2436918aa10997f",
+        "minilm_remaining_targets_v1_20261029/handoff/sub_segment/model_config.json": "db7f1b23f6539ccbfe6c694644eb53416c7c2ba712e6ce82b58b6adbf32d7999",
+        "minilm_remaining_targets_v1_20261029/handoff/sub_segment/encoder_config.json": "cf566f0a2e73d887c44858fa7ebc28d87dfef1d52ebd48cc0e1c462ca7ccf465",
+        "minilm_remaining_targets_v1_20261029/handoff/sub_segment/tokenizer/tokenizer.json": "8b79639ec74b46604e730f505186eaafb1006d2fd00f2c4930d168bb7f894680",
+        "minilm_remaining_targets_v1_20261029/handoff/sub_segment/tokenizer/tokenizer_config.json": "0dc7a57d8861ac73563173c43a1aeccaa3c06740b3d9740436d993b6b6690d02",
+        "confidence_review_v3_20261103/sub_segment/policy.json": "c6dc1db70c53efd6b4789847accab30494c9858f259cd48fb73d270a3e839989",
+        "confidence_review_v3_20261103/sub_segment/temperature.json": "373873d768287d9cd21b1d466b1d27f8739f4a20dbc4bd7ff7c2a25d05699c75"
+      }
+    }
+  }
+}

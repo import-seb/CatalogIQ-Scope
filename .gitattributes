@@ -31,3 +31,7 @@
 /scripts/flag_relationship_conflicts.py text eol=lf
 /tests/test_relationship_conflicts.py text eol=lf
 /docs/findings/03_modeling/relationship_conflicts_20261107/* text eol=lf
+
+/src/catalogiq/inference_*.py text eol=lf
+/tests/test_inference_*.py text eol=lf
+/docs/integration/inference_adapter* text eol=lf
