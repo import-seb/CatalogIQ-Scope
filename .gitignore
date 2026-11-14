@@ -227,3 +227,7 @@ __marimo__/
 # Local Jupyter and Anaconda
 .virtual_documents/
 anaconda_projects/
+
+# Local Vercel project link and build state
+.vercel/
+.vercel
