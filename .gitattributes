@@ -35,3 +35,7 @@
 /src/catalogiq/inference_*.py text eol=lf
 /tests/test_inference_*.py text eol=lf
 /docs/integration/inference_adapter* text eol=lf
+/src/catalogiq/target_classification.py text eol=lf
+/scripts/classify_target.py text eol=lf
+/tests/test_target_classification.py text eol=lf
+/docs/findings/03_modeling/target_classification_20261115/* text eol=lf

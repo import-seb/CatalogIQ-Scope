@@ -435,3 +435,73 @@ def relationship_conflicts_main(argv=None) -> int:
     print(f"Not checkable (one side absent, not a conflict): {len(unchecked):,}")
     print("No relation is approved, so these are observations and not review decisions.")
     return 0
+
+
+def classify_target_main(argv=None) -> int:
+    """Classify the unlabelled target dataset with the selected frozen models."""
+    from .inference_engine import InferenceEngine
+    from . import target_classification as tc
+    parser = argparse.ArgumentParser(description=classify_target_main.__doc__)
+    parser.add_argument("target_csv", type=Path)
+    parser.add_argument("--processed-dir", type=Path, required=True,
+                        help="directory holding the frozen serving members")
+    parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--batch-size", type=int, default=256)
+    parser.add_argument("--limit", type=int, help="classify only the first N eligible rows")
+    parser.add_argument("--json-sample", type=int, default=50,
+                        help="products to write into the documented-format sample (0 for none)")
+    parser.add_argument("--full-json", action="store_true",
+                        help="also write every product as one envelope; large, and the adapter's "
+                             "error text embeds local paths, so it is off by default")
+    args = parser.parse_args(argv)
+
+    frame = tc.load_target(args.target_csv)
+    reasons = tc.eligibility(frame)
+    report = tc.eligibility_report(frame, reasons)
+    records = tc.to_records(frame, reasons)
+    if args.limit:
+        records = records[:args.limit]
+        report["limited_to"] = len(records)
+    print(f"{report['rows_in_file']:,} rows, {report['eligible']:,} eligible, "
+          f"classifying {len(records):,}")
+
+    engine = InferenceEngine(args.processed_dir)
+
+    def progress(done, total):
+        print(f"  {done:,}/{total:,}", flush=True)
+
+    results = tc.classify(engine, records, batch_size=args.batch_size, progress=progress)
+    envelope = tc.response(results, registry_version=engine.registry_version)
+    table = tc.dashboard_table(frame, results, envelope)
+    skipped = tc.ineligible_table(frame, reasons)
+
+    args.output_root.mkdir(parents=True, exist_ok=True)
+    if args.json_sample:
+        sample = dict(envelope, products=envelope["products"][:args.json_sample])
+        (args.output_root / "target_predictions_sample.json").write_text(
+            json.dumps(sample, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    if args.full_json:
+        (args.output_root / "target_predictions.json").write_text(
+            json.dumps(envelope, ensure_ascii=False, separators=(",", ":")) + "\n",
+            encoding="utf-8", newline="\n")
+    table.to_csv(args.output_root / "target_predictions.csv", index=False, lineterminator="\n")
+    skipped.to_csv(args.output_root / "target_ineligible.csv", index=False, lineterminator="\n")
+
+    statuses = {}
+    for product in envelope["products"]:
+        for target, prediction in product["predictions"].items():
+            statuses.setdefault(target, {}).setdefault(prediction["status"], 0)
+            statuses[target][prediction["status"]] += 1
+    report["status_counts"] = statuses
+    report["schema_version"] = envelope["schema_version"]
+    report["engine_version"] = envelope["engine_version"]
+    report["relationship_registry_version"] = envelope["relationship_registry_version"]
+    report["products_written"] = len(envelope["products"])
+    (args.output_root / "target_classification_report.json").write_text(
+        json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+
+    print(f"Wrote {len(table):,} classified rows and {len(skipped):,} ineligible rows "
+          f"to {args.output_root}")
+    for target, counts in sorted(statuses.items()):
+        print(f"  {target}: {counts}")
+    return 0

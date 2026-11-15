@@ -1,0 +1,57 @@
+{
+  "eligibility_version": "target-eligibility-20261115-v1",
+  "rows_in_file": 28082,
+  "eligible": 26192,
+  "ineligible": 1890,
+  "ineligible_by_reason": {
+    "marked_exclude": 1852,
+    "missing_product_name": 37,
+    "unknown_retailer": 1
+  },
+  "reason_meanings": {
+    "marked_exclude": "The source row carries the Exclude marker.",
+    "missing_product_name": "No ProductName, so there is nothing to classify.",
+    "missing_identifier": "No JoiningKey, so the result could not be traced back.",
+    "duplicate_identifier": "JoiningKey is not unique within the file.",
+    "unknown_retailer": "Retailer is not one of the six known retailers, which indicates a shifted row rather than a product."
+  },
+  "model_input_fields_present_among_eligible": {
+    "ProductCategory": 26191,
+    "ProductName": 26192,
+    "ProductBrand": 26185,
+    "ProductDescription": 8249,
+    "ProductContents": 10624
+  },
+  "known_retailers": [
+    "Amazon",
+    "Walmart",
+    "Walgreens",
+    "CVS",
+    "Target",
+    "Kroger"
+  ],
+  "status_counts": {
+    "Segment": {
+      "unavailable": 26192
+    },
+    "Mnfr": {
+      "unavailable": 26192
+    },
+    "TargetAgeGroup": {
+      "unavailable": 26192
+    },
+    "Brand": {
+      "unavailable": 26192
+    },
+    "Sub-Segment": {
+      "unavailable": 26192
+    },
+    "Platform": {
+      "unavailable": 26192
+    }
+  },
+  "schema_version": "catalogiq-inference-request-v1",
+  "engine_version": "catalogiq-inference-v1-20261111",
+  "relationship_registry_version": "relationships-20261107-candidate-v2",
+  "products_written": 26192
+}
