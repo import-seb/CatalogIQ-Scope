@@ -21,6 +21,9 @@ from catalogiq.split_protocol import canonical_digest
 
 class ProtectedAssessmentTests(unittest.TestCase):
     def protocol(self, root):
+        # Windows runner TEMP may be an alias/junction. Production callers resolve
+        # their checkout before file_pin; synthetic fixtures must do the same.
+        root = Path(root).resolve()
         directory = root/SOURCE
         directory.mkdir(parents=True)
         registry = pd.DataFrame({"record_id": ["a", "b", "c"], "group_id": ["g", "g", "h"]})
@@ -38,6 +41,28 @@ class ProtectedAssessmentTests(unittest.TestCase):
         path = root/"protocol.json"
         write_json(path, p)
         return path, p
+
+    def test_fixture_resolves_root_before_pinning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            alias = Path(tmp)/"alias"
+            alias.mkdir()
+            supplied_root = alias/".."/"checkout"
+            with patch("test_protected_test_assessment.file_pin", wraps=file_pin) as pin:
+                path, protocol = self.protocol(supplied_root)
+            resolved = supplied_root.resolve()
+            pin.assert_called_once_with(resolved, resolved/SOURCE/"protected_final_test.csv")
+            self.assertEqual(path.parent, resolved)
+            self.assertEqual(protocol["artifacts"][0]["path"], f"{SOURCE}/protected_final_test.csv")
+
+    def test_file_pin_still_rejects_external_paths_before_reading(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()/"checkout"
+            root.mkdir()
+            outside = root.parent/"outside.json"
+            outside.write_text("synthetic outside artifact", encoding="utf8")
+            with patch.object(Path, "read_bytes", side_effect=AssertionError("Must not read outside artifact")):
+                with self.assertRaisesRegex(ValueError, "inside the checkout"):
+                    file_pin(root, outside)
 
     def test_preflight_validates_identity_without_opening_or_hashing_test(self):
         with tempfile.TemporaryDirectory() as tmp:

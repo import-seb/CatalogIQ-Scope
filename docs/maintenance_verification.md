@@ -61,11 +61,22 @@ Its private evidence remains archived locally, and its aggregate results are
 preserved in the research reports. This new source-only run establishes that
 reviewers can test the reusable engineering without that private archive.
 
-The full-repository suite was not rerun as part of this packaging task; it is not
-claimed green here. Main/adapter PR #35 already records three Windows synthetic
-protected-assessment path errors, separate from this work. This change leaves
-that implementation and its evaluation outputs unchanged; inspect actual PR CI
-results rather than inferring them from these focused checks.
+The initial publication checks above did not include the full-repository suite.
+PR CI then reproduced three Windows failures already recorded on main/adapter
+PR #35: the synthetic assessment fixture passed an unresolved temporary root to
+`file_pin`, whose production callers require a resolved checkout. The fixture now
+resolves its root before creating/pinning files. Regression cases exercise a
+noncanonical root and confirm that outside-checkout files remain rejected before
+reading. The production assessment module, frozen protocol and evaluation outputs
+are unchanged. Actual CI status and the follow-up verification belong to this
+repair; they must not be inferred from the earlier focused run.
+
+Local repair verification: **10 assessment tests passed** and **719 full-repository
+tests completed with no failures/errors and one expected private-artifact skip**.
+The full run used an aggregate 4-GiB job limit, four-CPU affinity and CPU/time
+bounds; the temporary harness allowed the child processes required by the CLI
+tests. Real project data was blocked, the private-model opt-in was disabled and
+CUDA remained uninitialized. No installed dependency or production file changed.
 
 All four criteria pass at the **offline engineering** scope. Shared authenticated
 application storage, UI/backend wiring and a coordinated loader for any future
