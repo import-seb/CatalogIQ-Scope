@@ -32,19 +32,19 @@
   ],
   "status_counts": {
     "Segment": {
-      "unavailable": 26192
+      "suggestion": 26192
     },
     "Mnfr": {
-      "unavailable": 26192
+      "suggestion": 26192
     },
     "TargetAgeGroup": {
-      "unavailable": 26192
+      "suggestion": 26192
     },
     "Brand": {
-      "unavailable": 26192
+      "suggestion": 26192
     },
     "Sub-Segment": {
-      "unavailable": 26192
+      "suggestion": 26192
     },
     "Platform": {
       "unavailable": 26192

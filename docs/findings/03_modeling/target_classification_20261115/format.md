@@ -100,21 +100,73 @@ Five source values already began with an apostrophe of their own and are left
 alone. Everything else is byte identical to the input: 112,328 cell comparisons
 across both files found no other difference.
 
-## 5. Current state
+## 5. Run of 2026-11-15
 
-The run on 2026-11-15 processed all 26,192 eligible rows. **All six targets
-report `unavailable`**, because the frozen serving members are not present. The
-engine reports `model_unavailable` per route instead of failing, so the file has
-its final shape already and the same command produces real predictions once the
-artifacts arrive.
+All 26,192 eligible rows were classified. Five routes returned suggestions and
+Platform returned `unavailable`, which is correct: it has no selected route.
 
-Missing: 30 of the 36 files `frozen_routes.json` pins. The Brand lookup's
-`model.json` and `manifest.json` and the four `predictions_contract_v2_20261031`
-manifests are present and hash-verified. The four MiniLM routes and all ten
-`confidence_review_v3_20261103` policy and temperature files are not.
-`13_remaining_minilm_training_20261029.md` records that the handoff ZIPs were
-built and verified but that "no external delivery occurred", which is consistent
-with none of them being on this machine.
+| Target | Status | Notes |
+|---|---|---|
+| Segment | suggestion | 26,192 |
+| Sub-Segment | suggestion | 26,192, provisional per the handoff |
+| Brand | suggestion | 26,192 |
+| Mnfr | suggestion | 26,192 |
+| TargetAgeGroup | suggestion | 26,192 |
+| Platform | unavailable | no selected route |
 
-Nothing needs to be trusted in that transfer. The loader rehashes every pinned
-file and raises `artifact_mismatch` if one does not match.
+Every policy ships `enabled=false` with `operational_threshold=null`, so nothing
+is auto-accepted and every product still needs a human.
+
+### The same bytes on two machines
+
+The run was executed twice, on an Apple Silicon Mac and on an x86 Linux
+container, against the same frozen artifacts. `report.json` and
+`ineligible.csv` came out byte identical:
+
+```
+828f95272517dc813559c06bb949f06905beeb713c8dc5490273796f573cc0a4  report.json
+a4b2438ffcc3c876399cbf4eafdaadd25a6ebb5ab7733d511c7a8dab58439eca  ineligible.csv
+```
+
+### Predictions look like the training population
+
+`J&J` appears on 361 of 26,192 rows, 1.4%, against 1.4% in training.
+`UnItemised brand` lands on 66.0% against 70% in training. Segment is dominated
+by `Vitamins, Minerals & Supplements` at 62.7%. Nothing shifted.
+
+### Relationship rules on unseen data
+
+The warn-mode checker ran over the predictions for the first time on data no
+model had seen:
+
+| Relation | On validation | On the target set |
+|---|---|---|
+| R1 Sub-Segment under Segment | 1.83% | 1.61% (421 of 26,192) |
+| R2 Brand under Mnfr | 0.05% | 0.042% (11) |
+| Pairs that could not be checked | 7,285 | **0** |
+
+The rates hold on unseen data, which is the first evidence that the rules
+generalize rather than describing the validation split.
+
+The zero confirms what section 3 could only assert: the 7,285 unchecked pairs on
+validation were an artifact of each target having its own validation set. In
+serving, every available model predicts for every product, so the pair is always
+complete.
+
+The relations are still `candidate` and nothing is enforced. These 432 products
+are a warn-mode queue, not a decision.
+
+### Serving artifacts
+
+Delivered 2026-11-15 and verified before use: the outer archive's SHA-256, all
+18 files, the 37 members inside the three model ZIPs with their CRCs, and all 36
+pins in `frozen_routes.json`. The delivery's copy of `frozen_routes.json` is
+byte identical to the one in the repository.
+
+Running inference also needs `torch` and `transformers`, and `pyproject.toml`
+declares neither as a runtime dependency. Without them every MiniLM route
+reports `model_unavailable`, which reads as missing files rather than a missing
+package. `transformers>=4.50,<5` resolves against the pinned
+`tokenizers==0.22.2`; the 5.x series forces an upgrade that breaks the pin.
+Tokenizing the same strings under 0.22.2 and 0.23.3 gives identical token ids,
+so the pin is about reproducibility discipline, not a change in output.
