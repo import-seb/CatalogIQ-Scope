@@ -19,8 +19,11 @@ MAX_BYTES = 2 * 1024 * 1024
 
 def read_examples():
     directory = ROOT / "docs" / "integration"
-    return {kind: json.loads((directory / f"inference_adapter_{kind}.json").read_text(encoding="utf-8"))
-            for kind in ("request", "response")}
+    examples = {kind: json.loads((directory / f"inference_adapter_{kind}.json").read_text(encoding="utf-8"))
+                for kind in ("request", "response")}
+    registry_path = ROOT / "src/catalogiq/resources/relationships/classification_relationship_registry.json"
+    examples["relationship_registry"] = json.loads(registry_path.read_text(encoding="utf-8"))
+    return examples
 
 
 def validate_request(body):

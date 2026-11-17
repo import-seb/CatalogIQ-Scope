@@ -6,7 +6,7 @@ export const MAX_BYTES = 2 * 1024 * 1024;
 export const SCHEMA = 'catalogiq-inference-request-v1';
 
 // RFC 4180-style quoted cells, embedded newlines, BOM, CRLF and explicit malformed-file errors.
-export function parseCSV(text) {
+export function readCSVTable(text, { allowEmpty = false } = {}) {
   text = text.replace(/^\uFEFF/, '');
   const rows = []; let row = [], cell = '', quoted = false, closed = false;
   const finishCell = () => { row.push(cell); cell = ''; closed = false; };
@@ -25,15 +25,22 @@ export function parseCSV(text) {
   }
   if (quoted) throw new Error('A quoted cell is not closed. Please check your CSV file.');
   if (cell || row.length || closed) finishRow();
-  if (rows.length < 2) throw new Error('Add a header row and at least one product.');
+  if (!rows.length || (!allowEmpty && rows.length < 2)) throw new Error('Add a header row and at least one product.');
   const headers = rows.shift();
   if (headers.some(h => !h.trim()) || new Set(headers).size !== headers.length) throw new Error('Column names must be nonempty and unique.');
+  const records = rows.map((cells, index) => {
+    if (cells.length !== headers.length) throw new Error(`Row ${index + 2} has ${cells.length} cells; expected ${headers.length}.`);
+    return Object.fromEntries(headers.map((key, i) => [key, cells[i]]));
+  });
+  return { headers, records };
+}
+
+export function parseCSV(text) {
+  const { headers, records: rows } = readCSVTable(text);
   if (rows.length > MAX_ROWS) throw new Error(`Choose up to ${MAX_ROWS} products at a time.`);
   for (const field of ['record_id', ...FIELDS]) if (!headers.includes(field)) throw new Error(`Missing column: ${field}. Download the CSV template for the required columns.`);
   const ids = new Set();
-  return rows.map((cells, index) => {
-    if (cells.length !== headers.length) throw new Error(`Row ${index + 2} has ${cells.length} cells; expected ${headers.length}.`);
-    const source = Object.fromEntries(headers.map((key, i) => [key, cells[i]]));
+  return rows.map((source, index) => {
     const id = source.record_id;
     if (!id.trim() || ids.has(id)) throw new Error(`Row ${index + 2}: product IDs must be nonempty and unique.`);
     ids.add(id);
@@ -109,11 +116,13 @@ export function csvCell(value) {
 export function exportCSV(records) {
   const sourceKeys = [...new Set(records.flatMap(r => Object.keys(r.source)))];
   const generated = ['catalogiq:mode','catalogiq:review_status','catalogiq:reviewer','catalogiq:reviewed_at','catalogiq:review_note','catalogiq:engine_version','catalogiq:registry_version'];
+  generated.push('catalogiq:relationship_warnings', 'catalogiq:relationship_import');
   for (const t of TARGETS) generated.push(...['original_label','final_label','raw_confidence','prediction_status','review_reasons','model_version'].map(k=>`catalogiq:${t}:${k}`));
   const headers = [...sourceKeys.map(k => 'source:' + k), ...generated];
   const lines = records.map(r => {
     const d = r.decision;
     const cells = [...sourceKeys.map(k => r.source[k]),r.mode,d?.action || 'pending',d?.reviewer,d?.timestamp,d?.note,r.engine_version,r.relationship_registry_version];
+    cells.push(r.relationship_warnings?.length ? JSON.stringify(r.relationship_warnings) : '', r.relationship_import ? JSON.stringify(r.relationship_import) : '');
     for (const target of TARGETS) {
       const p = r.result?.predictions[target];
       cells.push(p?.predicted_label, d && d.action !== 'rejected' ? d.labels[target] : '', p?.confidence, p?.status || 'not_run', p?.review_reasons?.join('; '),p?.provenance?.model_id);
