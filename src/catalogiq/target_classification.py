@@ -20,10 +20,10 @@ from .inference_adapter import format_response
 from .inference_engine import ProductRecord
 from .target_minilm_preparation import INPUT_FIELDS
 
-ELIGIBILITY_VERSION = "target-eligibility-20261115-v1"
+ELIGIBILITY_VERSION = "target-eligibility-20261116-v2"
 ID_COLUMN = "JoiningKey"
-KNOWN_RETAILERS = ("Amazon", "Walmart", "Walgreens", "CVS", "Target", "Kroger")
-EXCLUDE_MARKER = "Exclude"
+DECISIONS_FILE = "row_decisions.csv"
+ELIGIBLE_STATUS = "candidate"
 
 # Kept beside every result so a reviewer can trace a row back to its source.
 SOURCE_COLUMNS = (ID_COLUMN, "Retailer", "Category", "ProductCategory", "ProductBrand",
@@ -50,15 +50,6 @@ def csv_cell(value):
     text = str(value)
     return "'" + text if _FORMULA.search(text) else value
 
-INELIGIBLE_REASONS = {
-    "marked_exclude": "The source row carries the Exclude marker.",
-    "missing_product_name": "No ProductName, so there is nothing to classify.",
-    "missing_identifier": f"No {ID_COLUMN}, so the result could not be traced back.",
-    "duplicate_identifier": f"{ID_COLUMN} is not unique within the file.",
-    "unknown_retailer": ("Retailer is not one of the six known retailers, which indicates a "
-                         "shifted row rather than a product."),
-}
-
 
 def _text(frame: pd.DataFrame, column: str) -> pd.Series:
     if column not in frame.columns:
@@ -76,27 +67,78 @@ def load_target(path: str | Path) -> pd.DataFrame:
     return frame.reset_index(drop=True)
 
 
-def eligibility(frame: pd.DataFrame) -> pd.Series:
-    """One reason code per row, or NA when the row is eligible.
+def load_decisions(path: str | Path, dataset: str = "target") -> pd.DataFrame:
+    """Read one dataset's rows from the integrated cleaner's `row_decisions.csv`.
 
-    Order matters only for reporting; a row is ineligible if any rule fires.
+    Eligibility is not decided here. `docs/decisions.md` already settles it, and
+    `integration.row_decision` implements it, so this module reads that verdict
+    instead of keeping a second rule that can drift from the agreed one.
+    """
+    frame = pd.read_csv(path, dtype="string", low_memory=False, encoding="utf-8")
+    missing = {"dataset", ID_COLUMN, "status"} - set(frame.columns)
+    if missing:
+        raise ValueError(f"{path} is not a row_decisions export; missing {sorted(missing)}")
+    frame = frame[frame["dataset"].astype("string").str.strip() == dataset].copy()
+    if frame.empty:
+        raise ValueError(f"{path} holds no rows for dataset {dataset!r}")
+    frame[ID_COLUMN] = frame[ID_COLUMN].astype("string").str.strip()
+    return frame.reset_index(drop=True)
+
+
+def eligibility(frame: pd.DataFrame, decisions: pd.DataFrame) -> pd.Series:
+    """One reason per row, or NA when the integrated cleaner kept the row.
+
+    A row is eligible when its status is `candidate`. Anything else carries the
+    cleaner's own reason codes, so the reason a product was skipped is the reason
+    the agreed policy gives, not one invented here.
     """
     identifier = _text(frame, ID_COLUMN)
-    reasons = pd.Series(pd.NA, index=frame.index, dtype="string")
+    # Normalize both sides here so the join does not depend on the caller having
+    # gone through load_decisions. The raw value is still what gets exported.
+    decisions = decisions.copy()
+    decisions[ID_COLUMN] = _text(decisions, ID_COLUMN)
+    verdicts = decisions.drop_duplicates(subset=[ID_COLUMN], keep=False)
+    if len(verdicts) != len(decisions):
+        raise ValueError("row_decisions holds duplicate identifiers; cannot align by identity")
+    present = identifier[~_blank(identifier)]
+    unknown = set(present) - set(verdicts[ID_COLUMN])
+    if unknown:
+        raise ValueError(f"{len(unknown):,} target rows have no decision; "
+                         "the decisions file and the target CSV disagree")
 
-    def mark(mask: pd.Series, code: str) -> None:
-        reasons.loc[mask & reasons.isna()] = code
+    status = verdicts.set_index(ID_COLUMN)["status"].astype("string").str.strip()
+    reasons_by_id = verdicts.set_index(ID_COLUMN).get("quarantine_reasons")
+    holds_by_id = verdicts.set_index(ID_COLUMN).get("hold_reasons")
 
-    mark(_text(frame, "Exclude").fillna("").eq(EXCLUDE_MARKER), "marked_exclude")
-    mark(_blank(identifier), "missing_identifier")
-    mark(identifier.duplicated(keep=False) & ~_blank(identifier), "duplicate_identifier")
-    mark(_blank(_text(frame, "ProductName")), "missing_product_name")
-    mark(~_text(frame, "Retailer").fillna("").isin(KNOWN_RETAILERS), "unknown_retailer")
-    return reasons
+    out = pd.Series(pd.NA, index=frame.index, dtype="string")
+    for position in frame.index:
+        key = identifier[position]
+        if pd.isna(key) or not str(key).strip():
+            out[position] = "missing_identifier"
+            continue
+        verdict = status.get(key)
+        if verdict == ELIGIBLE_STATUS:
+            continue
+        detail = ""
+        for source in (reasons_by_id, holds_by_id):
+            if source is not None:
+                value = source.get(key)
+                if isinstance(value, str) and value.strip():
+                    detail = value.strip()
+                    break
+        out[position] = f"{verdict}: {detail}" if detail else str(verdict)
+    return out
 
 
 def eligibility_report(frame: pd.DataFrame, reasons: pd.Series) -> dict:
     counts = reasons.value_counts(dropna=True).to_dict()
+    codes: dict[str, int] = {}
+    for reason, count in counts.items():
+        _, _, detail = str(reason).partition(": ")
+        for code in (detail.split(";") if detail else []):
+            code = code.strip()
+            if code:
+                codes[code] = codes.get(code, 0) + int(count)
     eligible = int(reasons.isna().sum())
     fill = {}
     for field in INPUT_FIELDS:
@@ -104,19 +146,19 @@ def eligibility_report(frame: pd.DataFrame, reasons: pd.Series) -> dict:
         fill[field] = int(present.sum())
     return {
         "eligibility_version": ELIGIBILITY_VERSION,
+        "eligibility_source": f"integrated cleaner {DECISIONS_FILE}, status == {ELIGIBLE_STATUS!r}",
+        "policy_reference": "docs/decisions.md, exclude policy 'keep'",
         "rows_in_file": int(len(frame)),
         "eligible": eligible,
         "ineligible": int(len(frame) - eligible),
-        "ineligible_by_reason": {k: int(v) for k, v in counts.items()},
-        "reason_meanings": INELIGIBLE_REASONS,
+        "ineligible_by_status": {k: int(v) for k, v in counts.items()},
+        "ineligible_by_reason_code": dict(sorted(codes.items(), key=lambda kv: -kv[1])),
         "model_input_fields_present_among_eligible": fill,
-        "known_retailers": list(KNOWN_RETAILERS),
     }
 
 
-def to_records(frame: pd.DataFrame, reasons: pd.Series | None = None) -> list[ProductRecord]:
+def to_records(frame: pd.DataFrame, reasons: pd.Series) -> list[ProductRecord]:
     """Eligible rows as ProductRecord. record_id is the source identifier, never regenerated."""
-    reasons = eligibility(frame) if reasons is None else reasons
     rows = frame.loc[reasons.isna()]
     identifier = _text(rows, ID_COLUMN)
     fields = {name: _text(rows, name) for name in INPUT_FIELDS}
@@ -207,5 +249,6 @@ def ineligible_table(frame: pd.DataFrame, reasons: pd.Series) -> pd.DataFrame:
         table[column] = table[column].map(csv_cell)
     table["catalogiq:eligibility"] = "ineligible"
     table["catalogiq:ineligible_reason"] = reasons.loc[rows.index].values
+    table["catalogiq:eligibility_source"] = DECISIONS_FILE
     table["catalogiq:eligibility_version"] = ELIGIBILITY_VERSION
     return table

@@ -1,57 +1,59 @@
 {
-  "eligibility_version": "target-eligibility-20261115-v1",
+  "eligibility_version": "target-eligibility-20261116-v2",
+  "eligibility_source": "integrated cleaner row_decisions.csv, status == 'candidate'",
+  "policy_reference": "docs/decisions.md, exclude policy 'keep'",
   "rows_in_file": 28082,
-  "eligible": 26192,
-  "ineligible": 1890,
-  "ineligible_by_reason": {
-    "marked_exclude": 1852,
-    "missing_product_name": 37,
-    "unknown_retailer": 1
+  "eligible": 27870,
+  "ineligible": 212,
+  "ineligible_by_status": {
+    "quarantine: feature:text_in_multiple_numeric_anchors;structural:text_in_multiple_numeric_anchors": 76,
+    "quarantine: feature:url_in_timestamp_with_displacement;feature:text_numeric_failure_with_corroboration;structural:text_numeric_failure_with_corroboration;structural:url_in_timestamp_with_displacement": 60,
+    "quarantine: structural:missing_product_text": 41,
+    "quarantine: feature:url_in_timestamp_with_displacement;feature:text_in_multiple_numeric_anchors;structural:text_in_multiple_numeric_anchors;structural:url_in_timestamp_with_displacement": 33,
+    "quarantine: feature:unexpected_exclude_with_populated_unknown_columns;structural:unexpected_exclude_with_populated_unknown_columns": 1,
+    "quarantine: feature:unexpected_exclude_with_populated_unknown_columns;structural:missing_product_text;structural:unexpected_exclude_with_populated_unknown_columns": 1
   },
-  "reason_meanings": {
-    "marked_exclude": "The source row carries the Exclude marker.",
-    "missing_product_name": "No ProductName, so there is nothing to classify.",
-    "missing_identifier": "No JoiningKey, so the result could not be traced back.",
-    "duplicate_identifier": "JoiningKey is not unique within the file.",
-    "unknown_retailer": "Retailer is not one of the six known retailers, which indicates a shifted row rather than a product."
+  "ineligible_by_reason_code": {
+    "feature:text_in_multiple_numeric_anchors": 109,
+    "structural:text_in_multiple_numeric_anchors": 109,
+    "feature:url_in_timestamp_with_displacement": 93,
+    "structural:url_in_timestamp_with_displacement": 93,
+    "feature:text_numeric_failure_with_corroboration": 60,
+    "structural:text_numeric_failure_with_corroboration": 60,
+    "structural:missing_product_text": 42,
+    "feature:unexpected_exclude_with_populated_unknown_columns": 2,
+    "structural:unexpected_exclude_with_populated_unknown_columns": 2
   },
   "model_input_fields_present_among_eligible": {
-    "ProductCategory": 26191,
-    "ProductName": 26192,
-    "ProductBrand": 26185,
-    "ProductDescription": 8249,
-    "ProductContents": 10624
+    "ProductCategory": 27866,
+    "ProductName": 27869,
+    "ProductBrand": 27861,
+    "ProductDescription": 8867,
+    "ProductContents": 11154
   },
-  "known_retailers": [
-    "Amazon",
-    "Walmart",
-    "Walgreens",
-    "CVS",
-    "Target",
-    "Kroger"
-  ],
+  "decisions_sha256": "791b84911f442de3821a50ddebe43064d3aea0dd32df7d82a7ee5e3bd72242d2",
   "status_counts": {
     "Segment": {
-      "suggestion": 26192
+      "suggestion": 27870
     },
     "Mnfr": {
-      "suggestion": 26192
+      "suggestion": 27870
     },
     "TargetAgeGroup": {
-      "suggestion": 26192
+      "suggestion": 27870
     },
     "Brand": {
-      "suggestion": 26192
+      "suggestion": 27870
     },
     "Sub-Segment": {
-      "suggestion": 26192
+      "suggestion": 27870
     },
     "Platform": {
-      "unavailable": 26192
+      "unavailable": 27870
     }
   },
   "schema_version": "catalogiq-inference-request-v1",
   "engine_version": "catalogiq-inference-v1-20261111",
   "relationship_registry_version": "relationships-20261107-candidate-v2",
-  "products_written": 26192
+  "products_written": 27870
 }

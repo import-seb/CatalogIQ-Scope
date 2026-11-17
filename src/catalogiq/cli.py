@@ -439,6 +439,8 @@ def relationship_conflicts_main(argv=None) -> int:
 
 def classify_target_main(argv=None) -> int:
     """Classify the unlabelled target dataset with the selected frozen models."""
+    import hashlib
+
     from .inference_engine import InferenceEngine
     from . import target_classification as tc
     parser = argparse.ArgumentParser(description=classify_target_main.__doc__)
@@ -446,6 +448,9 @@ def classify_target_main(argv=None) -> int:
     parser.add_argument("--processed-dir", type=Path, required=True,
                         help="directory holding the frozen serving members")
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--decisions", type=Path, required=True,
+                        help="row_decisions.csv from the integrated cleaner, which decides "
+                             "eligibility under the agreed Exclude policy")
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--limit", type=int, help="classify only the first N eligible rows")
     parser.add_argument("--json-sample", type=int, default=50,
@@ -456,8 +461,12 @@ def classify_target_main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     frame = tc.load_target(args.target_csv)
-    reasons = tc.eligibility(frame)
+    decisions = tc.load_decisions(args.decisions)
+    reasons = tc.eligibility(frame, decisions)
     report = tc.eligibility_report(frame, reasons)
+    # The content hash, never the path. An absolute path in a committed artifact
+    # breaks reproducibility across machines and leaks where the run happened.
+    report["decisions_sha256"] = hashlib.sha256(args.decisions.read_bytes()).hexdigest()
     records = tc.to_records(frame, reasons)
     if args.limit:
         records = records[:args.limit]

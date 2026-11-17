@@ -1,6 +1,6 @@
 # Target classification output format
 
-Ticket #1287. Owner: Maria. Eligibility version `target-eligibility-20261115-v1`.
+Ticket #1287. Owner: Maria. Eligibility version `target-eligibility-20261116-v2`.
 
 This is the documented format the fourth acceptance criterion asks for. It
 describes what `scripts/classify_target.py` writes and how those columns line up
@@ -10,8 +10,10 @@ checked rather than asserted.
 ## 1. What runs
 
 ```
-python -m scripts.classify_target data/raw/Selfcare_Target_data.csv \
-    --processed-dir data/processed --output-root data/processed/target_classification_20261115
+python -m scripts.classify_target "data/provided/Selfcare_Target_data (1).csv" \
+    --processed-dir data/processed \
+    --decisions data/processed/integrated_20261116/row_decisions.csv \
+    --output-root data/processed/target_classification_20261116
 ```
 
 The script chooses no labels and loads no model of its own. It reads the target
@@ -22,29 +24,44 @@ are small enough to keep as evidence.
 
 ## 2. Eligibility
 
-The criterion says "every **eligible** target product" and nothing in the repo
-defined eligible, so the rule lives in `target_classification.py` with a version
-string of its own. A row gets at most one reason, the first that applies.
+Eligibility is not decided in this module. `docs/decisions.md` settles it and
+`integration.row_decision` implements it, so the classifier reads that verdict
+from `row_decisions.csv` instead of keeping a second rule that can drift.
 
-| Reason | Meaning | Rows, 2026-11-15 |
-|---|---|---|
-| `marked_exclude` | The source row carries the `Exclude` marker. | 1,852 |
-| `missing_identifier` | No `JoiningKey`, so the result could not be traced back. | 0 |
-| `duplicate_identifier` | `JoiningKey` is not unique within the file. | 0 |
-| `missing_product_name` | No `ProductName`, so there is nothing to classify. | 37 |
-| `unknown_retailer` | `Retailer` is not one of the six known retailers, which indicates a shifted row rather than a product. | 1 |
+A product is eligible when the integrated cleaner's status is `candidate`, run
+with the agreed `--exclude-policy keep`.
 
-Of 28,082 rows, **26,192 are eligible** and 1,890 are not. The two counts always
-add back to the row count, and a test enforces that nothing is dropped silently.
+An earlier version of this file carried a rule written here instead, and it
+disagreed with the policy on four counts. It disqualified the `Exclude` marker
+on its own, against policy 1. It disqualified a missing `ProductName` without
+looking at description or contents, against policy 4. It quarantined on a single
+unexpected `Retailer`, against policies 6 and 7, which require documented
+combinations of evidence. And it treated only blanks as missing, while the
+policy also counts a case-insensitive `null`. That rule excluded 1,678 products
+the agreed policy keeps.
 
-The `unknown_retailer` rule catches real corruption. Two rows in this file have
-product description text in `Retailer` and in `JoiningKey`, from a shifted row.
+Of 28,082 target rows, **27,870 are eligible** and 212 are quarantined:
 
-The five fields the models read are present among eligible rows at
-`ProductCategory` 26,191, `ProductName` 26,192, `ProductBrand` 26,185,
-`ProductDescription` 8,249 and `ProductContents` 10,624. The last two look thin,
-but training is 31.7% and 40.2% on the same fields against 31.5% and 40.6% here,
-so the target data is no poorer than what the models were fitted on.
+| Reason code | Rows |
+|---|---|
+| `text_in_multiple_numeric_anchors` | 109 |
+| `url_in_timestamp_with_displacement` | 93 |
+| `text_numeric_failure_with_corroboration` | 60 |
+| `missing_product_text` | 42 |
+| `unexpected_exclude_with_populated_unknown_columns` | 2 |
+
+Each code appears under both a `feature:` and a `structural:` prefix, since the
+two streams reached it independently. A row carries every contributing reason.
+
+The two rows with product description text in `Retailer` are quarantined here as
+`unexpected_exclude_with_populated_unknown_columns`, which is the policy's own
+route: the `Exclude` marker combined with populated unknown columns, not one
+suspicious field on its own.
+
+The models were fitted under the same policy. The pinned split protocol records
+`source.input_rows: 83938`, which is exactly the integrated cleaner's training
+candidate count, so classifying `Exclude`-marked target products is inside the
+training distribution rather than an extrapolation.
 
 ## 3. Files written
 
@@ -100,61 +117,59 @@ Five source values already began with an apostrophe of their own and are left
 alone. Everything else is byte identical to the input: 112,328 cell comparisons
 across both files found no other difference.
 
-## 5. Run of 2026-11-15
+## 5. Run of 2026-11-16
 
-All 26,192 eligible rows were classified. Five routes returned suggestions and
+All 27,870 eligible rows were classified. Five routes returned suggestions and
 Platform returned `unavailable`, which is correct: it has no selected route.
-
-| Target | Status | Notes |
-|---|---|---|
-| Segment | suggestion | 26,192 |
-| Sub-Segment | suggestion | 26,192, provisional per the handoff |
-| Brand | suggestion | 26,192 |
-| Mnfr | suggestion | 26,192 |
-| TargetAgeGroup | suggestion | 26,192 |
-| Platform | unavailable | no selected route |
-
 Every policy ships `enabled=false` with `operational_threshold=null`, so nothing
 is auto-accepted and every product still needs a human.
 
-### The same bytes on two machines
+The report records the decisions file by content hash
+(`791b84911f442de3821a50ddebe43064d3aea0dd32df7d82a7ee5e3bd72242d2`) rather than
+by path. An earlier version wrote the path, which leaked the machine the run
+happened on and broke the byte-for-byte comparison below.
 
-The run was executed twice, on an Apple Silicon Mac and on an x86 Linux
-container, against the same frozen artifacts. `report.json` and
-`ineligible.csv` came out byte identical:
-
-```
-828f95272517dc813559c06bb949f06905beeb713c8dc5490273796f573cc0a4  report.json
-a4b2438ffcc3c876399cbf4eafdaadd25a6ebb5ab7733d511c7a8dab58439eca  ineligible.csv
-```
-
-### Predictions look like the training population
-
-`J&J` appears on 361 of 26,192 rows, 1.4%, against 1.4% in training.
-`UnItemised brand` lands on 66.0% against 70% in training. Segment is dominated
-by `Vitamins, Minerals & Supplements` at 62.7%. Nothing shifted.
-
-### Relationship rules on unseen data
-
-The warn-mode checker ran over the predictions for the first time on data no
-model had seen:
+### Relationship rules
 
 | Relation | On validation | On the target set |
 |---|---|---|
-| R1 Sub-Segment under Segment | 1.83% | 1.61% (421 of 26,192) |
-| R2 Brand under Mnfr | 0.05% | 0.042% (11) |
-| Pairs that could not be checked | 7,285 | **0** |
+| R1 Sub-Segment under Segment | 1.83% | 2.29% (638 of 27,870) |
+| R2 Brand under Mnfr | 0.05% | 0.047% (13) |
+| Pairs that could not be checked | 7,285 | 0 |
 
-The rates hold on unseen data, which is the first evidence that the rules
-generalize rather than describing the validation split.
+651 products carry a relationship conflict. The relations are still `candidate`
+and nothing is enforced, so this is a warn-mode queue rather than a decision.
 
 The zero confirms what section 3 could only assert: the 7,285 unchecked pairs on
 validation were an artifact of each target having its own validation set. In
-serving, every available model predicts for every product, so the pair is always
-complete.
+serving, every available model predicts for every product.
 
-The relations are still `candidate` and nothing is enforced. These 432 products
-are a warn-mode queue, not a decision.
+### The `Exclude` marker predicts disagreement
+
+R1's 2.29% is higher than validation's 1.83%, and the gap comes from one place:
+
+| Population | Products | With a conflict |
+|---|---|---|
+| Marked `Exclude` | 1,836 | 219 (11.93%) |
+| Not marked | 26,034 | 431 (1.66%) |
+
+Products carrying the marker are **7.2 times** more likely to produce a
+relationship conflict. The 1.66% on the rest sits close to validation's 1.83%,
+so the rule generalizes; the marker is what moves the overall rate.
+
+Both things are true at once. These are real products and the agreed policy to
+keep them is right, since the models were trained on a population that includes
+them. They also deserve priority in the review queue, and the marker already in
+the source data is a usable signal for ordering it.
+
+An earlier version of this file reported 1.61% and said the rates held. That
+comparison was against the 26,192 rows the superseded eligibility rule had
+selected, not against the population the policy defines.
+
+### Predictions look like the training population
+
+`J&J` appears on 1.4% of rows, against 1.4% in training. Segment is dominated by
+`Vitamins, Minerals & Supplements`. Nothing shifted.
 
 ### Serving artifacts
 
@@ -168,5 +183,6 @@ declares neither as a runtime dependency. Without them every MiniLM route
 reports `model_unavailable`, which reads as missing files rather than a missing
 package. `transformers>=4.50,<5` resolves against the pinned
 `tokenizers==0.22.2`; the 5.x series forces an upgrade that breaks the pin.
-Tokenizing the same strings under 0.22.2 and 0.23.3 gives identical token ids,
-so the pin is about reproducibility discipline, not a change in output.
+Tokenizing the same strings under both versions gives identical token ids, so
+the pin is about reproducibility discipline, not a change in output. With both
+installed the full suite runs green.
