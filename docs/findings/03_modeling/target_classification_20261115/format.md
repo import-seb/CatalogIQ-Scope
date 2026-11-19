@@ -137,7 +137,7 @@ happened on and broke the byte-for-byte comparison below.
 | R2 Brand under Mnfr | 0.05% | 0.047% (13) |
 | Pairs that could not be checked | 7,285 | 0 |
 
-651 products carry a relationship conflict. The relations are still `candidate`
+651 relationship conflicts fall on 650 products (one product fails both rules). The relations are still `candidate`
 and nothing is enforced, so this is a warn-mode queue rather than a decision.
 
 The zero confirms what section 3 could only assert: the 7,285 unchecked pairs on
