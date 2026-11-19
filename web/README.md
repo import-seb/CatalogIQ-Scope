@@ -127,6 +127,11 @@ distinguishes warning rows from distinct products, since a product can have
 multiple warnings. The 64 MB per-file limit applies to this saved-run reader;
 ordinary product input retains its 2 MB / 250-row limit.
 
+The actual CSVs received November 18 passed these checks: 27,870 unique products,
+651 warning rows across 650 products, including one product with two warnings.
+See [the verification record](verification/relationship-results-20261118.md)
+for input hashes, checker parity, browser evidence and remaining limitations.
+
 Warnings remain attached to the original model suggestions after a human
 correction. Both exports preserve them; JSON also retains the complete review
 history. Saved CSVs omit full probability distributions and some source fields;

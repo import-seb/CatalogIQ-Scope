@@ -13,10 +13,13 @@ See [the saved-run instructions](README.md#review-marias-saved-classification-ru
 Candidate warnings are informational and are preserved alongside the original
 predictions and human decisions. The checker does not activate candidate rules.
 
-Local and static browser tests pass with synthetic files. Final acceptance on
-the reported 27,870 products and 651 warnings is pending the actual two CSVs.
-Do not publish those files in the static demo or describe synthetic test counts
-as verification of the real run.
+The two CSVs received on November 18 have been verified: 27,870 unique products
+and 651 candidate warnings across 650 products. The production importer and
+the canonical Python checker reconcile all warning rows. Browser checks cover
+import, approval, correction, reload and CSV/JSON export with the real files.
+See [verification evidence](verification/relationship-results-20261118.md).
+Keep the source CSVs and test review exports private; they are not static demo
+assets or completed catalog decisions. Team/PO acceptance remains separate.
 
 ## Required bundle
 
