@@ -4,6 +4,23 @@ The UI and local API wrapper are ready to exercise the existing adapter. Actual
 model inference remains pending. The Vercel site is a browser-only demo and
 cannot load these Python models.
 
+## Saved classification results and relationship warnings
+
+This flow can be reviewed separately from live inference. Use **Add products →
+Saved results** with Maria's corrected `target_predictions.csv`,
+`relationship_conflicts.csv` and the matching classification `report.json`.
+See [the saved-run instructions](README.md#review-marias-saved-classification-run).
+Candidate warnings are informational and are preserved alongside the original
+predictions and human decisions. The checker does not activate candidate rules.
+
+The two CSVs received on November 18 have been verified: 27,870 unique products
+and 651 candidate warnings across 650 products. The production importer and
+the canonical Python checker reconcile all warning rows. Browser checks cover
+import, approval, correction, reload and CSV/JSON export with the real files.
+See [verification evidence](verification/relationship-results-20261118.md).
+Keep the source CSVs and test review exports private; they are not static demo
+assets or completed catalog decisions. Team/PO acceptance remains separate.
+
 ## Required bundle
 
 Use the same commit of `src/catalogiq/resources/inference/frozen_routes.json`

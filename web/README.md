@@ -83,9 +83,13 @@ access to the team repository. The CLI deployment does not require that access.
 - Local browser persistence, CSV results and JSON audit exports. Original
   source fields, model versions, probabilities, provenance, decisions and
   review history remain separate. Pending/rejected rows have no final labels.
-- CSV formula protection. Exact unsanitized source values remain available in
-  the JSON audit export. CSV source columns are prefixed `source:` to prevent
-  collisions with generated `catalogiq:` columns.
+- CSV formula protection. Product-entry source values remain available in
+  the JSON audit export. Saved-result imports preserve the source values as
+  supplied in that CSV, including any existing formula protection. CSV source
+  columns are prefixed `source:` to prevent collisions with generated fields.
+- Import saved classification results with their candidate relationship warnings.
+  Warnings explain incompatible or missing classifications without changing
+  suggestions, review policy or the existing approval/correction controls.
 - Desktop and mobile layouts, keyboard focus, native dialogs, labelled
   controls and reduced-motion support.
 
@@ -93,6 +97,50 @@ All current model suggestions require human review. Sub-Segment is provisional;
 Platform is deferred. The UI does not introduce confidence thresholds, invent
 relationship conflicts, activate candidate rules or modify model policy.
 Reviewer names are self-entered attribution, **not authenticated identity**.
+
+## Review Maria's saved classification run
+
+In **Add products → Saved results**, select these three files from the same run:
+
+1. `target_predictions.csv`
+2. `relationship_conflicts.csv`
+3. The classification `report.json` containing `eligibility_version`,
+   `decisions_sha256`, counts and model/registry versions.
+
+The supported export is documented on `evaluation/classify-target` at `0f962ee`,
+under `docs/findings/03_modeling/target_classification_20261115/`. The report
+declares `target-eligibility-20261116-v2`: 27,870 classified products and 212
+quarantined products. Obtain the two CSVs from the run owner; they are not in
+Git. The interface does not recreate eligibility or reject an Exclude marker.
+
+Files stay in the browser. The reader checks exact product IDs, supported
+model/registry versions, labels, confidence, report counts and candidate warning
+completeness. A stale or truncated warning file fails before changing the
+workspace. The source files' SHA-256 hashes are recorded in each imported batch.
+The cleaner decision hash is retained as declared provenance; the cleaner CSV
+is not supplied here, so that hash is not independently recomputed.
+
+Start with **Products with relationship warnings**, or select all classified
+products. Choose a batch that fits the remaining workspace capacity (250 total).
+Export and clear the workspace before reviewing the next batch. The summary
+distinguishes warning rows from distinct products, since a product can have
+multiple warnings. The 64 MB per-file limit applies to this saved-run reader;
+ordinary product input retains its 2 MB / 250-row limit.
+
+The actual CSVs received November 18 passed these checks: 27,870 unique products,
+651 warning rows across 650 products, including one product with two warnings.
+See [the verification record](verification/relationship-results-20261118.md)
+for input hashes, checker parity, browser evidence and remaining limitations.
+
+Warnings remain attached to the original model suggestions after a human
+correction. Both exports preserve them; JSON also retains the complete review
+history. Saved CSVs omit full probability distributions and some source fields;
+those values are not reconstructed. These rows are not sent for new inference.
+
+The tests use synthetic fixtures, including a 27,870-product / 651-warning
+fixture. **The actual latest CSVs have not been received or verified yet.**
+After receiving them, confirm their counts and IDs, inspect examples of each
+warning type, and exercise approval, correction, refresh and both exports.
 
 ## Connect real models after the handoff
 
@@ -113,7 +161,7 @@ the `products` envelope for one or many records. Transport endpoints:
 | Endpoint | Purpose |
 | --- | --- |
 | `GET /api/health` | `mode` (`demo` or `live`) and request limits |
-| `GET /api/examples` | Synthetic request and saved example response |
+| `GET /api/examples` | Synthetic request, saved example response and candidate registry |
 | `POST /api/predict` | Adapter JSON request → adapter JSON response |
 
 Do not mix old demo reviews with a real run: export/clear the demo workspace
@@ -162,10 +210,12 @@ history, unchanged original predictions, unavailable-model behavior, HTTP
 guards, browser imports/reviews/downloads/persistence and mobile layout.
 Browser screenshots are generated under the ignored `web/test-results/`.
 
-The suites contain 14 domain/transport tests, 12 Python server/artifact tests,
-12 local API browser scenarios and 7 static browser scenarios (45 checks).
+The suites contain 20 domain/transport/import tests, 12 Python server/artifact tests,
+15 local API browser scenarios and 10 static browser scenarios (57 checks).
 Browser scenarios include CSV preview and draft recovery as well as
 partial model failure and network failure/retry, plus desktop and mobile layouts.
+Saved-result scenarios cover informational warnings, review/export persistence,
+stale-file rejection, storage failure without data loss and batch selection.
 No real-model inference has been run with this interface yet.
 
 ## Remaining before live model integration

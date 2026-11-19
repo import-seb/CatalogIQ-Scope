@@ -1,7 +1,9 @@
 import { test,expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 import {readinessTests} from '../shared/workspace-readiness.mjs';
+import {relationshipReviewTests} from '../shared/relationship-review.mjs';
 readinessTests(test,expect);
+relationshipReviewTests(test,expect);
 
 test('example review, correction, persistence and both export formats',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});

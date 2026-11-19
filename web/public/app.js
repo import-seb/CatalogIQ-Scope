@@ -1,5 +1,6 @@
 import {FIELDS,TARGETS,TITLES,MAX_ROWS,MAX_BYTES,SCHEMA,parseCSV,validateImport,alignResponse,alternatives,canReview,recordDecision,exportCSV,auditExport,csvCell} from './domain.js';
 import {createTransport} from './transport.js';
+import {RESULT_FILE_BYTES, RELATIONSHIP_MESSAGES, parseSavedResults, warningMessage} from './relationship-import.js';
 
 const transport=createTransport({staticDemo:document.querySelector('meta[name="catalogiq-runtime"]')?.content==='static-demo'});
 
@@ -40,12 +41,27 @@ function captureDraft(){
   const indicator=$('#review-draft-status');
   if(indicator){indicator.hidden=false;indicator.textContent=storageOK?'Draft saved in this browser. Save your review to apply it.':'Draft is not saved. Keep this page open until storage is available.';}
 }
-function counts(){return {all:state.records.length,pending:state.records.filter(r=>!r.decision).length,reviewed:state.records.filter(r=>r.decision&&r.decision.action!=='rejected').length,rejected:state.records.filter(r=>r.decision?.action==='rejected').length};}
-function visibleRecords(){return state.records.filter(r=> (state.filter==='all'||(state.filter==='pending'&&!r.decision)||(state.filter==='reviewed'&&r.decision&&r.decision.action!=='rejected')||(state.filter==='rejected'&&r.decision?.action==='rejected'))&&[r.product.record_id,...FIELDS.map(f=>r.product[f])].join(' ').toLowerCase().includes(state.search.toLowerCase()));}
+function counts(){return {all:state.records.length,pending:state.records.filter(r=>!r.decision).length,reviewed:state.records.filter(r=>r.decision&&r.decision.action!=='rejected').length,rejected:state.records.filter(r=>r.decision?.action==='rejected').length,warnings:state.records.filter(r=>r.relationship_warnings?.length).length};}
+function visibleRecords(){return state.records.filter(r=> (state.filter==='all'||(state.filter==='pending'&&!r.decision)||(state.filter==='reviewed'&&r.decision&&r.decision.action!=='rejected')||(state.filter==='rejected'&&r.decision?.action==='rejected')||(state.filter==='warnings'&&r.relationship_warnings?.length))&&[r.product.record_id,...FIELDS.map(f=>r.product[f])].join(' ').toLowerCase().includes(state.search.toLowerCase()));}
 const pill = r => `<span class="pill ${status(r)}">${status(r)==='approved'||status(r)==='corrected'?'✓ ':''}${statusLabel(status(r))}</span>`;
 function sourceDetails(r){return `<details class="source-summary"><summary>Product details</summary><dl>${FIELDS.map(f=>`<dt>${esc(({ProductCategory:'Category',ProductName:'Name',ProductBrand:'Brand',ProductDescription:'Description',ProductContents:'Contents'})[f])}</dt><dd>${esc(r.product[f] || 'Not provided')}</dd>`).join('')}</dl></details>`;}
 const reasonNames={automatic_acceptance_disabled:'Automatic approval is turned off.',no_approved_threshold:'Review thresholds have not been approved.',provisional_model:'Sub-segment suggestions are still provisional.',target_unavailable:'Platform classification is not available yet.',models_not_connected:'Models are not connected. No prediction was generated.',missing_text:'Some product information is missing.',quarantined:'This product was flagged before classification.',unapproved_relationship_rule:'This relationship has not been approved.',relationship_conflict:'A combination of predictions needs a closer look.'};
-function reasonText(code){return reasonNames[code] || code.replaceAll('_',' ').replace(/^./,s=>s.toUpperCase())+'.';}
+function reasonText(code){return RELATIONSHIP_MESSAGES[code] || reasonNames[code] || code.replaceAll('_',' ').replace(/^./,s=>s.toUpperCase())+'.';}
+
+function relationshipWarningsHTML(record) {
+  if (!record.relationship_warnings?.length) return '';
+  return `<section class="relationship-notice" aria-label="Relationship warnings">
+    <h3>Check these classifications together</h3>
+    <p>These checks use candidate rules that are awaiting approval. You can confirm or correct the classifications as usual.</p>
+    <ul>${record.relationship_warnings.map(warning => `<li>
+      <p>${esc(warningMessage(warning))}</p>
+      <p class="warning-pair">${esc(TITLES[warning.child_target])} · ${esc(warning.child_prediction || 'Missing')}
+        <br>${esc(TITLES[warning.parent_target])} · ${esc(warning.parent_prediction || 'Missing')}</p>
+      <details><summary>Warning details</summary><p>${esc(warning.observation)}<br>${esc(warning.relation_id)} · ${esc(warning.registry_version)}</p></details>
+    </li>`).join('')}</ul>
+    ${record.decision ? '<p>Warnings describe the original model suggestions. Your saved review appears below.</p>' : ''}
+  </section>`;
+}
 
 function render(){
   editing=!!selected()?.draft?.editing;
@@ -61,10 +77,10 @@ function render(){
     <div class="workflow" aria-label="Workflow"><span><b>1</b>Add products</span><span class="connector" aria-hidden="true"></span><span class="current"><b>2</b>Review suggestions</span><span class="connector" aria-hidden="true"></span><span><b>3</b>Export results</span></div>
     <div class="work-grid"><div><section class="panel" aria-label="Products"><div class="panel-top"><h2>Products <span>${c.all} total</span></h2><span class="saved">${icon(storageOK?'check':'info')}${storageOK?'Saved in this browser':'Not saved — export your work'}</span></div>
     <div class="search-wrap">${icon('search')}<input id="search" type="search" aria-label="Search products" placeholder="Search products or IDs…" value="${esc(state.search)}"></div>
-    <div class="filters" aria-label="Filter products">${[['all','All products',c.all],['pending','Needs review',c.pending],['reviewed','Reviewed',c.reviewed],['rejected','Rejected',c.rejected]].map(([f,l,n])=>`<button class="filter ${state.filter===f?'active':''}" data-action="filter" data-filter="${f}" aria-pressed="${state.filter===f}">${l}<span>${n}</span></button>`).join('')}</div>
+    <div class="filters" aria-label="Filter products">${[['all','All products',c.all],['pending','Needs review',c.pending],['warnings','Relationship warnings',c.warnings],['reviewed','Reviewed',c.reviewed],['rejected','Rejected',c.rejected]].map(([f,l,n])=>`<button class="filter ${state.filter===f?'active':''}" data-action="filter" data-filter="${f}" aria-pressed="${state.filter===f}">${l}<span>${n}</span></button>`).join('')}</div>
     <div id="product-table">${tableHTML()}</div><div class="panel-bottom"><span>${visibleRecords().length} of ${c.all} products</span><button class="button quiet small" data-action="examples" ${busy?'disabled':''}>${icon('refresh')}Load examples</button></div></section>
     <p class="under-table"><strong>Every prediction gets a human check.</strong><br>Confidence is the model’s score, not a guarantee of correctness.</p>
-    ${state.records.some(r=>!r.decision&&!canReview(r))?`<button class="button" data-action="classify" ${busy?'disabled':''}>${icon('refresh')}${busy?'Checking products…':'Try classification'}</button>`:''}
+    ${state.records.some(r=>r.mode!=='imported'&&!r.decision&&!canReview(r))?`<button class="button" data-action="classify" ${busy?'disabled':''}>${icon('refresh')}${busy?'Checking products…':'Try classification'}</button>`:''}
     </div><section class="panel review-panel" id="review-panel" aria-label="Product review">${reviewHTML()}</section></div>
     <footer class="footer-note"><span>${health.browser_only?'Uploads and reviews stay in your browser. They aren’t shared with other visitors.':health.mode==='demo'?'Demo results are marked in every export.':'Product reviews are stored in this browser.'} Your original product data is preserved.</span><button class="button quiet small" data-action="reset">Clear workspace</button></footer></main></div></div>`;
 }
@@ -86,10 +102,12 @@ function reviewHTML(){
   const reviewable=canReview(r);
   const anySuggestion=Object.values(predictions).some(p=>p.status==='suggestion');
   const failedTargets=Object.values(predictions).some(p=>p.status==='failed');
-  const modelSource=r.mode==='demo'?'Saved example · not a new model run':'Model suggestions';
+  const incompleteMessage=r.mode==='imported'?'Request an updated saved result before approving.':'Try classification again before approving.';
+  const modelSource=r.mode==='demo'?'Saved example · not a new model run':r.mode==='imported'?'Imported model results':'Model suggestions';
   return `<div class="review-header"><h2>Product review</h2><small>${state.records.indexOf(r)+1} of ${state.records.length}</small></div><div class="review-body">
     <div class="review-product"><div class="product-art">${icon('box')}</div><div><h3>${esc(r.product.ProductName||'Unnamed product')}</h3><p>${esc(r.product.record_id)} · ${esc(modelSource)}</p></div></div>
-    ${sourceDetails(r)}<div class="review-callout">${icon('shield')}<div>${reviewable?'<strong>Your review is required.</strong> '+(reasons.slice(0,2).map(reasonText).join(' ')||'Check the suggestions before approving.'):anySuggestion||failedTargets?'<strong>Some predictions are unavailable.</strong> Your product is saved. Try classification again before approving.':'<strong>Waiting for models.</strong> Your product is saved. Predictions will be available after the models are connected.'}</div></div>
+    ${sourceDetails(r)}<div class="review-callout">${icon('shield')}<div>${reviewable?'<strong>Your review is required.</strong> '+(reasons.slice(0,2).map(reasonText).join(' ')||'Check the suggestions before approving.'):anySuggestion||failedTargets?'<strong>Some predictions are unavailable.</strong> Your product is saved. '+incompleteMessage:'<strong>Waiting for models.</strong> Your product is saved. Predictions will be available after the models are connected.'}</div></div>
+    ${relationshipWarningsHTML(r)}
     <div class="section-label">${r.decision&&r.decision.action!=='rejected'?'Reviewed classifications':'Suggested classifications'}<span>${editing?'Choose a label below':'Raw confidence'}</span></div>
     <div class="prediction-grid">${TARGETS.map(t=>{
       const p=predictions[t];const usable=p?.status==='suggestion';const final=(editing?draft?.labels[t]:null)??r.decision?.labels[t]??p?.predicted_label;
@@ -98,6 +116,7 @@ function reviewHTML(){
       ${p?.selection_status==='provisional'?'<p class="micro">Provisional suggestion</p>':''}${r.decision?.labels[t]&&r.decision.labels[t]!==p?.predicted_label?`<p class="micro">Changed from ${esc(p.predicted_label)}. Score belongs to original prediction.</p>`:''}</div>`;
     }).join('')}</div>
     ${reviewable?`<details class="alternative-details"><summary>See alternatives & review notes</summary><div class="alternatives">${TARGETS.filter(t=>predictions[t]?.status==='suggestion').map(t=>`<div class="alternative-target">${TITLES[t]}</div>${alternatives(predictions[t]).map(a=>`<div class="alternative-line"><b>${esc(a.label)}</b><span>${percent(a.probability)}</span></div>`).join('')}`).join('')}</div><p class="micro">${esc(reasons.map(reasonText).join(' '))}</p><p class="micro">Alternatives are suggestions from the model, not approved relationships.</p></details>`:''}
+    ${r.mode==='imported'?'<p class="micro">This CSV includes saved labels and scores. Full probability distributions and omitted source fields were not included in the export.</p>':''}
     ${r.decision&&!editing?`<div class="decision-banner ${r.decision.action}"><strong>${statusLabel(r.decision.action)}</strong> by ${esc(r.decision.reviewer)}<br><span>${esc(new Date(r.decision.timestamp).toLocaleString())}</span>${r.decision.note?`<p>${esc(r.decision.note)}</p>`:''}<button class="button small" data-action="edit">${icon('edit')}Review again</button></div>`:`<div class="review-controls"><div class="field"><label class="field-label" for="reviewer">Reviewed by</label><input class="text-input" id="reviewer" autocomplete="name" placeholder="Your name" value="${esc(draft?.reviewer??state.reviewer)}" maxlength="100"><p class="micro">Recorded with your decision. This is a local workspace, not a verified login.</p></div><label class="field-label" for="review-note">Review note <span class="optional">${editing?'· required for a correction':'· optional for approval'}</span></label><textarea id="review-note" placeholder="Explain a correction or why you’re rejecting this product…" maxlength="2000">${esc(draft?.note??(editing?r.decision?.note||'':''))}</textarea><p id="review-draft-status" class="micro draft-status" ${draft?'':'hidden'}>${storageOK?'Draft saved in this browser. Save your review to apply it.':'Draft is not saved. Keep this page open until storage is available.'}</p><p id="review-error" class="error-text" role="alert" hidden></p><div class="review-actions"><button class="button primary" data-action="${editing?'correct':'approve'}" ${reviewable?'':'disabled'}>${icon('check')}${editing?'Save review':'Approve'}</button><button class="button" data-action="${editing?'cancel-edit':'edit'}" ${reviewable?'':'disabled'}>${icon(editing?'close':'edit')}${editing?'Discard draft':'Correct'}</button><button class="button danger" data-action="reject">Reject</button></div><p class="review-hint">${reviewable?'Approval covers the five available targets. Platform stays unavailable. Your decision does not change the model’s review policy.':'Approval and corrections unlock when predictions are available.'}</p></div>`}
     ${r.history?.length?`<details class="alternative-details"><summary>Review history (${r.history.length})</summary><ol class="history-list">${r.history.map(h=>`<li>${esc(statusLabel(h.action))} · ${esc(h.reviewer)} · ${esc(new Date(h.timestamp).toLocaleString())}${h.note?`<br>${esc(h.note)}`:''}</li>`).join('')}</ol></details>`:''}</div>`;
 }
@@ -126,7 +145,8 @@ function dialogHeader(id,title,subtitle){return `<div class="dialog-header"><div
 function showInput(tab='csv'){
   uploadToken++;staged=[];stagedName='';
   const dialog=$('#input-dialog');
-  dialog.innerHTML=dialogHeader('input-title','Add products','Start with one product or bring in a CSV from your store.')+`<div class="dialog-content"><div class="dialog-tabs" aria-label="Input method"><button class="dialog-tab ${tab==='csv'?'active':''}" data-tab="csv" aria-pressed="${tab==='csv'}">Upload CSV</button><button class="dialog-tab ${tab==='single'?'active':''}" data-tab="single" aria-pressed="${tab==='single'}">One product</button></div>
+  if(tab==='results'){showSavedResults(dialog);return;}
+  dialog.innerHTML=dialogHeader('input-title','Add products','Start with one product or bring in a CSV from your store.')+`<div class="dialog-content"><div class="dialog-tabs" aria-label="Input method"><button class="dialog-tab ${tab==='csv'?'active':''}" data-tab="csv" aria-pressed="${tab==='csv'}">Upload CSV</button><button class="dialog-tab ${tab==='single'?'active':''}" data-tab="single" aria-pressed="${tab==='single'}">One product</button><button class="dialog-tab" data-tab="results" aria-pressed="false">Saved results</button></div>
     ${tab==='csv'?`<label class="dropzone" id="dropzone">${icon('upload')}<strong>Drop your CSV here, or browse</strong><p>Up to ${MAX_ROWS} products · CSV · 2 MB maximum</p><input type="file" id="csv-file" accept=".csv,text/csv" aria-label="Upload product CSV"></label><div id="file-ready" class="file-ready" role="status" hidden></div><div id="csv-preview" class="csv-preview" hidden></div><button class="button small" id="template">${icon('download')}Download CSV template</button><p class="micro">Keep product IDs as text to preserve leading zeros. Extra columns are retained for export but are not sent to the model.</p>`:`<form id="single-form"><div class="form-grid"><div class="field"><label class="field-label" for="record-id">Product ID</label><input id="record-id" class="text-input" name="record_id" placeholder="e.g. SKU-001" required maxlength="200"></div><div class="field"><label class="field-label" for="product-brand">Brand</label><input id="product-brand" class="text-input" name="ProductBrand" placeholder="e.g. Claritin" maxlength="1000"></div><div class="field full"><label class="field-label" for="product-name">Product name</label><input id="product-name" class="text-input" name="ProductName" placeholder="e.g. Claritin RediTabs" required maxlength="2000"></div><div class="field full"><label class="field-label" for="product-category">Store category</label><input id="product-category" class="text-input" name="ProductCategory" placeholder="e.g. Health > Allergy Relief" maxlength="4000"><p>Use the category from the product’s original listing.</p></div><div class="field full"><label class="field-label" for="product-description">Description</label><textarea id="product-description" name="ProductDescription" placeholder="What does the listing say?" maxlength="20000"></textarea></div><div class="field full"><label class="field-label" for="product-contents">Contents or ingredients</label><input id="product-contents" class="text-input" name="ProductContents" placeholder="Optional" maxlength="10000"></div></div></form>`}
     <p class="micro">${health.mode==='demo'?'Demo mode: new products are saved with “Awaiting models.” No new predictions will be generated.':'Your products will be sent to the local classification adapter.'}</p><p class="error-text" id="input-error" role="alert" hidden></p><div class="dialog-footer"><button class="button quiet" data-close>Cancel</button><button class="button primary" id="import-submit" ${tab==='csv'?'disabled':''}>${icon('plus')}Add products</button></div></div>`;
   if(!dialog.open)dialog.showModal();
@@ -169,6 +189,139 @@ async function readFile(file){
     $('#file-ready').hidden=false;$('#csv-preview').hidden=false;$('#import-submit').disabled=false;
   }catch(e){if(token===uploadToken&&$('#csv-file'))showError('#input-error',e.message);}
 }
+
+function showSavedResults(dialog) {
+  let loaded = null;
+  let importDetails = null;
+  let available = [];
+  let batchSize = 0;
+  dialog.innerHTML = dialogHeader('input-title', 'Review saved results', 'Bring in the prediction export and its relationship warnings.') + `
+    <div class="dialog-content saved-results-import">
+      <button class="button quiet small" id="back-to-input">Back to product entry</button>
+      <p>Choose the three files from the same classification run. Files are read in this browser.</p>
+      <div class="field"><label class="field-label" for="saved-predictions">Predictions CSV</label>
+        <input id="saved-predictions" type="file" accept=".csv,text/csv"></div>
+      <div class="field"><label class="field-label" for="saved-warnings">Relationship warnings CSV</label>
+        <input id="saved-warnings" type="file" accept=".csv,text/csv"></div>
+      <div class="field"><label class="field-label" for="saved-report">Classification report JSON</label>
+        <input id="saved-report" type="file" accept=".json,application/json"></div>
+      <p class="micro">Each file can be up to 64 MB. Review up to ${MAX_ROWS} products in a workspace, then export your decisions before starting the next batch.</p>
+      <button class="button" id="read-saved-results">Read saved results</button>
+      <div id="saved-results-selection" hidden>
+        <p id="saved-results-summary" role="status"></p>
+        <div class="field"><label class="field-label" for="saved-results-scope">Products to review</label>
+          <select id="saved-results-scope"><option value="warnings">Products with relationship warnings</option><option value="all">All classified products</option></select></div>
+        <div class="field"><label class="field-label" for="saved-results-batch">Batch</label><select id="saved-results-batch"></select></div>
+        <p id="saved-results-preview" class="micro"></p>
+      </div>
+      <p id="saved-results-error" class="error-text" role="alert" hidden></p>
+      <div class="dialog-footer"><button class="button quiet" data-close>Cancel</button>
+        <button class="button primary" id="add-saved-results" disabled>Add selected batch</button></div>
+    </div>`;
+  if (!dialog.open) dialog.showModal();
+  $('#back-to-input').onclick = () => showInput();
+
+  function selectedBatch() {
+    const start = Number($('#saved-results-batch').value);
+    return available.slice(start, start + batchSize);
+  }
+  function updatePreview() {
+    const batch = selectedBatch();
+    const count = batch.reduce((sum, record) => sum + record.relationship_warnings.length, 0);
+    $('#saved-results-preview').textContent = `${batch.length} products and ${count} warnings in this batch. ${available.length} matching products remain outside this workspace.`;
+    $('#add-saved-results').disabled = batch.length === 0;
+  }
+  function chooseBatches() {
+    const ids = new Set(state.records.map(record => record.product.record_id));
+    available = loaded.records.filter(record => !ids.has(record.product.record_id) &&
+      ($('#saved-results-scope').value === 'all' || record.relationship_warnings.length > 0));
+    batchSize = Math.max(0, MAX_ROWS - state.records.length);
+    const options = [];
+    if (batchSize > 0) {
+      for (let start = 0; start < available.length; start += batchSize) {
+        options.push(`<option value="${start}">${start + 1}–${Math.min(start + batchSize, available.length)} of ${available.length}</option>`);
+      }
+    }
+    $('#saved-results-batch').innerHTML = options.join('');
+    $('#saved-results-batch').disabled = options.length === 0;
+    updatePreview();
+    if (!batchSize) showError('#saved-results-error', 'Export and clear this workspace before adding a saved batch.');
+  }
+  for (const input of dialog.querySelectorAll('input[type="file"]')) {
+    input.onchange = () => {
+      loaded = null;
+      $('#saved-results-selection').hidden = true;
+      $('#saved-results-error').hidden = true;
+      $('#add-saved-results').disabled = true;
+    };
+  }
+  $('#saved-results-scope').onchange = chooseBatches;
+  $('#saved-results-batch').onchange = updatePreview;
+  $('#read-saved-results').onclick = async () => {
+    loaded = null;
+    $('#saved-results-selection').hidden = true;
+    $('#saved-results-error').hidden = true;
+    $('#add-saved-results').disabled = true;
+    const files = ['saved-predictions', 'saved-warnings', 'saved-report'].map(id => $(`#${id}`).files[0]);
+    if (files.some(file => !file)) {
+      showError('#saved-results-error', 'Choose the predictions, warnings and report files.');
+      return;
+    }
+    if (files.some(file => file.size > RESULT_FILE_BYTES)) {
+      showError('#saved-results-error', 'Choose files smaller than 64 MB each.');
+      return;
+    }
+    busy = true;
+    dialog.querySelectorAll('input,button,select').forEach(control => control.disabled = true);
+    $('#read-saved-results').textContent = 'Checking saved results…';
+    try {
+      const buffers = await Promise.all(files.map(file => file.arrayBuffer()));
+      const texts = buffers.map(buffer => new TextDecoder('utf-8', {fatal: true}).decode(buffer));
+      if (texts.some(text => text.includes('\0'))) throw new Error('Save each file as UTF-8 and try again.');
+      const report = JSON.parse(texts[2].replace(/^\uFEFF/, ''));
+      const parsed = parseSavedResults(texts[0], texts[1], report, examples.response, examples.relationship_registry);
+      const hashes = await Promise.all(buffers.map(buffer => crypto.subtle.digest('SHA-256', buffer)));
+      importDetails = {eligibility_version: report.eligibility_version, decisions_sha256: report.decisions_sha256,
+        products_in_run: parsed.records.length, warnings_in_file: parsed.warningCount,
+        products_with_warnings: parsed.flaggedCount, files: files.map((file, index) => ({
+          name: file.name, sha256: Array.from(new Uint8Array(hashes[index]), byte => byte.toString(16).padStart(2, '0')).join(''),
+        }))};
+      loaded = parsed;
+      $('#saved-results-summary').textContent = `${parsed.records.length.toLocaleString('en-US')} classified products. ${parsed.warningCount.toLocaleString('en-US')} relationship warnings across ${parsed.flaggedCount.toLocaleString('en-US')} products. ${report.ineligible} products quarantined by the cleaner.`;
+      $('#saved-results-scope').value = parsed.flaggedCount ? 'warnings' : 'all';
+      $('#saved-results-selection').hidden = false;
+    } catch (error) {
+      showError('#saved-results-error', error.message);
+    } finally {
+      busy = false;
+      dialog.querySelectorAll('input,button,select').forEach(control => control.disabled = false);
+      $('#read-saved-results').textContent = 'Read saved results';
+      $('#add-saved-results').disabled = true;
+      if (loaded) chooseBatches();
+    }
+  };
+  $('#add-saved-results').onclick = () => {
+    try {
+      const batch = selectedBatch();
+      if (!loaded || !batch.length) return;
+      validateImport(batch, state.records);
+      const records = batch.map(record => ({...record, source_name: importDetails.files[0].name,
+        created_at: new Date().toISOString(), relationship_import: importDetails}));
+      const nextState = {...state, records: [...state.records, ...records], selectedId: records[0].product.record_id,
+        search: '', filter: $('#saved-results-scope').value === 'warnings' ? 'warnings' : 'all'};
+      // Commit once, before replacing the visible workspace. A failed save leaves existing work intact.
+      try { localStorage.setItem(KEY, JSON.stringify(nextState)); }
+      catch { throw new Error('Browser storage is full or unavailable. Export your current work and review a smaller workspace.'); }
+      state = nextState;
+      storageOK = true;
+      editing = false;
+      dialog.close();
+      render();
+      notify(`${records.length} saved results added for review.`);
+    } catch (error) { showError('#saved-results-error', error.message); }
+  };
+}
+
 function showError(selector,message){$(selector).textContent=message;$(selector).hidden=false;}
 function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function showExport(){
@@ -206,7 +359,7 @@ document.addEventListener('click',async e=>{
     const d=$('#reset-dialog');d.innerHTML=dialogHeader('reset-title','Clear this workspace?','Export your work first if you want to keep it.')+`<div class="dialog-content"><p class="help-copy">This removes ${state.records.length} products and their review history from this browser. Downloaded exports will remain.</p><div class="dialog-footer"><button class="button" data-close>Keep products</button><button class="button danger" id="confirm-reset">Clear workspace</button></div></div>`;d.showModal();$('#confirm-reset').onclick=()=>{state.records=[];state.selectedId=null;state.search='';state.filter='all';editing=false;save();d.close();render();notify('Workspace cleared.');};
   }
   if(action==='classify'){
-    busy=true;render();const pending=state.records.filter(r=>!r.decision&&!canReview(r));
+    busy=true;render();const pending=state.records.filter(r=>r.mode!=='imported'&&!r.decision&&!canReview(r));
     try{const result=await requestPredictions(pending.map(r=>r.product));const rows=alignResponse(result,pending.map(r=>r.product));for(let i=0;i<pending.length;i++){pending[i].result=rows[i];pending[i].mode=health.mode;pending[i].engine_version=result.engine_version;pending[i].relationship_registry_version=result.relationship_registry_version;}save();notify(health.mode==='demo'?'Models are still disconnected. Your products remain saved.':'Predictions updated.');}catch(e){notify(e.message);}finally{busy=false;render();}
   }
 });
