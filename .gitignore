@@ -4,6 +4,14 @@
 /data/interim/
 /data/processed/
 
+# Machine-local maintenance inventories and sessions; never publish private state.
+/experiments/maintenance_research/*_session.json
+/experiments/maintenance_research/session.json
+/experiments/maintenance_research/dependencies.json
+/experiments/maintenance_research/model_sources.json
+/experiments/maintenance_research/cleanup_inventory.json
+/experiments/maintenance_research/compatibility_provenance.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

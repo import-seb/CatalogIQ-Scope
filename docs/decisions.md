@@ -66,3 +66,64 @@ are recorded in the run summary, and are not the agreed default.
 No model, feature-engineered category levels, evaluation split or inferred target
 labels are introduced by these decisions. Working manufacturer/age vocabularies,
 ambiguous fields and individual flagged values remain visible for team review.
+
+## 2026-11-14: Maintenance scope and confirmation collection
+
+**Authority/status:** Sebastian's capstone scope decision. Prioritize correction
+tracking through mandatory human review and defer further model-update experiments
+until suitable new confirmation data is available. This records the decision;
+application integration and model updates require separate authorization.
+
+### Evidence and limits
+
+We investigated inexpensive maintenance of CatalogIQ's existing models through
+correction memory, incremental classifier updates and LoRA where warranted across
+the four MiniLM targets, alongside a separate Brand lookup maintenance strategy.
+The preliminary experiments demonstrated technical feasibility and some methods
+preserved historical validation performance. Their update examples were previously
+trained-on records, so these results do not establish reliable improvements from
+genuinely new product confirmations.
+
+The evidence supports target-specific policies:
+
+- Segment: correction memory and promising warm-start SGD head updates.
+- Mnfr: correction memory and limited encouraging PA-II evidence. Maintenance
+  LoRA was skipped under the experiment's routing rule.
+- TargetAgeGroup: correction memory; head updates remain conditional on a
+  demonstrated need.
+- Sub-Segment: correction memory and label-conflict adjudication. Tested parameter
+  updates failed per-class retention safeguards and are not eligible for use.
+- Brand: correction memory and maintenance of the existing probabilistic lookup,
+  rather than a replacement neural model.
+
+LoRA did not demonstrate a consistent advantage in the targets where it was
+tested. No general recommendation to apply one updater to every target follows.
+
+The original datasets were allocated for model development and final evaluation;
+no separate independently labeled future-maintenance evaluation cohort was
+reserved. This is an experimental-design limitation for the new maintenance
+question, not evidence that the original allocation was inappropriate.
+
+### Decision and next steps
+
+Recommend integrating versioned confirmation/correction tracking into CatalogIQ's
+mandatory human-review workflow. Normal operation can gradually supply labels
+without launching another bulk-labeling project. The existing isolated ledger
+prototype is research infrastructure; production collection is not yet integrated.
+
+Before using collected labels for maintenance, verify product identity and
+training exposure, deduplicate repeated confirmations, adjudicate contradictory
+labels and reserve independent product groups for evaluation before fitting or
+selecting updates. A newly dated confirmation does not make an old training
+product genuinely new, and human approval alone does not certify ground truth.
+
+Further maintenance experiments are deferred. Existing models, Brand lookup,
+inference behavior and dataset allocations remain unchanged. The protected test
+set is not retired or repurposed by this decision. No unvalidated maintenance
+updates will be deployed, and every prediction still requires human approval,
+including correction-memory suggestions.
+
+Earlier experiment proposals remain reference material; this decision controls
+the current capstone scope. Supporting evidence: [maintenance research](../MAINTENANCE_RESEARCH_REPORT.md),
+[Sub-Segment and Brand findings](../MAINTENANCE_FINDINGS.md), and
+[future confirmation workflow](../MAINTENANCE_WORKFLOW.md).
