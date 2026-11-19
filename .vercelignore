@@ -1,0 +1,24 @@
+# Upload only the static-demo sources and two synthetic adapter fixtures.
+/*
+!vercel.json
+!web
+web/*
+!web/package.json
+!web/package-lock.json
+!web/build-demo.mjs
+!web/public
+!docs
+docs/*
+!docs/integration
+docs/integration/*
+!docs/integration/inference_adapter_request.json
+!docs/integration/inference_adapter_response.json
+!src
+src/*
+!src/catalogiq
+src/catalogiq/*
+!src/catalogiq/resources
+src/catalogiq/resources/*
+!src/catalogiq/resources/relationships
+src/catalogiq/resources/relationships/*
+!src/catalogiq/resources/relationships/classification_relationship_registry.json

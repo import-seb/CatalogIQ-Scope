@@ -35,3 +35,11 @@
 /src/catalogiq/inference_*.py text eol=lf
 /tests/test_inference_*.py text eol=lf
 /docs/integration/inference_adapter* text eol=lf
+
+# Local web app sources and test fixtures are portable across platforms.
+/web/** text eol=lf
+/web/public/assets/*.png -text
+/web/public/assets/*.woff2 -text
+/.github/workflows/web.yml text eol=lf
+/.vercelignore text eol=lf
+/vercel.json text eol=lf
