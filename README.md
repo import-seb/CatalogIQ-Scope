@@ -13,6 +13,38 @@ target names, target-specific missing-label masks, a shared prediction manifest,
 per-model cost measurements and fitted-model handoff. Use the agreed split for
 each target; new Brand/Sub-Segment allocations must arrive before their final runs.
 
+## AI assistance and verification
+
+CatalogIQ uses **ChatGPT and Codex, both from OpenAI**, as development and
+research assistants:
+
+- **ChatGPT** supports research planning, discussion of methods and tradeoffs,
+  interpretation of findings, and drafting and editing documentation.
+- **Codex** supports repository work, including writing and refactoring code,
+  debugging, adding tests, running checks, and updating technical documentation.
+
+The project team remains responsible for accepted code, data decisions, and
+reported conclusions. AI-generated suggestions require review and verification
+before they are treated as project findings or adopted into the workflow.
+
+Our verification practices follow the [contribution workflow](CONTRIBUTING.md):
+
+- Review proposed changes against the source data, recorded decisions, and
+  relevant references. Record accepted rules, assumptions, and limitations in
+  [current decisions](docs/decisions.md) and [findings](docs/findings/).
+- Check code with behavioral tests using synthetic, nonprivate fixtures.
+  CI runs the Python tests and a package build; these checks do not execute
+  research notebooks or establish model quality.
+- Rerun changed analyses from a fresh kernel, reconcile row counts and audit
+  outputs, and record input scope, missing-value policies, thresholds, and
+  denominators before relying on results.
+- Verify frozen split membership and integrity hashes, fit learned preprocessing
+  on training data, and use validation for development while keeping the reserved
+  final test closed.
+- Support reported metrics and conclusions with reproducible run artifacts,
+  document limitations and checks that remain incomplete, and review outputs
+  for private data before sharing.
+
 ## Start here
 
 Use Python 3.11 or newer; Python 3.12 is the suggested project environment.
