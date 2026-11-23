@@ -27,17 +27,9 @@ def candidate_scores(features, scores, brand_labels, lookup, warnings):
     return scores.min(axis=1).where(eligible)
 
 
-def replay(args):
-    frames, lookup, features = load_inputs(args.handoff, args.validation)
-    _, ids = shared_audit(frames, features)
-    audit = {k: f.loc[ids] for k, f in frames.items()}
-    warns = flag_all({k: f.reset_index() for k, f in audit.items()}).record_id
-    scores = pd.DataFrame({k: f.calibrated_confidence for k, f in audit.items()})
-    audit_score = candidate_scores(features.loc[ids], scores, audit["Brand"].predicted_label, lookup, warns)
-    errors = pd.DataFrame({k: f.true_label.ne(f.predicted_label) for k, f in audit.items()}).any(axis=1)
-
-    catalog = pd.read_csv(args.catalog, dtype=str, keep_default_na=False).set_index("JoiningKey", verify_integrity=True)
-    warnings = pd.read_csv(args.warnings, dtype=str, keep_default_na=False)
+def score_catalog(catalog_path, warnings_path, lookup):
+    catalog = pd.read_csv(catalog_path, dtype=str, keep_default_na=False).set_index("JoiningKey", verify_integrity=True)
+    warnings = pd.read_csv(warnings_path, dtype=str, keep_default_na=False)
     registry_version = load_registry()["registry_version"]
     if not (catalog["catalogiq:registry_version"].eq(registry_version).all()
             and warnings.registry_version.eq(registry_version).all()):
@@ -52,6 +44,18 @@ def replay(args):
         target_scores[k] = pd.to_numeric(catalog[prefix + "calibrated_confidence"], errors="coerce").where(available)
     catalog_score = candidate_scores(catalog, pd.DataFrame(target_scores), catalog["catalogiq:Brand:original_label"],
                                      lookup, warnings.record_id).where(catalog["catalogiq:eligibility"].eq("eligible"))
+    return catalog, catalog_score
+
+
+def replay(args):
+    frames, lookup, features = load_inputs(args.handoff, args.validation)
+    _, ids = shared_audit(frames, features)
+    audit = {k: f.loc[ids] for k, f in frames.items()}
+    warns = flag_all({k: f.reset_index() for k, f in audit.items()}).record_id
+    scores = pd.DataFrame({k: f.calibrated_confidence for k, f in audit.items()})
+    audit_score = candidate_scores(features.loc[ids], scores, audit["Brand"].predicted_label, lookup, warns)
+    errors = pd.DataFrame({k: f.true_label.ne(f.predicted_label) for k, f in audit.items()}).any(axis=1)
+    catalog, catalog_score = score_catalog(args.catalog, args.warnings, lookup)
     rows = []
     for floor in (0.95, 0.98, 0.99, 0.995):
         eligible = audit_score.ge(floor)
