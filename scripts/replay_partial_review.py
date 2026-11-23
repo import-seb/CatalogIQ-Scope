@@ -51,6 +51,7 @@ def read_predictions(package, route, calibration):
         raise ValueError("Expected a frozen temperature recipe")
     confidence = temperature_scale(probabilities, params.temperature).max(axis=1)
     frame = predictions[["record_id", "predicted_label", "true_label"]].copy()
+    frame["calibrated_confidence"] = confidence
     frame["score_pass"] = confidence >= params.candidate_threshold
     frame = frame.merge(context[["record_id", "group_id"]], on="record_id", validate="one_to_one")
     lookup = json.loads(member("model.json")) if manifest["target"] == "Brand" else None
