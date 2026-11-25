@@ -39,3 +39,11 @@
 /scripts/classify_target.py text eol=lf
 /tests/test_target_classification.py text eol=lf
 /docs/findings/03_modeling/target_classification_20261115/* text eol=lf
+
+# Local web app sources and test fixtures are portable across platforms.
+/web/** text eol=lf
+/web/public/assets/*.png -text
+/web/public/assets/*.woff2 -text
+/.github/workflows/web.yml text eol=lf
+/.vercelignore text eol=lf
+/vercel.json text eol=lf
